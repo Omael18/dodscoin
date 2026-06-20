@@ -5,42 +5,148 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Dodscoin</title>
   <style>
-    :root{--bg:#0a0a0f;--card:#12121a;--ink:#f4f4f5;--muted:#a1a1aa;--accent:#facc15;--border:#24242e}
-    *{box-sizing:border-box}
-    body{margin:0;background:var(--bg);color:var(--ink);font-family:system-ui,-apple-system,Segoe UI,sans-serif;line-height:1.25}
-    .wrap{max-width:520px;margin:0 auto;padding:28px 18px 42px}
+    @import url('https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700&display=swap');
+    :root{--ink:#f4f4f5;--muted:#a1a1aa;--accent:#facc15;--card:rgba(15,15,25,0.85);--border:rgba(255,255,255,0.12)}
+    *{box-sizing:border-box;margin:0;padding:0}
+    body{font-family:'Fredoka',system-ui,-apple-system,sans-serif;line-height:1.25;overflow-x:hidden;min-height:100vh;color:var(--ink)}
+
+    /* SKY */
+    .sky{position:fixed;inset:0;z-index:0;background:linear-gradient(180deg,#070b1a 0%,#0c1445 40%,#162066 70%,#1a3a8a 100%);overflow:hidden}
+
+    /* STARS */
+    .stars{position:absolute;inset:0}
+    .star{position:absolute;width:3px;height:3px;background:#fff;border-radius:50%;opacity:.7}
+    .star:nth-child(1){top:8%;left:12%;animation:twinkle 2s infinite alternate}
+    .star:nth-child(2){top:15%;left:45%;width:2px;height:2px;animation:twinkle 3s infinite alternate}
+    .star:nth-child(3){top:5%;left:70%;animation:twinkle 2.5s infinite alternate}
+    .star:nth-child(4){top:20%;left:85%;width:2px;height:2px;animation:twinkle 1.8s infinite alternate}
+    .star:nth-child(5){top:12%;left:30%;animation:twinkle 2.2s infinite alternate}
+    .star:nth-child(6){top:3%;left:55%;width:2px;height:2px;animation:twinkle 3.5s infinite alternate}
+    .star:nth-child(7){top:25%;left:8%;animation:twinkle 2s infinite alternate}
+    .star:nth-child(8){top:18%;left:60%;width:2px;height:2px;animation:twinkle 2.8s infinite alternate}
+    @keyframes twinkle{0%{opacity:.3;transform:scale(.8)}100%{opacity:1;transform:scale(1.2)}}
+
+    /* MOON */
+    .moon{position:absolute;top:8%;right:12%;width:90px;height:90px;border-radius:50%;background:radial-gradient(circle at 35% 35%,#fff9c4,#fdd835,#f9a825);box-shadow:0 0 40px 15px rgba(253,216,53,0.3),0 0 80px 30px rgba(253,216,53,0.15);z-index:2}
+    .moon::after{content:'';position:absolute;top:20%;left:15%;width:25%;height:25%;border-radius:50%;background:rgba(245,193,7,0.5)}
+
+    /* ROCKET */
+    .rocket{position:absolute;top:22%;right:20%;z-index:3;animation:fly 4s ease-in-out infinite alternate}
+    .rocket svg{width:60px;height:auto;filter:drop-shadow(0 0 12px rgba(250,204,21,0.5))}
+    @keyframes fly{0%{transform:translateY(0) rotate(-15deg)}100%{transform:translateY(-18px) rotate(-10deg)}}
+
+    /* TRAIL */
+    .trail{position:absolute;top:30%;right:18%;z-index:1;animation:fly 4s ease-in-out infinite alternate}
+    .trail svg{width:50px;height:auto;opacity:.6}
+
+    /* SEA */
+    .sea{position:fixed;bottom:0;left:0;right:0;height:35vh;z-index:1}
+    .wave{position:absolute;bottom:0;width:200%;height:100%;animation:wave 8s linear infinite}
+    .wave svg{width:100%;height:100%}
+    .wave:nth-child(2){animation:wave 12s linear infinite reverse;opacity:.5;bottom:10px}
+    @keyframes wave{0%{transform:translateX(0)}100%{transform:translateX(-50%)}}
+
+    /* REFLECTION */
+    .reflection{position:fixed;bottom:0;left:0;right:0;height:35vh;z-index:0;background:linear-gradient(180deg,rgba(26,58,138,0.3) 0%,rgba(10,25,70,0.9) 100%);opacity:.4}
+
+    /* CONTENT */
+    .wrap{position:relative;z-index:10;max-width:420px;margin:0 auto;padding:36px 18px 50px;min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center}
     header{text-align:center;margin-bottom:22px}
-    .logo{width:84px;height:84px;border-radius:50%;border:2px solid var(--border);object-fit:cover}
-    h1{font-size:1.7rem;margin:12px 0 4px}
-    .sub{color:var(--muted);font-size:0.92rem}
-    .mint{display:block;word-break:break-all;color:var(--muted);font-size:0.78rem;margin-top:8px}
-    .links{display:grid;gap:12px}
-    a.link{display:flex;align-items:center;gap:12px;padding:14px 16px;background:var(--card);border:1px solid var(--border);color:var(--ink);text-decoration:none;border-radius:14px;transition:transform .12s ease, border-color .12s ease}
-    a.link:hover{transform:translateY(-1px);border-color:var(--accent)}
-    .icon{width:22px;height:22px;fill:currentColor}
-    .label{font-weight:700;flex:1}
-    .hint{color:var(--muted);font-size:0.78rem}
-    footer{margin-top:26px;text-align:center;color:var(--muted);font-size:0.78rem}
+    .logo{width:90px;height:90px;border-radius:50%;border:3px solid var(--accent);object-fit:cover;box-shadow:0 0 20px rgba(250,204,21,0.3)}
+    h1{font-size:2rem;margin:12px 0 4px;color:var(--accent);text-shadow:0 0 20px rgba(250,204,21,0.3)}
+    .sub{color:var(--muted);font-size:.88rem}
+    .mint{display:block;word-break:break-all;color:var(--muted);font-size:.72rem;margin-top:8px;font-family:monospace}
+    .links{display:grid;gap:10px;width:100%}
+    a.link{display:flex;align-items:center;gap:12px;padding:14px 16px;background:var(--card);border:1px solid var(--border);color:var(--ink);text-decoration:none;border-radius:14px;backdrop-filter:blur(12px);transition:transform .12s ease, border-color .12s ease}
+    a.link:hover{transform:translateY(-2px);border-color:var(--accent)}
+    .icon{width:22px;height:22px;fill:currentColor;flex-shrink:0}
+    .label{font-weight:600;flex:1;font-size:.95rem}
+    .hint{color:var(--muted);font-size:.72rem}
+    footer{margin-top:28px;text-align:center;color:var(--muted);font-size:.72rem}
+
+    /* REDUCED MOTION */
+    @media(prefers-reduced-motion:reduce){
+      .star,.rocket,.wave{animation:none!important}
+    }
   </style>
 </head>
 <body>
+  <!-- SKY -->
+  <div class="sky">
+    <div class="stars">
+      <div class="star"></div><div class="star"></div><div class="star"></div>
+      <div class="star"></div><div class="star"></div><div class="star"></div>
+      <div class="star"></div><div class="star"></div>
+    </div>
+    <div class="moon"></div>
+
+    <!-- ROCKET -->
+    <div class="rocket">
+      <svg viewBox="0 0 80 120" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <!-- body -->
+        <ellipse cx="40" cy="55" rx="18" ry="35" fill="#f4f4f5" stroke="#a1a1aa" stroke-width="2"/>
+        <!-- nose -->
+        <path d="M22 30 Q40 0 58 30" fill="#facc15" stroke="#eab308" stroke-width="2"/>
+        <!-- window -->
+        <circle cx="40" cy="45" r="8" fill="#60a5fa" stroke="#3b82f6" stroke-width="2"/>
+        <circle cx="37" cy="42" r="3" fill="rgba(255,255,255,0.5)"/>
+        <!-- fins -->
+        <path d="M22 75 L10 90 L22 85Z" fill="#facc15" stroke="#eab308" stroke-width="1.5"/>
+        <path d="M58 75 L70 90 L58 85Z" fill="#facc15" stroke="#eab308" stroke-width="1.5"/>
+        <!-- flame -->
+        <path d="M30 88 Q40 115 50 88" fill="#f97316" opacity="0.9"/>
+        <path d="M34 88 Q40 108 46 88" fill="#facc15"/>
+      </svg>
+    </div>
+
+    <!-- TRAIL SPARKLES -->
+    <div class="trail">
+      <svg viewBox="0 0 60 80" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <circle cx="30" cy="10" r="2" fill="#facc15" opacity="0.8"/>
+        <circle cx="25" cy="25" r="1.5" fill="#facc15" opacity="0.6"/>
+        <circle cx="35" cy="35" r="2" fill="#facc15" opacity="0.7"/>
+        <circle cx="28" cy="50" r="1.5" fill="#facc15" opacity="0.5"/>
+        <circle cx="32" cy="65" r="2" fill="#facc15" opacity="0.4"/>
+        <circle cx="26" cy="75" r="1" fill="#facc15" opacity="0.3"/>
+      </svg>
+    </div>
+  </div>
+
+  <!-- SEA -->
+  <div class="reflection"></div>
+  <div class="sea">
+    <div class="wave">
+      <svg viewBox="0 0 2400 200" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M0 80 Q300 20 600 80 T1200 80 T1800 80 T2400 80 V200 H0Z" fill="rgba(30,64,175,0.6)"/>
+        <path d="M0 100 Q300 50 600 100 T1200 100 T1800 100 T2400 100 V200 H0Z" fill="rgba(29,78,216,0.5)"/>
+        <path d="M0 130 Q300 90 600 130 T1200 130 T1800 130 T2400 130 V200 H0Z" fill="rgba(37,99,235,0.4)"/>
+      </svg>
+    </div>
+    <div class="wave">
+      <svg viewBox="0 0 2400 200" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M0 90 Q300 40 600 90 T1200 90 T1800 90 T2400 90 V200 H0Z" fill="rgba(59,130,246,0.3)"/>
+      </svg>
+    </div>
+  </div>
+
+  <!-- CONTENT -->
   <div class="wrap">
     <header>
       <img class="logo" src="https://plum-healthy-coral-227.mypinata.cloud/ipfs/bafybeigya3gh44dyl5k67yt4on4ralmbuteg3ol5z2fdx7hwftsawaf2xe" alt="Dodscoin" />
-      <h1>Dodscoin</h1>
-      <p class="sub">Solana Token-2022 meme coin</p>
+      <h1>DODSC</h1>
+      <p class="sub">Solana Token-2022 meme coin 🚀</p>
       <span class="mint">4nsq8dMuf6JqqaZpgbtCMVuRt9bYcrLS1Df5pGb4MWpx</span>
     </header>
 
     <div class="links">
       <a class="link" href="https://dexscreener.com/solana/gayrrdeoybdp2tcn6qc5dxqmx5aesockouum1zdvrymg" target="_blank" rel="noopener">
-        <svg class="icon" viewBox="0 0 24 24"><path d="M12 2a10 10 0 1 0 10 10A10 10 0 0 0 12 2Zm1 15h-2v-6h2Zm0-8h-2V7h2Z"/></svg>
+        <svg class="icon" viewBox="0 0 24 24"><path d="M3 3v18h18V3H3zm8 14H7v-4h4v4zm0-6H7V7h4v4zm6 6h-4v-4h4v4zm0-6h-4V7h4v4z"/></svg>
         <span class="label">Dexscreener</span>
         <span class="hint">Voir le cours</span>
       </a>
 
       <a class="link" href="https://raydium.io/swap/?inputMint=sol&outputMint=4nsq8dMuf6JqqaZpgbtCMVuRt9bYcrLS1Df5pGb4MWpx" target="_blank" rel="noopener">
-        <svg class="icon" viewBox="0 0 24 24"><path d="M4 4h16v16H4Z"/></svg>
+        <svg class="icon" viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
         <span class="label">Acheter sur Raydium</span>
         <span class="hint">Swap SOL → DODSC</span>
       </a>
@@ -60,6 +166,12 @@
       <a class="link" href="https://www.tiktok.com/@dodscoin2026" target="_blank" rel="noopener">
         <svg class="icon" viewBox="0 0 24 24"><path d="M16.6 5.82A4.3 4.3 0 0 1 14 6V3a6.3 6.3 0 0 0-5.9 3.8A4.28 4.28 0 0 0 8.2 11v.4a4.45 4.45 0 0 1-2.2-4.1V7.1a6.28 6.28 0 0 0-.7 3.5 6.12 6.12 0 0 0 6.2 6 6.2 6.2 0 0 0 5.5-3.4v-1.4a4.34 4.34 0 0 0 2.5 1.3V7.4a4.23 4.23 0 0 1-2.9-1.6Z"/></svg>
         <span class="label">TikTok</span>
+        <span class="hint">@dodscoin2026</span>
+      </a>
+
+      <a class="link" href="https://t.me/dodscoin2026" target="_blank" rel="noopener">
+        <svg class="icon" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm4.64 6.8c-.15 1.58-.8 5.42-1.13 7.19-.14.75-.42 1-.68 1.03-.58.05-1.02-.38-1.58-.75-.88-.58-1.38-.94-2.23-1.5-.99-.65-.35-1.01.22-1.59.15-.15 2.71-2.48 2.76-2.69a.2.2 0 00-.05-.18c-.06-.05-.14-.03-.21-.02-.09.02-1.49.95-4.22 2.79-.4.27-.76.41-1.08.4-.36-.01-1.04-.2-1.55-.37-.63-.2-1.12-.31-1.08-.66.02-.18.27-.36.74-.55 2.92-1.27 4.86-2.11 5.83-2.51 2.78-1.16 3.35-1.36 3.73-1.36.08 0 .27.02.39.12.1.08.13.19.14.27-.01.06.01.24 0 .38z"/></svg>
+        <span class="label">Telegram</span>
         <span class="hint">@dodscoin2026</span>
       </a>
     </div>
