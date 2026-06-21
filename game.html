@@ -25,7 +25,6 @@ body {
   min-height:100vh;
   overflow-x:hidden;
 }
-
 nav {
   position:sticky; top:0; z-index:100;
   background: rgba(10,22,40,0.95);
@@ -52,7 +51,6 @@ nav {
   color:var(--turquoise);
   background: rgba(0,201,167,0.15);
 }
-
 .page-header {
   text-align:center;
   padding:30px 20px 16px;
@@ -66,7 +64,6 @@ nav {
   background-clip:text;
 }
 .page-header p { color:var(--text); margin-top:8px; font-size:1rem; }
-
 .score-bar {
   display:flex; justify-content:space-between; align-items:center;
   flex-wrap:wrap; gap:8px;
@@ -85,8 +82,6 @@ nav {
 .score-bar .score-val { color:var(--turquoise); }
 .score-bar .height-val { color:#ffd54f; }
 .score-bar .best-val { color:#ff9800; }
-.score-bar .timer-val { color:#80deea; }
-
 .game-container {
   position:relative; z-index:1;
   max-width:820px;
@@ -101,7 +96,6 @@ nav {
   border: 2px solid rgba(0,201,167,0.3);
   cursor:pointer;
 }
-
 .instructions {
   text-align:center;
   padding:16px;
@@ -116,7 +110,6 @@ nav {
   border:1px solid rgba(255,255,255,0.2);
   font-family:'Fredoka',sans-serif;
 }
-
 .game-controls {
   display:flex; justify-content:center; align-items:center;
   gap:12px; padding:8px 0;
@@ -142,7 +135,6 @@ nav {
 }
 .game-controls .back-link { margin-right:auto; }
 .game-controls .reset-btn { margin-left:auto; }
-
 footer {
   position:relative; z-index:1;
   background: rgba(6,15,30,0.9);
@@ -173,7 +165,6 @@ footer {
   font-size:0.8rem;
   color:rgba(200,214,229,0.4);
 }
-
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after {
     animation-duration: 0.01ms !important;
@@ -196,14 +187,13 @@ footer {
 
 <div class="page-header">
   <h1>🐕 Dive the Dog — DODSC</h1>
-  <p>Press SPACE, click, or tap to dive!</p>
+  <p>Watch Lassie dive off the calanque into the Mediterranean!</p>
 </div>
 
 <div class="score-bar">
   <span>🐕 Dives: <span class="score-val" id="scoreVal">0</span></span>
-  <span>📏 Height: <span class="height-val" id="heightVal">12m</span></span>
+  <span>📏 Height: <span class="height-val" id="heightVal">30m</span></span>
   <span>🏆 Best: <span class="best-val" id="bestVal">0</span></span>
-  <span>⏱️ <span class="timer-val" id="timerVal">0.0s</span></span>
   <span id="stateLabel">Ready to dive!</span>
 </div>
 
@@ -217,7 +207,7 @@ footer {
 </div>
 
 <div class="instructions">
-  Desktop: <kbd>SPACE</kbd> or click &nbsp;|&nbsp; Mobile: tap anywhere
+  Press <kbd>SPACE</kbd> or tap to dive! &nbsp;Avoid the boat!
 </div>
 
 <footer>
@@ -235,14 +225,19 @@ footer {
 (function(){
   'use strict';
 
-  // ── Canvas setup with retina support ──
+  // ═══════════════════════════════════════════
+  //  CANVAS SETUP
+  // ═══════════════════════════════════════════
   const canvas = document.getElementById('gameCanvas');
   const ctx = canvas.getContext('2d');
   const dpr = window.devicePixelRatio || 1;
 
   const BASE_W = 800;
-  const BASE_H = 480; // 60% of 800
-  const WATER_Y = BASE_H * 0.58; // water line at ~58% of height
+  const BASE_H = 480;
+  const WATER_Y = BASE_H * 0.55; // water surface at ~55% of height
+  const CLIFF_W = 190;           // cliff width from left edge
+  const CLIFF_TOP = 0;           // cliff starts at very top of canvas
+  const CLIFF_BOTTOM = BASE_H + 20; // cliff goes below canvas
 
   function resizeCanvas() {
     const container = canvas.parentElement;
@@ -257,15 +252,18 @@ footer {
   resizeCanvas();
   window.addEventListener('resize', resizeCanvas);
 
-  // ── DOM refs ──
+  // ═══════════════════════════════════════════
+  //  DOM REFS
+  // ═══════════════════════════════════════════
   const scoreEl = document.getElementById('scoreVal');
   const heightEl = document.getElementById('heightVal');
   const bestEl = document.getElementById('bestVal');
-  const timerEl = document.getElementById('timerVal');
   const stateEl = document.getElementById('stateLabel');
   const resetBtn = document.getElementById('resetBtn');
 
-  // ── Audio (Web Audio API) ──
+  // ═══════════════════════════════════════════
+  //  AUDIO (Web Audio API)
+  // ═══════════════════════════════════════════
   const AudioCtx = window.AudioContext || window.webkitAudioContext;
   let audioCtx;
   function ensureAudio() { if(!audioCtx) audioCtx = new AudioCtx(); }
@@ -277,7 +275,6 @@ footer {
     const d = buf.getChannelData(0);
     for(let i=0; i<d.length; i++){
       const t = i/audioCtx.sampleRate;
-      // White noise with envelope + low-freq thump
       d[i] = (Math.random()*2-1)*Math.exp(-t*6)*0.35
             + Math.sin(t*80)*Math.exp(-t*10)*0.25;
     }
@@ -312,7 +309,6 @@ footer {
     const d = buf.getChannelData(0);
     for(let i=0; i<d.length; i++){
       const t = i/audioCtx.sampleRate;
-      // Bark: harmonics + noise burst
       d[i] = Math.sin(t*600)*Math.exp(-t*18)*0.3
             + Math.sin(t*1200)*Math.exp(-t*22)*0.15
             + (Math.random()*2-1)*Math.exp(-t*30)*0.1;
@@ -327,61 +323,62 @@ footer {
     src.start();
   }
 
-  function playWind(){
+  function playCrash(){
     ensureAudio();
-    const dur = 2.0;
+    const dur = 0.4;
     const buf = audioCtx.createBuffer(1, audioCtx.sampleRate*dur, audioCtx.sampleRate);
     const d = buf.getChannelData(0);
-    let val = 0;
     for(let i=0; i<d.length; i++){
       const t = i/audioCtx.sampleRate;
-      // Brown noise (wind-like)
-      val += (Math.random()*2-1)*0.02;
-      val *= 0.998;
-      d[i] = val * Math.sin(t*0.5)*0.5;
+      d[i] = (Math.random()*2-1)*Math.exp(-t*8)*0.5
+            + Math.sin(t*200)*Math.exp(-t*12)*0.3
+            + Math.sin(t*150)*Math.exp(-t*6)*0.2;
     }
     const src = audioCtx.createBufferSource();
     src.buffer = buf;
     const filt = audioCtx.createBiquadFilter();
     filt.type = 'lowpass';
-    filt.frequency.value = 300;
-    const gain = audioCtx.createGain();
-    gain.gain.value = 0.15;
-    src.connect(filt).connect(gain).connect(audioCtx.destination);
+    filt.frequency.value = 800;
+    src.connect(filt).connect(audioCtx.destination);
     src.start();
   }
 
-  // ── Game state ──
+  // ═══════════════════════════════════════════
+  //  GAME STATE
+  // ═══════════════════════════════════════════
   let dives = parseInt(localStorage.getItem('dods_dives') || '0');
   let bestDive = parseInt(localStorage.getItem('dods_best') || '0');
-  let dogState = 'idle'; // idle, diving, splashing, swimming, climbing
-  let dogX = 165, dogY = WATER_Y - 100;
+
+  // Dog state machine: 'idle' | 'diving' | 'splashing' | 'swimming' | 'climbing'
+  let dogState = 'idle';
+  let dogX = CLIFF_W - 30;    // sits near right edge of cliff top
+  let dogY = 50;               // sits on top edge
   let dogAngle = 0;
+  let diveStartX, diveStartY;
   let targetX, targetY;
-  let diveStartX = 165, diveStartY;
+  let diveTime = 0;
+  let swimTimer = 0;
+  let resetTimer = 0;
+  let climbProgress = 0;
+
+  // Boat
+  let boatX = 450;
+  let boatDir = 1;
+  let boatBobPhase = 0;
+  let boatWobble = 0;
+
+  // Effects
   let splashes = [];
   let bubbles = [];
   let ripples = [];
-  let fishList = [];
-  let clouds = [];
-  let seaweedList = [];
-  let pebbles = [];
-  let crabList = [];
+  let floatingText = []; // for SPLASH!/CRASH! text
+
+  // Environment
   let waterOffset = 0;
-  let swimTimer = 0;
-  let resetTimer = 0;
-  let diveTime = 0;
-  let diveTimerActive = false;
-  let windTimer = 0;
+  let sunAngle = 0;
 
-  // ── Cliff geometry (white limestone calanque) ──
-  const CLIFF_LEFT = 0;
-  const CLIFF_TOP = 20;
-  const CLIFF_WATER_X = 195; // where cliff meets water on the right side
-  const CLIFF_BOTTOM = WATER_Y + 30;
-
-  // ── Init entities ──
-  // Fish - 3+ types
+  // Fish
+  let fishList = [];
   const fishTypes = [
     { name:'dorade', color:'#FFD700', stripeColor:'#DAA520', size:10 },
     { name:'raie', color:'#87CEEB', stripeColor:'#4682B4', size:12 },
@@ -391,7 +388,7 @@ footer {
   for(let i=0; i<8; i++){
     const ft = fishTypes[i % fishTypes.length];
     fishList.push({
-      x: 100 + Math.random() * (BASE_W - 100),
+      x: CLIFF_W + 30 + Math.random() * (BASE_W - CLIFF_W - 60),
       y: WATER_Y + 30 + Math.random() * (BASE_H - WATER_Y - 60),
       speed: 0.3 + Math.random()*0.7,
       size: ft.size,
@@ -402,7 +399,8 @@ footer {
     });
   }
 
-  // Clouds - white fluffy daytime clouds
+  // Clouds
+  let clouds = [];
   for(let i=0; i<5; i++){
     clouds.push({
       x: i*180 + Math.random()*60,
@@ -415,9 +413,10 @@ footer {
   }
 
   // Seaweed
+  let seaweedList = [];
   for(let i=0; i<8; i++){
     seaweedList.push({
-      x: 120 + Math.random()*(BASE_W-120),
+      x: CLIFF_W + 40 + Math.random()*(BASE_W - CLIFF_W - 80),
       baseY: BASE_H - 5,
       height: 20 + Math.random()*40,
       phase: Math.random()*Math.PI*2,
@@ -426,29 +425,32 @@ footer {
   }
 
   // Pebbles on sandy bottom
+  let pebbles = [];
   for(let i=0; i<20; i++){
     pebbles.push({
-      x: 80 + Math.random()*(BASE_W-80),
+      x: CLIFF_W + 20 + Math.random()*(BASE_W - CLIFF_W - 40),
       y: BASE_H - 3 - Math.random()*8,
       r: 2 + Math.random()*4,
       color: `hsl(${30+Math.random()*20}, ${20+Math.random()*15}%, ${55+Math.random()*20}%)`
     });
   }
 
-  // Crabs
-  for(let i=0; i<2; i++){
-    crabList.push({
-      x: 250 + Math.random()*400,
-      y: BASE_H - 10,
-      dir: Math.random()>0.5 ? 1 : -1,
-      legPhase: Math.random()*Math.PI*2,
-      moveTimer: 0,
-      paused: false,
-      pauseTimer: 0
-    });
+  // ═══════════════════════════════════════════
+  //  CLIFF GEOMETRY (detailed profile)
+  // ═══════════════════════════════════════════
+  // Right edge of cliff at various heights
+  function cliffEdgeX(y) {
+    if (y < 30) return CLIFF_W;           // flat top
+    if (y < 60) return CLIFF_W + (y - 30) * 0.15; // slight overhang then inward
+    if (y < 120) return CLIFF_W + 5 + (y - 60) * 0.05;
+    if (y < 200) return CLIFF_W + 8 - (y - 120) * 0.1;
+    if (y < WATER_Y) return CLIFF_W - 4 - (y - 200) * 0.05;
+    return CLIFF_W - 8 + (y - WATER_Y) * 0.3; // base rocks widen
   }
 
-  // ── Splash / effects helpers ──
+  // ═══════════════════════════════════════════
+  //  EFFECTS HELPERS
+  // ═══════════════════════════════════════════
   function addSplash(x, y){
     // Water droplets
     for(let i=0; i<18; i++){
@@ -464,7 +466,7 @@ footer {
         isDroplet: true
       });
     }
-    // Foam ring
+    // Foam rings
     ripples.push({ x: x, y: y, radius: 5, maxRadius: 60, life: 1 });
     ripples.push({ x: x, y: y, radius: 2, maxRadius: 40, life: 1, delay: 0.15 });
     // Bubbles
@@ -493,10 +495,20 @@ footer {
     playBubble();
   }
 
-  // ── Drawing functions ──
+  function addFloatingText(x, y, text, color){
+    floatingText.push({
+      x: x, y: y,
+      text: text,
+      color: color,
+      life: 1,
+      vy: -1.5
+    });
+  }
 
+  // ═══════════════════════════════════════════
+  //  DRAWING: SKY
+  // ═══════════════════════════════════════════
   function drawSky(){
-    // Bright blue daytime sky gradient
     const grad = ctx.createLinearGradient(0, 0, 0, WATER_Y);
     grad.addColorStop(0, '#4A90D9');
     grad.addColorStop(0.5, '#6BB3E8');
@@ -513,6 +525,9 @@ footer {
     ctx.fillRect(0, WATER_Y-40, BASE_W, 40);
   }
 
+  // ═══════════════════════════════════════════
+  //  DRAWING: SUN (animated rays)
+  // ═══════════════════════════════════════════
   function drawSun(){
     const sx = BASE_W - 90, sy = 55, sr = 35;
     // Glow
@@ -530,7 +545,7 @@ footer {
     ctx.strokeStyle = 'rgba(255,210,80,0.3)';
     ctx.lineWidth = 2.5;
     for(let i=0; i<12; i++){
-      const a = (i/12)*Math.PI*2 + waterOffset*0.002;
+      const a = (i/12)*Math.PI*2 + sunAngle;
       ctx.beginPath();
       ctx.moveTo(sx + Math.cos(a)*(sr+6), sy + Math.sin(a)*(sr+6));
       ctx.lineTo(sx + Math.cos(a)*(sr+22), sy + Math.sin(a)*(sr+22));
@@ -545,6 +560,9 @@ footer {
     ctx.fill();
   }
 
+  // ═══════════════════════════════════════════
+  //  DRAWING: CLOUDS
+  // ═══════════════════════════════════════════
   function drawClouds(){
     for(const c of clouds){
       ctx.fillStyle = 'rgba(255,255,255,0.85)';
@@ -557,73 +575,55 @@ footer {
         ctx.ellipse(c.x+ox, c.y+oy, pr, c.h*(0.7+Math.sin(i)*0.3), 0, 0, Math.PI*2);
         ctx.fill();
       }
-      // Shadow
-      ctx.fillStyle = 'rgba(200,210,230,0.25)';
-      for(let i=0; i<c.puffs; i++){
-        const ox = (i - (c.puffs-1)/2) * pw * 0.6;
-        const oy = Math.sin(i*1.2)*5 + 6;
-        const pr = pw * (0.35 + Math.sin(i*0.8)*0.1);
-        ctx.beginPath();
-        ctx.ellipse(c.x+ox, c.y+oy, pr, c.h*0.4, 0, 0, Math.PI*2);
-        ctx.fill();
-      }
     }
   }
 
+  // ═══════════════════════════════════════════
+  //  DRAWING: CLIFF (white limestone, LEFT side)
+  // ═══════════════════════════════════════════
   function drawCliff(){
-    // Main white limestone body
     ctx.save();
-    const cliffGrad = ctx.createLinearGradient(0, CLIFF_TOP, 0, CLIFF_BOTTOM);
+
+    // Main limestone body gradient
+    const cliffGrad = ctx.createLinearGradient(0, 0, 0, CLIFF_BOTTOM);
     cliffGrad.addColorStop(0, '#F5F0E8');
-    cliffGrad.addColorStop(0.2, '#EDE6D8');
-    cliffGrad.addColorStop(0.4, '#E8DCC8');
-    cliffGrad.addColorStop(0.6, '#DDD0B8');
-    cliffGrad.addColorStop(0.8, '#D4C5A9');
+    cliffGrad.addColorStop(0.15, '#EDE6D8');
+    cliffGrad.addColorStop(0.3, '#E8DCC8');
+    cliffGrad.addColorStop(0.5, '#DDD0B8');
+    cliffGrad.addColorStop(0.7, '#D4C5A9');
     cliffGrad.addColorStop(1, '#C8B898');
     ctx.fillStyle = cliffGrad;
 
-    // Cliff shape - tall limestone calanque
+    // Build cliff shape: left=0, right edge follows cliffEdgeX(y)
     ctx.beginPath();
-    ctx.moveTo(0, CLIFF_TOP);
-    ctx.lineTo(200, CLIFF_TOP);
-    ctx.lineTo(215, CLIFF_TOP + 15);
-    ctx.lineTo(220, CLIFF_TOP + 50);
-    // Jagged cliff face
-    ctx.lineTo(218, CLIFF_TOP + 80);
-    ctx.lineTo(225, CLIFF_TOP + 110);
-    ctx.lineTo(220, CLIFF_TOP + 140);
-    ctx.lineTo(210, CLIFF_TOP + 170);
-    ctx.lineTo(200, CLIFF_TOP + 195);
-    ctx.lineTo(195, WATER_Y - 5);
-    // Base into water
-    ctx.lineTo(210, WATER_Y + 15);
-    ctx.lineTo(200, WATER_Y + 25);
-    ctx.lineTo(0, WATER_Y + 40);
-    ctx.lineTo(0, CLIFF_TOP);
+    ctx.moveTo(0, 0);
+    // Top edge across
+    ctx.lineTo(CLIFF_W, 0);
+    // Right edge going down with natural profile
+    const steps = 40;
+    for(let i=0; i<=steps; i++){
+      const y = (i/steps) * CLIFF_BOTTOM;
+      ctx.lineTo(cliffEdgeX(y), y);
+    }
+    // Bottom across and back up
+    ctx.lineTo(0, CLIFF_BOTTOM);
     ctx.closePath();
     ctx.fill();
 
-    // Horizontal strata layers
+    // Horizontal strata lines
     ctx.strokeStyle = 'rgba(160,140,110,0.25)';
     ctx.lineWidth = 1;
-    const strataCount = 20;
+    const strataCount = 22;
     for(let i=0; i<strataCount; i++){
-      const y = CLIFF_TOP + 20 + i * ((WATER_Y - CLIFF_TOP - 10) / strataCount);
-      if(y > WATER_Y) break;
-      // Calculate cliff edge x at this y
-      let edgeX = 200;
-      if(y < CLIFF_TOP + 50) edgeX = 200 + (y-CLIFF_TOP)*0.075;
-      else if(y < CLIFF_TOP + 110) edgeX = 220 - (y-CLIFF_TOP-50)*0.04;
-      else edgeX = 225 - (y-CLIFF_TOP-110)*0.15;
-
+      const y = 25 + i * ((CLIFF_BOTTOM - 20) / strataCount);
+      const ex = cliffEdgeX(y);
       const startX = 5 + Math.random()*10;
-      const endX = edgeX - 10 - Math.random()*10;
+      const endX = ex - 8 - Math.random()*8;
       if(endX > startX + 20){
         ctx.beginPath();
         ctx.moveTo(startX, y + Math.random()*2);
-        // Slightly wavy line
-        for(let x = startX; x < endX; x += 15){
-          ctx.lineTo(x, y + Math.sin(x*0.05+i)*2);
+        for(let x = startX; x < endX; x += 12){
+          ctx.lineTo(x, y + Math.sin(x*0.05+i)*1.5);
         }
         ctx.stroke();
       }
@@ -632,9 +632,9 @@ footer {
     // Small cracks
     ctx.strokeStyle = 'rgba(120,100,75,0.2)';
     ctx.lineWidth = 0.8;
-    for(let i=0; i<8; i++){
-      const cx = 30 + Math.random()*160;
-      const cy = CLIFF_TOP + 30 + Math.random()*150;
+    for(let i=0; i<10; i++){
+      const cx = 20 + Math.random()*140;
+      const cy = 30 + Math.random()*180;
       ctx.beginPath();
       ctx.moveTo(cx, cy);
       let rx = cx, ry = cy;
@@ -646,51 +646,43 @@ footer {
       ctx.stroke();
     }
 
-    // Moss / lichen patches on top edges
-    const mossColors = ['#5a8a5a', '#6b9a4a', '#4a7a3a', '#7aaa5a'];
-    for(let i=0; i<12; i++){
-      const mx = 60 + Math.random()*150;
-      const my = CLIFF_TOP + Math.random()*15;
-      const mw = 8 + Math.random()*15;
-      const mh = 3 + Math.random()*5;
-      ctx.fillStyle = mossColors[i % mossColors.length];
-      ctx.globalAlpha = 0.5 + Math.random()*0.3;
+    // Tiny bit of green on very top edge (simple, no animation)
+    ctx.fillStyle = '#7aaa5a';
+    ctx.globalAlpha = 0.5;
+    for(let i=0; i<8; i++){
+      const mx = 30 + Math.random()*140;
+      const my = 2 + Math.random()*5;
+      const mw = 6 + Math.random()*12;
       ctx.beginPath();
-      ctx.ellipse(mx, my, mw, mh, Math.random()*0.3, 0, Math.PI*2);
+      ctx.ellipse(mx, my, mw, 2+Math.random()*2, 0, 0, Math.PI*2);
       ctx.fill();
     }
     ctx.globalAlpha = 1;
 
-    // Wild herbs / garrigue on top
-    ctx.strokeStyle = '#5a7a3a';
-    ctx.lineWidth = 1.2;
-    for(let i=0; i<30; i++){
-      const hx = 20 + Math.random()*180;
-      const hy = CLIFF_TOP + 2 + Math.random()*10;
-      const hh = 5 + Math.random()*10;
-      const sway = Math.sin(waterOffset*0.02 + i)*2;
-      ctx.beginPath();
-      ctx.moveTo(hx, hy);
-      ctx.quadraticCurveTo(hx+sway, hy-hh/2, hx+sway*1.5, hy-hh);
-      ctx.stroke();
-      // Small leaves
-      if(Math.random()>0.5){
-        ctx.fillStyle = '#6a9a4a';
-        ctx.beginPath();
-        ctx.ellipse(hx+sway*1.2, hy-hh*0.8, 2, 1, Math.random(), 0, Math.PI*2);
-        ctx.fill();
-      }
+    // Light hit on right cliff face
+    ctx.fillStyle = 'rgba(255,255,240,0.1)';
+    const faceStart = 40;
+    ctx.beginPath();
+    ctx.moveTo(cliffEdgeX(faceStart) - 5, faceStart);
+    ctx.lineTo(cliffEdgeX(faceStart) + 3, faceStart);
+    for(let y = faceStart; y < WATER_Y + 20; y += 5){
+      ctx.lineTo(cliffEdgeX(y) + 3, y);
     }
+    for(let y = WATER_Y + 20; y >= faceStart; y -= 5){
+      ctx.lineTo(cliffEdgeX(y) - 5, y);
+    }
+    ctx.closePath();
+    ctx.fill();
 
-    // Rocks at cliff base in water
-    const rockColors = ['#C8B898', '#B8A888', '#A89878'];
+    // Rocks/boulders at base where cliff meets water
+    const rockColors = ['#C8B898', '#B8A888', '#A89878', '#D4C5A9'];
     const baseRocks = [
-      {x:205, y:WATER_Y+8, r:14},
-      {x:228, y:WATER_Y+5, r:10},
-      {x:245, y:WATER_Y+12, r:8},
-      {x:255, y:WATER_Y+2, r:12},
-      {x:190, y:WATER_Y+15, r:6},
-      {x:270, y:WATER_Y+8, r:7},
+      {x: cliffEdgeX(WATER_Y+8), y: WATER_Y+8, r: 14},
+      {x: cliffEdgeX(WATER_Y+5)+15, y: WATER_Y+5, r: 10},
+      {x: cliffEdgeX(WATER_Y+12)+25, y: WATER_Y+12, r: 8},
+      {x: cliffEdgeX(WATER_Y+2)+35, y: WATER_Y+2, r: 12},
+      {x: cliffEdgeX(WATER_Y+15)+5, y: WATER_Y+15, r: 6},
+      {x: cliffEdgeX(WATER_Y+8)+45, y: WATER_Y+8, r: 7},
     ];
     for(const br of baseRocks){
       ctx.fillStyle = rockColors[Math.floor(Math.random()*rockColors.length)];
@@ -704,38 +696,12 @@ footer {
       ctx.fill();
     }
 
-    // Cliff face - light hit on right side
-    ctx.fillStyle = 'rgba(255,255,240,0.08)';
-    ctx.beginPath();
-    ctx.moveTo(195, CLIFF_TOP+40);
-    ctx.lineTo(225, CLIFF_TOP+60);
-    ctx.lineTo(215, CLIFF_TOP+130);
-    ctx.lineTo(200, WATER_Y);
-    ctx.lineTo(195, WATER_Y);
-    ctx.lineTo(195, CLIFF_TOP+40);
-    ctx.closePath();
-    ctx.fill();
-
     ctx.restore();
   }
 
-  function drawWaterSurface(){
-    // Wavy surface line
-    ctx.beginPath();
-    ctx.moveTo(0, WATER_Y);
-    for(let x=0; x<=BASE_W; x+=3){
-      const wave1 = Math.sin((x+waterOffset)*0.018)*4;
-      const wave2 = Math.sin((x+waterOffset)*0.04)*2;
-      const wave3 = Math.sin((x+waterOffset)*0.008)*3;
-      ctx.lineTo(x, WATER_Y + wave1 + wave2 + wave3);
-    }
-    ctx.lineTo(BASE_W, WATER_Y + 10);
-    ctx.lineTo(0, WATER_Y + 10);
-    ctx.closePath();
-    ctx.fillStyle = 'rgba(64,224,208,0.6)';
-    ctx.fill();
-  }
-
+  // ═══════════════════════════════════════════
+  //  DRAWING: WATER (to the RIGHT of cliff)
+  // ═══════════════════════════════════════════
   function drawWater(){
     // Main water body - turquoise gradient
     const grad = ctx.createLinearGradient(0, WATER_Y, 0, BASE_H);
@@ -747,34 +713,30 @@ footer {
     ctx.fillStyle = grad;
 
     ctx.beginPath();
-    ctx.moveTo(0, WATER_Y);
-    for(let x=0; x<=BASE_W; x+=3){
+    // Start at cliff edge at water level
+    const startX = cliffEdgeX(WATER_Y);
+    ctx.moveTo(startX, WATER_Y);
+    // Wavy surface to the right
+    for(let x = startX; x <= BASE_W; x += 3){
       const wave = Math.sin((x+waterOffset)*0.018)*4
                  + Math.sin((x+waterOffset)*0.04)*2
                  + Math.sin((x+waterOffset)*0.008)*3;
       ctx.lineTo(x, WATER_Y + wave);
     }
     ctx.lineTo(BASE_W, BASE_H);
-    ctx.lineTo(0, BASE_H);
+    ctx.lineTo(startX, BASE_H);
     ctx.closePath();
     ctx.fill();
 
-    // Sandy bottom
+    // Sandy bottom (only in water area)
     const sandGrad = ctx.createLinearGradient(0, BASE_H-25, 0, BASE_H);
     sandGrad.addColorStop(0, 'rgba(244,228,193,0)');
     sandGrad.addColorStop(0.4, 'rgba(244,228,193,0.3)');
     sandGrad.addColorStop(1, 'rgba(244,228,193,0.6)');
     ctx.fillStyle = sandGrad;
-    ctx.fillRect(0, BASE_H-25, BASE_W, 25);
+    ctx.fillRect(CLIFF_W - 20, BASE_H-25, BASE_W - CLIFF_W + 20, 25);
 
-    // Sand texture
-    ctx.fillStyle = 'rgba(244,228,193,0.15)';
-    for(let x=0; x<BASE_W; x+=8){
-      const h = 2 + Math.sin(x*0.3)*1.5;
-      ctx.fillRect(x, BASE_H-h, 6, h);
-    }
-
-    // Pebbles on bottom
+    // Pebbles
     for(const p of pebbles){
       ctx.fillStyle = p.color;
       ctx.beginPath();
@@ -787,7 +749,7 @@ footer {
     ctx.globalAlpha = 0.07;
     ctx.fillStyle = '#ffffff';
     for(let i=0; i<6; i++){
-      const rx = 80 + i*120 + Math.sin(waterOffset*0.005+i)*15;
+      const rx = CLIFF_W + 60 + i*95 + Math.sin(waterOffset*0.005+i)*15;
       const topW = 15 + Math.sin(i*2)*5;
       const botW = 50 + Math.sin(i*3)*20;
       ctx.beginPath();
@@ -801,9 +763,10 @@ footer {
     ctx.restore();
 
     // Foam where water meets cliff
+    const foamX = cliffEdgeX(WATER_Y);
     ctx.fillStyle = 'rgba(255,255,255,0.5)';
-    for(let i=0; i<10; i++){
-      const fx = 195 + Math.random()*30;
+    for(let i=0; i<12; i++){
+      const fx = foamX + Math.random()*25;
       const fy = WATER_Y - 2 + Math.random()*6;
       const fw = 5 + Math.random()*10;
       ctx.beginPath();
@@ -816,15 +779,18 @@ footer {
     ctx.lineWidth = 1.5;
     for(let i=0; i<3; i++){
       ctx.beginPath();
-      const startX = 250 + i*150;
-      for(let x=startX; x<startX+60; x+=3){
+      const startX2 = CLIFF_W + 60 + i*150;
+      for(let x=startX2; x<startX2+60; x+=3){
         const wy = WATER_Y + Math.sin((x+waterOffset)*0.018)*4 - 2;
-        if(x===startX) ctx.moveTo(x, wy); else ctx.lineTo(x, wy);
+        if(x===startX2) ctx.moveTo(x, wy); else ctx.lineTo(x, wy);
       }
       ctx.stroke();
     }
   }
 
+  // ═══════════════════════════════════════════
+  //  DRAWING: SEAWEED
+  // ═══════════════════════════════════════════
   function drawSeaweed(){
     for(const sw of seaweedList){
       const t = waterOffset * 0.015;
@@ -840,7 +806,6 @@ footer {
         ctx.lineTo(sw.x + sway, sw.baseY - sw.height * frac);
       }
       ctx.stroke();
-
       // Leaf tips
       ctx.fillStyle = sw.color;
       const tipSway = Math.sin(t + sw.phase + 2) * 8;
@@ -850,24 +815,24 @@ footer {
     }
   }
 
+  // ═══════════════════════════════════════════
+  //  DRAWING: FISH
+  // ═══════════════════════════════════════════
   function drawFish(){
     for(const f of fishList){
       ctx.save();
       ctx.translate(f.x, f.y);
       ctx.scale(f.dir, 1);
-
       // Body
       ctx.fillStyle = f.color;
       ctx.beginPath();
       ctx.ellipse(0, 0, f.size, f.size*0.45, 0, 0, Math.PI*2);
       ctx.fill();
-
       // Stripe
       ctx.fillStyle = f.stripeColor;
       ctx.beginPath();
       ctx.ellipse(f.size*0.1, 0, f.size*0.3, f.size*0.35, 0, 0, Math.PI*2);
       ctx.fill();
-
       // Tail
       ctx.fillStyle = f.color;
       ctx.beginPath();
@@ -876,15 +841,13 @@ footer {
       ctx.lineTo(-f.size-8, 6);
       ctx.closePath();
       ctx.fill();
-
-      // Fin on top
+      // Fin
       ctx.beginPath();
       ctx.moveTo(-2, -f.size*0.4);
       ctx.lineTo(3, -f.size*0.7);
       ctx.lineTo(6, -f.size*0.35);
       ctx.closePath();
       ctx.fill();
-
       // Eye
       ctx.fillStyle = 'white';
       ctx.beginPath();
@@ -894,289 +857,332 @@ footer {
       ctx.beginPath();
       ctx.arc(f.size*0.45, -1, 1.3, 0, Math.PI*2);
       ctx.fill();
-
       ctx.restore();
     }
   }
 
-  function drawCrab(){
-    for(const c of crabList){
-      ctx.save();
-      ctx.translate(c.x, c.y);
-      ctx.scale(c.dir, 1);
+  // ═══════════════════════════════════════════
+  //  DRAWING: BOAT (Pointu Provençal)
+  // ═══════════════════════════════════════════
+  function drawBoat(){
+    const bx = boatX;
+    const by = WATER_Y - 2 + Math.sin(boatBobPhase)*3;
+    const wobbleAngle = Math.sin(boatWobble)*0.15;
 
-      // Body
-      ctx.fillStyle = '#D44';
-      ctx.beginPath();
-      ctx.ellipse(0, 0, 7, 5, 0, 0, Math.PI*2);
-      ctx.fill();
+    ctx.save();
+    ctx.translate(bx, by);
+    ctx.rotate(wobbleAngle);
 
-      // Legs
-      ctx.strokeStyle = '#C33';
-      ctx.lineWidth = 1.2;
-      const legSpread = [0.3, 0.6, 0.9];
-      for(const s of legSpread){
-        const ly = Math.sin(c.legPhase + s*5)*2;
-        ctx.beginPath();
-        ctx.moveTo(-3*s, 5);
-        ctx.lineTo(-5*s, 9+ly);
-        ctx.stroke();
-        ctx.beginPath();
-        ctx.moveTo(3*s, 5);
-        ctx.lineTo(5*s, 9+ly);
-        ctx.stroke();
-      }
+    // Hull - wooden pointed boat
+    ctx.fillStyle = '#8B6914';
+    ctx.beginPath();
+    ctx.moveTo(-35, 0);
+    ctx.quadraticCurveTo(-38, 8, -30, 12);
+    ctx.lineTo(25, 12);
+    ctx.quadraticCurveTo(42, 8, 45, 0);
+    ctx.quadraticCurveTo(42, -4, 25, -3);
+    ctx.lineTo(-30, -3);
+    ctx.quadraticCurveTo(-38, -4, -35, 0);
+    ctx.closePath();
+    ctx.fill();
 
-      // Claws
-      ctx.fillStyle = '#E55';
-      ctx.beginPath();
-      ctx.ellipse(8, -1, 3, 2, 0.2, 0, Math.PI*2);
-      ctx.fill();
-      ctx.beginPath();
-      ctx.ellipse(8, 3, 3, 2, -0.2, 0, Math.PI*2);
-      ctx.fill();
+    // Hull stripe
+    ctx.strokeStyle = '#6B4914';
+    ctx.lineWidth = 1.5;
+    ctx.beginPath();
+    ctx.moveTo(-30, 5);
+    ctx.lineTo(30, 5);
+    ctx.stroke();
 
-      // Eyes
-      ctx.fillStyle = '#111';
-      ctx.beginPath();
-      ctx.arc(5, -3, 1, 0, Math.PI*2);
-      ctx.fill();
-      ctx.beginPath();
-      ctx.arc(5, 3, 1, 0, Math.PI*2);
-      ctx.fill();
+    // Bow (pointed front)
+    ctx.fillStyle = '#9B7924';
+    ctx.beginPath();
+    ctx.moveTo(45, 0);
+    ctx.lineTo(55, -1);
+    ctx.lineTo(45, 5);
+    ctx.closePath();
+    ctx.fill();
 
-      ctx.restore();
-    }
+    // Mast
+    ctx.strokeStyle = '#5C4033';
+    ctx.lineWidth = 2.5;
+    ctx.beginPath();
+    ctx.moveTo(5, -3);
+    ctx.lineTo(5, -55);
+    ctx.stroke();
+
+    // Sail (white triangle)
+    ctx.fillStyle = '#FFFFFF';
+    ctx.globalAlpha = 0.9;
+    ctx.beginPath();
+    ctx.moveTo(5, -50);
+    ctx.lineTo(5, -10);
+    ctx.lineTo(35, -15);
+    ctx.closePath();
+    ctx.fill();
+    ctx.globalAlpha = 1;
+
+    // Red/white striped canopy hint
+    ctx.fillStyle = '#E63946';
+    ctx.globalAlpha = 0.6;
+    ctx.fillRect(-20, -8, 40, 3);
+    ctx.globalAlpha = 1;
+
+    // Interior seat
+    ctx.fillStyle = '#7B5914';
+    ctx.fillRect(-15, -2, 30, 5);
+
+    ctx.restore();
   }
 
-  // ── Dog drawing (Border Collie / Rough Collie - Lassie style) ──
+  // ═══════════════════════════════════════════
+  //  DRAWING: COLLIE/LASSIE DOG
+  // ═══════════════════════════════════════════
+  // Sable/brown colors
+  const SABLE = '#B8860B';      // dark goldenrod / sable
+  const SABLE_LIGHT = '#C4883A'; // lighter sable
+  const SABLE_DARK = '#8B6508';  // darker sable
+  const WHITE = '#FFFFFF';
+  const WHITE_WARM = '#F8F4EE';
+
   function drawCollie(){
     ctx.save();
     ctx.translate(dogX, dogY);
     ctx.rotate(dogAngle);
 
-    const isIdle = dogState === 'idle';
-    const isSwimming = dogState === 'swimming';
-    const isDiving = dogState === 'diving';
-    const isClimbing = dogState === 'climbing';
-
-    // Body scale
-    const sx = isDiving ? 1.1 : 1;
-    const sy = isDiving ? 0.9 : 1;
-    ctx.scale(sx, sy);
-
-    if(isIdle){
-      drawCollieSitting();
-    } else if(isDiving){
-      drawCollieDiving();
-    } else if(isSwimming){
-      drawCollieSwimming();
-    } else if(isClimbing){
-      drawCollieClimbing();
-    }
+    if(dogState === 'idle') drawCollieSitting();
+    else if(dogState === 'diving') drawCollieDiving();
+    else if(dogState === 'swimming') drawCollieSwimming();
+    else if(dogState === 'climbing') drawCollieClimbing();
 
     ctx.restore();
   }
 
   function drawCollieSitting(){
-    // Sitting collie on cliff edge, looking toward water
+    // ── SITTING COLLIE on cliff edge, looking right ──
 
-    // Tail - fluffy, waving
+    // Tail - bushy, curving upward, white tip, gently waving
     const tailWave = Math.sin(Date.now()*0.004)*8;
-    ctx.strokeStyle = '#1a1a1a';
-    ctx.lineWidth = 6;
+    ctx.strokeStyle = SABLE;
+    ctx.lineWidth = 7;
     ctx.lineCap = 'round';
     ctx.beginPath();
-    ctx.moveTo(-15, 5);
-    ctx.quadraticCurveTo(-28, -5+tailWave, -30, -18+tailWave);
+    ctx.moveTo(-18, 5);
+    ctx.quadraticCurveTo(-30, -8+tailWave, -32, -22+tailWave);
     ctx.stroke();
+    // Bushy fur strokes on tail
+    ctx.strokeStyle = SABLE_DARK;
+    ctx.lineWidth = 1;
+    for(let i=0; i<5; i++){
+      const f = i/5;
+      const tx = -18 + f*(-14);
+      const ty = 5 + f*(-27+tailWave);
+      ctx.beginPath();
+      ctx.moveTo(tx, ty);
+      ctx.lineTo(tx-3+Math.random()*2, ty-2);
+      ctx.stroke();
+    }
     // White tip
-    ctx.strokeStyle = '#fff';
+    ctx.strokeStyle = WHITE;
     ctx.lineWidth = 4;
     ctx.beginPath();
-    ctx.moveTo(-29, -15+tailWave);
-    ctx.lineTo(-31, -20+tailWave);
+    ctx.moveTo(-30, -18+tailWave);
+    ctx.lineTo(-33, -24+tailWave);
     ctx.stroke();
 
-    // Back legs (sitting)
-    ctx.strokeStyle = '#1a1a1a';
+    // Back legs (sitting position)
+    ctx.strokeStyle = SABLE;
     ctx.lineWidth = 5;
+    ctx.lineCap = 'round';
     ctx.beginPath();
-    ctx.moveTo(-10, 12);
-    ctx.quadraticCurveTo(-15, 18, -12, 24);
+    ctx.moveTo(-12, 12);
+    ctx.quadraticCurveTo(-16, 18, -13, 24);
     ctx.stroke();
     ctx.beginPath();
-    ctx.moveTo(0, 14);
-    ctx.quadraticCurveTo(-5, 20, -2, 24);
+    ctx.moveTo(-2, 14);
+    ctx.quadraticCurveTo(-6, 20, -3, 24);
     ctx.stroke();
-    // White paws
-    ctx.strokeStyle = '#fff';
+    // White socks on back paws
+    ctx.strokeStyle = WHITE;
     ctx.lineWidth = 3.5;
     ctx.beginPath();
-    ctx.moveTo(-13, 23);
-    ctx.lineTo(-11, 26);
+    ctx.moveTo(-14, 23);
+    ctx.lineTo(-12, 26);
     ctx.stroke();
     ctx.beginPath();
-    ctx.moveTo(-3, 23);
-    ctx.lineTo(-1, 26);
+    ctx.moveTo(-4, 23);
+    ctx.lineTo(-2, 26);
     ctx.stroke();
 
-    // Body - black with white chest
-    ctx.fillStyle = '#1a1a1a';
+    // Body - elongated, elegant
+    ctx.fillStyle = SABLE;
     ctx.beginPath();
-    ctx.ellipse(0, 4, 20, 14, 0, 0, Math.PI*2);
+    ctx.ellipse(0, 4, 22, 14, 0, 0, Math.PI*2);
     ctx.fill();
 
-    // White chest/belly
-    ctx.fillStyle = '#f0f0f0';
-    ctx.beginPath();
-    ctx.ellipse(5, 8, 12, 8, 0.2, 0, Math.PI*2);
-    ctx.fill();
-
-    // Fur texture strokes on body
-    ctx.strokeStyle = 'rgba(40,40,40,0.3)';
+    // Body fur strokes (long flowing fur)
+    ctx.strokeStyle = SABLE_DARK;
     ctx.lineWidth = 0.8;
-    for(let i=0; i<8; i++){
-      const fx = -12+i*4;
-      const fy = 0+Math.sin(i)*6;
+    for(let i=0; i<10; i++){
+      const fx = -16+i*4;
+      const fy = -2+Math.sin(i*0.7)*8;
       ctx.beginPath();
       ctx.moveTo(fx, fy);
-      ctx.lineTo(fx+2, fy+4);
+      ctx.quadraticCurveTo(fx+1, fy+5, fx+2, fy+9);
       ctx.stroke();
     }
-
-    // White collar/mane (collie characteristic)
-    ctx.fillStyle = '#f8f8f8';
-    ctx.beginPath();
-    ctx.ellipse(12, -2, 8, 10, 0.3, 0, Math.PI*2);
-    ctx.fill();
-    // Fur strokes on collar
-    ctx.strokeStyle = 'rgba(220,220,220,0.5)';
-    ctx.lineWidth = 0.7;
-    for(let i=0; i<6; i++){
-      const a = -0.8+i*0.35;
+    // Lighter fur strokes
+    ctx.strokeStyle = SABLE_LIGHT;
+    ctx.lineWidth = 0.6;
+    for(let i=0; i<8; i++){
+      const fx = -12+i*4;
+      const fy = 0+Math.sin(i*0.9)*7;
       ctx.beginPath();
-      ctx.moveTo(12+Math.cos(a)*5, -2+Math.sin(a)*7);
-      ctx.lineTo(12+Math.cos(a)*8, -2+Math.sin(a)*10);
+      ctx.moveTo(fx, fy);
+      ctx.lineTo(fx+1, fy+6);
       ctx.stroke();
     }
 
-    // Head
-    ctx.fillStyle = '#1a1a1a';
+    // White chest/mane (big fluffy white area)
+    ctx.fillStyle = WHITE_WARM;
     ctx.beginPath();
-    ctx.ellipse(18, -8, 12, 10, 0, 0, Math.PI*2);
+    ctx.ellipse(14, 4, 10, 12, 0.2, 0, Math.PI*2);
+    ctx.fill();
+    // Fluffy fur strokes on chest
+    ctx.strokeStyle = 'rgba(240,240,245,0.6)';
+    ctx.lineWidth = 0.7;
+    for(let i=0; i<8; i++){
+      const a = -1.0+i*0.3;
+      ctx.beginPath();
+      ctx.moveTo(14+Math.cos(a)*6, 4+Math.sin(a)*8);
+      ctx.lineTo(14+Math.cos(a)*10, 4+Math.sin(a)*12);
+      ctx.stroke();
+    }
+
+    // White belly
+    ctx.fillStyle = WHITE_WARM;
+    ctx.beginPath();
+    ctx.ellipse(2, 10, 14, 6, 0, 0, Math.PI*2);
     ctx.fill();
 
-    // White blaze on face (collie marking)
-    ctx.fillStyle = '#f8f8f8';
+    // Head - elongated, elegant
+    ctx.fillStyle = SABLE;
     ctx.beginPath();
-    ctx.moveTo(22, -14);
-    ctx.lineTo(26, -6);
-    ctx.lineTo(22, -2);
-    ctx.lineTo(18, -6);
-    ctx.lineTo(20, -14);
+    ctx.ellipse(20, -8, 13, 11, 0, 0, Math.PI*2);
+    ctx.fill();
+
+    // White blaze on face (collie signature)
+    ctx.fillStyle = WHITE_WARM;
+    ctx.beginPath();
+    ctx.moveTo(24, -16);
+    ctx.lineTo(28, -6);
+    ctx.lineTo(24, -2);
+    ctx.lineTo(20, -6);
+    ctx.lineTo(22, -16);
     ctx.closePath();
     ctx.fill();
 
-    // Long snout (collie characteristic)
-    ctx.fillStyle = '#222';
+    // Long narrow snout (collie characteristic)
+    ctx.fillStyle = SABLE_DARK;
     ctx.beginPath();
-    ctx.ellipse(28, -5, 8, 5, 0.1, 0, Math.PI*2);
+    ctx.ellipse(32, -5, 9, 5, 0.1, 0, Math.PI*2);
     ctx.fill();
     // White on snout
-    ctx.fillStyle = '#ddd';
+    ctx.fillStyle = WHITE_WARM;
     ctx.beginPath();
-    ctx.ellipse(28, -3, 5, 3, 0, 0, Math.PI*2);
+    ctx.ellipse(32, -3, 5, 3, 0, 0, Math.PI*2);
     ctx.fill();
 
     // Nose
     ctx.fillStyle = '#111';
     ctx.beginPath();
-    ctx.arc(35, -5, 2.5, 0, Math.PI*2);
+    ctx.arc(40, -5, 2.5, 0, Math.PI*2);
     ctx.fill();
 
     // Mouth
-    ctx.strokeStyle = '#333';
+    ctx.strokeStyle = '#444';
     ctx.lineWidth = 1;
     ctx.beginPath();
-    ctx.moveTo(35, -3);
-    ctx.quadraticCurveTo(32, 0, 28, -1);
+    ctx.moveTo(40, -3);
+    ctx.quadraticCurveTo(36, 0, 32, -1);
     ctx.stroke();
 
-    // Eyes - bright intelligent
+    // Eyes - warm brown, intelligent
     // Left eye
     ctx.fillStyle = '#fff';
     ctx.beginPath();
-    ctx.ellipse(22, -10, 4, 4.5, 0, 0, Math.PI*2);
+    ctx.ellipse(24, -10, 4, 4.5, 0, 0, Math.PI*2);
     ctx.fill();
-    ctx.fillStyle = '#4a2800';
+    ctx.fillStyle = '#6B3A1F';
     ctx.beginPath();
-    ctx.arc(23, -10, 2.8, 0, Math.PI*2);
+    ctx.arc(25, -10, 2.8, 0, Math.PI*2);
     ctx.fill();
     ctx.fillStyle = '#111';
     ctx.beginPath();
-    ctx.arc(23.5, -10, 1.5, 0, Math.PI*2);
+    ctx.arc(25.5, -10, 1.5, 0, Math.PI*2);
     ctx.fill();
-    // Highlight
     ctx.fillStyle = '#fff';
     ctx.beginPath();
-    ctx.arc(24.5, -11, 0.8, 0, Math.PI*2);
+    ctx.arc(26.5, -11, 0.8, 0, Math.PI*2);
     ctx.fill();
 
     // Right eye
     ctx.fillStyle = '#fff';
     ctx.beginPath();
-    ctx.ellipse(15, -10, 3.5, 4, 0, 0, Math.PI*2);
+    ctx.ellipse(17, -10, 3.5, 4, 0, 0, Math.PI*2);
     ctx.fill();
-    ctx.fillStyle = '#4a2800';
+    ctx.fillStyle = '#6B3A1F';
     ctx.beginPath();
-    ctx.arc(14.5, -10, 2.5, 0, Math.PI*2);
+    ctx.arc(16.5, -10, 2.5, 0, Math.PI*2);
     ctx.fill();
     ctx.fillStyle = '#111';
     ctx.beginPath();
-    ctx.arc(14, -10, 1.3, 0, Math.PI*2);
+    ctx.arc(16, -10, 1.3, 0, Math.PI*2);
     ctx.fill();
     ctx.fillStyle = '#fff';
     ctx.beginPath();
-    ctx.arc(15, -11, 0.7, 0, Math.PI*2);
+    ctx.arc(17, -11, 0.7, 0, Math.PI*2);
     ctx.fill();
 
-    // Pointed erect ears (collie characteristic)
+    // Pointed erect ears with tips folded forward (collie trait!)
     // Left ear
-    ctx.fillStyle = '#1a1a1a';
+    ctx.fillStyle = SABLE;
     ctx.beginPath();
-    ctx.moveTo(13, -16);
-    ctx.lineTo(8, -28);
-    ctx.lineTo(16, -18);
+    ctx.moveTo(14, -17);
+    ctx.lineTo(9, -30);
+    ctx.lineTo(7, -28); // folded tip
+    ctx.lineTo(13, -19);
     ctx.closePath();
     ctx.fill();
-    // Inner ear
     ctx.fillStyle = '#8B6F5E';
     ctx.beginPath();
-    ctx.moveTo(13, -17);
-    ctx.lineTo(10, -25);
-    ctx.lineTo(15, -19);
+    ctx.moveTo(14, -18);
+    ctx.lineTo(11, -26);
+    ctx.lineTo(10, -24);
+    ctx.lineTo(13, -19);
     ctx.closePath();
     ctx.fill();
 
     // Right ear
-    ctx.fillStyle = '#1a1a1a';
+    ctx.fillStyle = SABLE;
     ctx.beginPath();
-    ctx.moveTo(22, -16);
-    ctx.lineTo(26, -28);
-    ctx.lineTo(19, -17);
+    ctx.moveTo(23, -17);
+    ctx.lineTo(27, -30);
+    ctx.lineTo(29, -28); // folded tip
+    ctx.lineTo(24, -19);
     ctx.closePath();
     ctx.fill();
     ctx.fillStyle = '#8B6F5E';
     ctx.beginPath();
-    ctx.moveTo(22, -17);
-    ctx.lineTo(25, -25);
-    ctx.lineTo(20, -18);
+    ctx.moveTo(23, -18);
+    ctx.lineTo(26, -26);
+    ctx.lineTo(27, -24);
+    ctx.lineTo(24, -19);
     ctx.closePath();
     ctx.fill();
 
-    // Front legs
-    ctx.strokeStyle = '#1a1a1a';
+    // Front legs - long and slender
+    ctx.strokeStyle = SABLE;
     ctx.lineWidth = 5;
     ctx.lineCap = 'round';
     ctx.beginPath();
@@ -1187,8 +1193,8 @@ footer {
     ctx.moveTo(16, 12);
     ctx.lineTo(16, 24);
     ctx.stroke();
-    // White front paws
-    ctx.strokeStyle = '#f0f0f0';
+    // White socks on front paws
+    ctx.strokeStyle = WHITE;
     ctx.lineWidth = 4;
     ctx.beginPath();
     ctx.moveTo(8, 24);
@@ -1201,115 +1207,128 @@ footer {
   }
 
   function drawCollieDiving(){
-    // Long body stretched out, diving into water
+    // ── DIVING: body stretched out, long fur streaming ──
     const t = Date.now()*0.005;
 
     // Tail streaming behind
     const tailWave = Math.sin(t)*6;
-    ctx.strokeStyle = '#1a1a1a';
+    ctx.strokeStyle = SABLE;
     ctx.lineWidth = 6;
     ctx.lineCap = 'round';
     ctx.beginPath();
     ctx.moveTo(-22, -2);
-    ctx.quadraticCurveTo(-35, -5+tailWave, -40, -10+tailWave);
+    ctx.quadraticCurveTo(-35, -5+tailWave, -40, -12+tailWave);
     ctx.stroke();
-    ctx.strokeStyle = '#fff';
+    // Fur flowing back
+    ctx.strokeStyle = SABLE_DARK;
+    ctx.lineWidth = 0.8;
+    for(let i=0; i<4; i++){
+      const f = i/4;
+      const tx = -22 + f*(-18);
+      const ty = -2 + f*(-10+tailWave);
+      ctx.beginPath();
+      ctx.moveTo(tx, ty);
+      ctx.lineTo(tx-2, ty-4-Math.sin(t+i)*2);
+      ctx.stroke();
+    }
+    // White tip
+    ctx.strokeStyle = WHITE;
     ctx.lineWidth = 3;
     ctx.beginPath();
-    ctx.moveTo(-38, -8+tailWave);
-    ctx.lineTo(-41, -12+tailWave);
+    ctx.moveTo(-38, -10+tailWave);
+    ctx.lineTo(-41, -14+tailWave);
     ctx.stroke();
 
     // Body - stretched, elongated
-    ctx.fillStyle = '#1a1a1a';
+    ctx.fillStyle = SABLE;
     ctx.beginPath();
-    ctx.ellipse(0, 0, 26, 10, 0, 0, Math.PI*2);
+    ctx.ellipse(0, 0, 28, 10, 0, 0, Math.PI*2);
     ctx.fill();
 
+    // Long fur streaming upward (against gravity during dive)
+    ctx.strokeStyle = SABLE_DARK;
+    ctx.lineWidth = 0.8;
+    for(let i=0; i<8; i++){
+      const fx = -18+i*6;
+      ctx.beginPath();
+      ctx.moveTo(fx, -3);
+      ctx.lineTo(fx+1, -12-Math.sin(t+i)*4);
+      ctx.stroke();
+    }
+    ctx.strokeStyle = SABLE_LIGHT;
+    for(let i=0; i<6; i++){
+      const fx = -14+i*5;
+      ctx.beginPath();
+      ctx.moveTo(fx, -1);
+      ctx.lineTo(fx+1, -8-Math.sin(t+i)*3);
+      ctx.stroke();
+    }
+
     // White belly
-    ctx.fillStyle = '#f0f0f0';
+    ctx.fillStyle = WHITE_WARM;
     ctx.beginPath();
     ctx.ellipse(2, 5, 18, 5, 0, 0, Math.PI*2);
     ctx.fill();
 
     // White collar
-    ctx.fillStyle = '#f8f8f8';
+    ctx.fillStyle = WHITE_WARM;
     ctx.beginPath();
-    ctx.ellipse(15, -2, 7, 8, 0.2, 0, Math.PI*2);
+    ctx.ellipse(16, -2, 7, 8, 0.2, 0, Math.PI*2);
     ctx.fill();
 
-    // Fur flowing upward (against gravity)
-    ctx.strokeStyle = 'rgba(40,40,40,0.4)';
-    ctx.lineWidth = 0.8;
-    for(let i=0; i<6; i++){
-      const fx = -10+i*5;
-      ctx.beginPath();
-      ctx.moveTo(fx, -3);
-      ctx.lineTo(fx+1, -10-Math.sin(t+i)*3);
-      ctx.stroke();
-    }
-    ctx.strokeStyle = 'rgba(240,240,240,0.4)';
-    for(let i=0; i<4; i++){
-      const fx = -5+i*5;
-      ctx.beginPath();
-      ctx.moveTo(fx, 4);
-      ctx.lineTo(fx+1, 12+Math.sin(t+i)*3);
-      ctx.stroke();
-    }
-
     // Head
-    ctx.fillStyle = '#222';
+    ctx.fillStyle = SABLE;
     ctx.beginPath();
-    ctx.ellipse(22, -3, 10, 8, 0.2, 0, Math.PI*2);
+    ctx.ellipse(24, -3, 11, 9, 0.2, 0, Math.PI*2);
     ctx.fill();
 
     // White blaze
-    ctx.fillStyle = '#f0f0f0';
+    ctx.fillStyle = WHITE_WARM;
     ctx.beginPath();
-    ctx.moveTo(24, -9);
-    ctx.lineTo(28, -3);
-    ctx.lineTo(24, 1);
-    ctx.lineTo(21, -3);
+    ctx.moveTo(26, -9);
+    ctx.lineTo(30, -3);
+    ctx.lineTo(26, 1);
+    ctx.lineTo(23, -3);
     ctx.closePath();
     ctx.fill();
 
     // Snout
-    ctx.fillStyle = '#222';
+    ctx.fillStyle = SABLE_DARK;
     ctx.beginPath();
-    ctx.ellipse(30, -2, 7, 4, 0.2, 0, Math.PI*2);
+    ctx.ellipse(32, -2, 8, 4, 0.2, 0, Math.PI*2);
     ctx.fill();
     ctx.fillStyle = '#111';
     ctx.beginPath();
-    ctx.arc(36, -2, 2, 0, Math.PI*2);
+    ctx.arc(39, -2, 2, 0, Math.PI*2);
     ctx.fill();
 
     // Eyes
     ctx.fillStyle = '#fff';
     ctx.beginPath();
-    ctx.arc(24, -6, 3, 0, Math.PI*2);
+    ctx.arc(26, -6, 3, 0, Math.PI*2);
     ctx.fill();
-    ctx.fillStyle = '#4a2800';
+    ctx.fillStyle = '#6B3A1F';
     ctx.beginPath();
-    ctx.arc(24.5, -6, 2, 0, Math.PI*2);
+    ctx.arc(26.5, -6, 2, 0, Math.PI*2);
     ctx.fill();
 
     // Ears pinned back
-    ctx.fillStyle = '#1a1a1a';
+    ctx.fillStyle = SABLE;
     ctx.beginPath();
-    ctx.moveTo(18, -10);
-    ctx.lineTo(12, -18);
-    ctx.lineTo(16, -8);
+    ctx.moveTo(19, -10);
+    ctx.lineTo(13, -18);
+    ctx.lineTo(17, -8);
     ctx.closePath();
     ctx.fill();
     ctx.beginPath();
-    ctx.moveTo(24, -10);
-    ctx.lineTo(28, -18);
-    ctx.lineTo(22, -8);
+    ctx.moveTo(25, -10);
+    ctx.lineTo(29, -18);
+    ctx.lineTo(23, -8);
     ctx.closePath();
     ctx.fill();
 
     // Paws stretched out
-    ctx.strokeStyle = '#1a1a1a';
+    ctx.strokeStyle = SABLE;
     ctx.lineWidth = 4;
     ctx.beginPath();
     ctx.moveTo(8, 8);
@@ -1319,7 +1338,7 @@ footer {
     ctx.moveTo(16, 8);
     ctx.lineTo(18, 16);
     ctx.stroke();
-    ctx.strokeStyle = '#fff';
+    ctx.strokeStyle = WHITE;
     ctx.lineWidth = 3;
     ctx.beginPath();
     ctx.moveTo(5, 14);
@@ -1332,35 +1351,35 @@ footer {
   }
 
   function drawCollieSwimming(){
-    // Head above water, fur wet and flat, paddling
+    // ── SWIMMING: head above water, fur wet and flat ──
     const t = Date.now()*0.006;
 
-    // Body partially submerged - just show upper part
-    ctx.fillStyle = '#1a1a1a';
+    // Body partially submerged
+    ctx.fillStyle = SABLE;
     ctx.beginPath();
     ctx.ellipse(0, 2, 22, 8, 0, 0, Math.PI*2);
     ctx.fill();
 
-    // Wet fur (flat, slicked)
-    ctx.fillStyle = '#f0f0f0';
+    // Wet white belly
+    ctx.fillStyle = '#E8E4E0';
     ctx.beginPath();
     ctx.ellipse(3, 6, 15, 4, 0, 0, Math.PI*2);
     ctx.fill();
 
     // White collar (wet, flat)
-    ctx.fillStyle = '#e8e8e8';
+    ctx.fillStyle = '#E8E4E0';
     ctx.beginPath();
     ctx.ellipse(12, -1, 7, 6, 0.2, 0, Math.PI*2);
     ctx.fill();
 
     // Head above water
-    ctx.fillStyle = '#222';
+    ctx.fillStyle = SABLE;
     ctx.beginPath();
     ctx.ellipse(18, -10, 11, 9, 0, 0, Math.PI*2);
     ctx.fill();
 
     // White blaze
-    ctx.fillStyle = '#f0f0f0';
+    ctx.fillStyle = WHITE_WARM;
     ctx.beginPath();
     ctx.moveTo(20, -16);
     ctx.lineTo(25, -10);
@@ -1370,7 +1389,7 @@ footer {
     ctx.fill();
 
     // Snout
-    ctx.fillStyle = '#222';
+    ctx.fillStyle = SABLE_DARK;
     ctx.beginPath();
     ctx.ellipse(26, -8, 7, 5, 0.1, 0, Math.PI*2);
     ctx.fill();
@@ -1389,12 +1408,12 @@ footer {
     ctx.ellipse(28, -3, 3, 4, 0.1, 0, Math.PI*2);
     ctx.fill();
 
-    // Eyes - alert, looking around
+    // Eyes
     ctx.fillStyle = '#fff';
     ctx.beginPath();
     ctx.ellipse(22, -14, 3.5, 4, 0, 0, Math.PI*2);
     ctx.fill();
-    ctx.fillStyle = '#4a2800';
+    ctx.fillStyle = '#6B3A1F';
     ctx.beginPath();
     ctx.arc(22.5, -14, 2.3, 0, Math.PI*2);
     ctx.fill();
@@ -1407,40 +1426,44 @@ footer {
     ctx.arc(23.8, -15, 0.6, 0, Math.PI*2);
     ctx.fill();
 
-    // Erect ears (pointed, above water)
-    ctx.fillStyle = '#1a1a1a';
+    // Ears (pointed, above water)
+    ctx.fillStyle = SABLE;
     ctx.beginPath();
     ctx.moveTo(14, -17);
     ctx.lineTo(10, -28);
-    ctx.lineTo(17, -19);
+    ctx.lineTo(8, -26); // folded tip
+    ctx.lineTo(13, -19);
     ctx.closePath();
     ctx.fill();
     ctx.fillStyle = '#8B6F5E';
     ctx.beginPath();
     ctx.moveTo(14, -18);
-    ctx.lineTo(12, -25);
-    ctx.lineTo(16, -19);
+    ctx.lineTo(11, -25);
+    ctx.lineTo(10, -23);
+    ctx.lineTo(13, -19);
     ctx.closePath();
     ctx.fill();
 
-    ctx.fillStyle = '#1a1a1a';
+    ctx.fillStyle = SABLE;
     ctx.beginPath();
     ctx.moveTo(22, -17);
     ctx.lineTo(26, -28);
-    ctx.lineTo(20, -18);
+    ctx.lineTo(28, -26); // folded tip
+    ctx.lineTo(23, -19);
     ctx.closePath();
     ctx.fill();
     ctx.fillStyle = '#8B6F5E';
     ctx.beginPath();
     ctx.moveTo(22, -18);
     ctx.lineTo(25, -25);
-    ctx.lineTo(21, -19);
+    ctx.lineTo(26, -23);
+    ctx.lineTo(23, -19);
     ctx.closePath();
     ctx.fill();
 
-    // Paddling legs (in water, just hints)
+    // Paddling legs
     const legAnim = Math.sin(t*3);
-    ctx.strokeStyle = '#1a1a1a';
+    ctx.strokeStyle = SABLE;
     ctx.lineWidth = 3;
     ctx.beginPath();
     ctx.moveTo(-5, 8);
@@ -1450,7 +1473,7 @@ footer {
     ctx.moveTo(5, 8);
     ctx.lineTo(5-legAnim*4, 14);
     ctx.stroke();
-    ctx.strokeStyle = '#fff';
+    ctx.strokeStyle = WHITE;
     ctx.lineWidth = 2.5;
     ctx.beginPath();
     ctx.moveTo(-5+legAnim*4, 12);
@@ -1460,24 +1483,16 @@ footer {
     ctx.moveTo(5-legAnim*4, 12);
     ctx.lineTo(5-legAnim*5, 16);
     ctx.stroke();
-
-    // Wet fur texture (slicked down)
-    ctx.strokeStyle = 'rgba(40,40,40,0.3)';
-    ctx.lineWidth = 0.7;
-    for(let i=0; i<5; i++){
-      ctx.beginPath();
-      ctx.moveTo(-8+i*5, 0);
-      ctx.lineTo(-6+i*5, 4);
-      ctx.stroke();
-    }
   }
 
   function drawCollieClimbing(){
-    // Climbing back up - similar to diving but reversed
-    drawCollieSwimming(); // simplified - use swimming pose while climbing
+    // Simplified - swimming pose while climbing
+    drawCollieSwimming();
   }
 
-  // ── Splash effects ──
+  // ═══════════════════════════════════════════
+  //  DRAWING: EFFECTS
+  // ═══════════════════════════════════════════
   function drawSplashEffects(){
     // Droplets
     for(const s of splashes){
@@ -1485,7 +1500,6 @@ footer {
       ctx.beginPath();
       ctx.arc(s.x, s.y, s.size * s.life, 0, Math.PI*2);
       ctx.fill();
-      // Blue tint
       ctx.fillStyle = `rgba(100,200,220,${s.life*0.4})`;
       ctx.beginPath();
       ctx.arc(s.x, s.y, s.size * s.life * 0.6, 0, Math.PI*2);
@@ -1499,14 +1513,13 @@ footer {
       ctx.beginPath();
       ctx.arc(b.x, b.y, b.size, 0, Math.PI*2);
       ctx.stroke();
-      // Highlight
       ctx.fillStyle = `rgba(255,255,255,${b.life*0.4})`;
       ctx.beginPath();
       ctx.arc(b.x - b.size*0.3, b.y - b.size*0.3, b.size*0.3, 0, Math.PI*2);
       ctx.fill();
     }
 
-    // Ripples (expanding rings)
+    // Ripples
     for(const r of ripples){
       if(r.delay && r.delay > 0) continue;
       const alpha = r.life * 0.5;
@@ -1516,9 +1529,26 @@ footer {
       ctx.ellipse(r.x, r.y, r.radius, r.radius * 0.3, 0, 0, Math.PI*2);
       ctx.stroke();
     }
+
+    // Floating text (SPLASH! / CRASH!)
+    for(const ft of floatingText){
+      ctx.save();
+      ctx.globalAlpha = ft.life;
+      ctx.fillStyle = ft.color;
+      ctx.font = 'bold 36px Fredoka, sans-serif';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      // Shadow
+      ctx.shadowColor = 'rgba(0,0,0,0.4)';
+      ctx.shadowBlur = 6;
+      ctx.shadowOffsetX = 2;
+      ctx.shadowOffsetY = 2;
+      ctx.fillText(ft.text, ft.x, ft.y);
+      ctx.restore();
+    }
   }
 
-  // ── Swimming ripples around dog ──
+  // Swimming ripples around dog
   function drawSwimRipples(){
     if(dogState !== 'swimming') return;
     const t = Date.now()*0.003;
@@ -1532,33 +1562,31 @@ footer {
     }
   }
 
-  // ── Game logic ──
+  // ═══════════════════════════════════════════
+  //  GAME LOGIC
+  // ═══════════════════════════════════════════
   function dive(){
     if(dogState !== 'idle') return;
     dogState = 'diving';
     diveTime = 0;
     diveStartX = dogX;
     diveStartY = dogY;
-    targetX = 300 + Math.random() * 200;
+    // Target: arc into open water (right of cliff)
+    targetX = CLIFF_W + 60 + Math.random() * (BASE_W - CLIFF_W - 100);
     targetY = WATER_Y + 5;
-    dives++;
-    scoreEl.textContent = dives;
-    localStorage.setItem('dods_dives', dives.toString());
     stateEl.textContent = 'Diving! 🌀';
-    diveTimerActive = true;
     playBark();
   }
 
   function resetDog(){
     dogState = 'idle';
     dogAngle = 0;
-    dogX = 165;
-    dogY = WATER_Y - 100;
+    dogX = CLIFF_W - 30;
+    dogY = 50;
     stateEl.textContent = 'Ready to dive!';
     swimTimer = 0;
     resetTimer = 0;
-    diveTimerActive = false;
-    timerEl.textContent = '0.0s';
+    climbProgress = 0;
   }
 
   function resetAll(){
@@ -1571,28 +1599,33 @@ footer {
     resetDog();
   }
 
-  function triggerDive(){
-    dogState = 'diving';
-    diveTime = 0;
-    diveStartX = dogX;
-    diveStartY = dogY;
-    targetX = 300 + Math.random() * 200;
-    targetY = WATER_Y + 5;
-    dives++;
-    scoreEl.textContent = dives;
-    localStorage.setItem('dods_dives', dives.toString());
-    stateEl.textContent = 'Diving! 🌀';
-    diveTimerActive = true;
-    playBark();
+  function checkBoatCollision(){
+    // Check if dog landed on the boat
+    const bx = boatX;
+    const by = WATER_Y - 2 + Math.sin(boatBobPhase)*3;
+    const dogAbsX = dogX;
+    const dogAbsY = dogY;
+    // Boat bounding box
+    const boatLeft = bx - 38;
+    const boatRight = bx + 55;
+    const boatTop = by - 55; // includes mast
+    const boatBottom = by + 12;
+
+    return (dogAbsX > boatLeft && dogAbsX < boatRight &&
+            dogAbsY > by - 10 && dogAbsY < boatBottom + 5);
   }
 
-  // ── Main game loop ──
+  // ═══════════════════════════════════════════
+  //  MAIN GAME LOOP
+  // ═══════════════════════════════════════════
   let lastTime = 0;
+
   function loop(time){
     const dt = Math.min((time - lastTime) / 1000, 0.05);
     lastTime = time;
 
     waterOffset += 1;
+    sunAngle += 0.003;
 
     // Update clouds
     for(const c of clouds){
@@ -1606,69 +1639,75 @@ footer {
       f.wobble += 0.02;
       f.y += Math.sin(f.wobble) * 0.3;
       if(f.x > BASE_W + 40) f.dir = -1;
-      if(f.x < -40) f.dir = 1;
+      if(f.x < CLIFF_W - 20) f.dir = 1;
     }
 
-    // Update crabs
-    for(const c of crabList){
-      c.legPhase += dt * 4;
-      if(c.paused){
-        c.pauseTimer -= dt;
-        if(c.pauseTimer <= 0) c.paused = false;
-      } else {
-        c.moveTimer += dt;
-        c.x += c.dir * 8 * dt;
-        if(c.x > BASE_W - 50 || c.x < 100){
-          c.dir *= -1;
-        }
-        if(c.moveTimer > 2 + Math.random()*3){
-          c.paused = true;
-          c.pauseTimer = 1 + Math.random()*2;
-          c.moveTimer = 0;
-        }
-      }
-    }
+    // Update boat
+    boatBobPhase += dt * 2.5;
+    boatX += boatDir * 0.8;
+    if(boatX > BASE_W - 60) boatDir = -1;
+    if(boatX < CLIFF_W + 80) boatDir = 1;
+    if(boatWobble > 0) boatWobble -= dt * 3;
 
-    // Update dog position
+    // Update dog
     if(dogState === 'diving'){
       diveTime += dt;
-      timerEl.textContent = diveTime.toFixed(1) + 's';
-      const prog = Math.min(diveTime / 0.6, 1);
-      // Ease out
-      const ease = 1 - Math.pow(1 - prog, 3);
-      dogX = diveStartX + (targetX - diveStartX) * ease;
-      dogY = diveStartY + (targetY - diveStartY) * ease;
-      dogAngle = ease * Math.PI * 0.4;
+      // Parabolic arc from cliff top to water
+      const totalDiveTime = 0.8; // seconds for dive
+      const prog = Math.min(diveTime / totalDiveTime, 1);
+
+      // Horizontal: ease out
+      dogX = diveStartX + (targetX - diveStartX) * prog;
+
+      // Vertical: parabolic (gravity)
+      const gravity = 400;
+      const initialVY = -80; // slight upward kick
+      dogY = diveStartY + initialVY * prog + 0.5 * gravity * prog * prog;
+
+      // Rotation: dog angles downward during dive
+      dogAngle = prog * Math.PI * 0.4;
 
       if(prog >= 1){
-        dogState = 'splashing';
-        addSplash(dogX, WATER_Y);
-        stateEl.textContent = 'SPLASH! 💦';
-        diveTimerActive = false;
-        // Update best
-        const currentHeight = Math.round((WATER_Y - 20) / (BASE_H - 20) * 15);
-        if(diveTime > bestDive){
-          bestDive = diveTime;
-          localStorage.setItem('dods_best', bestDive.toString());
-          bestEl.textContent = bestDive.toFixed(1) + 's';
-          stateEl.textContent = 'NEW RECORD! 🏆';
+        dogY = WATER_Y + 3;
+        // Check if landed on boat
+        if(checkBoatCollision()){
+          // CRASH!
+          dogState = 'splashing';
+          addFloatingText(dogX, dogY - 40, 'CRASH!', '#E63946');
+          boatWobble = 5;
+          playCrash();
+          stateEl.textContent = 'CRASH! 💥 Boat hit!';
+          resetTimer = 0;
+        } else {
+          // SPLASH! (successful water dive)
+          dogState = 'splashing';
+          addSplash(dogX, WATER_Y);
+          addFloatingText(dogX, dogY - 40, 'SPLASH!', '#40E0D0');
+          dives++;
+          scoreEl.textContent = dives;
+          localStorage.setItem('dods_dives', dives.toString());
+          stateEl.textContent = 'SPLASH! 💦';
+          // Update best record
+          if(dives > bestDive){
+            bestDive = dives;
+            localStorage.setItem('dods_best', bestDive.toString());
+            bestEl.textContent = bestDive;
+            stateEl.textContent = 'NEW RECORD! 🏆';
+          }
+          resetTimer = 0;
         }
-        resetTimer = 0;
       }
     } else if(dogState === 'splashing'){
       resetTimer += dt;
       if(resetTimer > 0.5){
         dogState = 'swimming';
         dogY = WATER_Y + 3;
-        dogX = targetX;
         dogAngle = 0;
         stateEl.textContent = 'Swimming happily! 🐕';
         swimTimer = 0;
-        // Occasional bubbles while swimming
       }
     } else if(dogState === 'swimming'){
       swimTimer += dt;
-      timerEl.textContent = (diveTime + swimTimer).toFixed(1) + 's';
       dogX = targetX + Math.sin(swimTimer * 1.2) * 25;
       dogY = WATER_Y + 3 + Math.sin(swimTimer * 1.8) * 3;
 
@@ -1677,21 +1716,23 @@ footer {
 
       // After 3 seconds, climb back
       if(swimTimer > 3){
-        resetTimer += dt;
-        dogY = (WATER_Y + 3) - resetTimer * 50;
-        dogX = targetX + (165 - targetX) * Math.min(resetTimer / 0.6, 1);
+        dogState = 'climbing';
+        climbProgress = 0;
         stateEl.textContent = 'Climbing back! 🧗';
-        if(dogY < WATER_Y - 100){
-          resetDog();
-        }
       }
-    }
+    } else if(dogState === 'climbing'){
+      climbProgress += dt;
+      const climbDuration = 0.8;
+      const prog = Math.min(climbProgress / climbDuration, 1);
+      const ease = 1 - Math.pow(1 - prog, 2);
 
-    // Wind ambient sound occasionally
-    windTimer += dt;
-    if(windTimer > 8){
-      windTimer = 0;
-      playWind();
+      // Move back toward cliff top
+      dogX = targetX + (CLIFF_W - 30 - targetX) * ease;
+      dogY = (WATER_Y + 3) - ease * (WATER_Y + 3 - 50);
+
+      if(prog >= 1){
+        resetDog();
+      }
     }
 
     // Update splashes
@@ -1699,7 +1740,7 @@ footer {
       const s = splashes[i];
       s.x += s.vx;
       s.y += s.vy;
-      s.vy += 0.18; // gravity
+      s.vy += 0.18;
       s.life -= dt * 2.5;
       if(s.life <= 0) splashes.splice(i, 1);
     }
@@ -1717,34 +1758,43 @@ footer {
     // Update ripples
     for(let i=ripples.length-1; i>=0; i--){
       const r = ripples[i];
-      if(r.delay && r.delay > 0){
-        r.delay -= dt;
-        continue;
-      }
+      if(r.delay && r.delay > 0){ r.delay -= dt; continue; }
       r.radius += 40 * dt;
       r.life -= dt * 1.2;
       if(r.life <= 0 || r.radius > r.maxRadius) ripples.splice(i, 1);
     }
 
-    // ── DRAW ──
+    // Update floating text
+    for(let i=floatingText.length-1; i>=0; i--){
+      const ft = floatingText[i];
+      ft.y += ft.vy;
+      ft.life -= dt * 0.8;
+      if(ft.life <= 0) floatingText.splice(i, 1);
+    }
+
+    // ═══════════════════════════════════════════
+    //  DRAW ORDER (back to front)
+    // ═══════════════════════════════════════════
     ctx.clearRect(0, 0, BASE_W, BASE_H);
 
     drawSky();
     drawSun();
     drawClouds();
-    drawCliff();
-    drawWater();
+    drawCliff();       // Cliff first (covers left side)
+    drawWater();       // Water only on right of cliff
     drawSeaweed();
     drawFish();
-    drawCrab();
+    drawBoat();
     drawSwimRipples();
-    drawCollie();
+    drawCollie();      // Dog on top
     drawSplashEffects();
 
     requestAnimationFrame(loop);
   }
 
-  // ── Controls ──
+  // ═══════════════════════════════════════════
+  //  CONTROLS
+  // ═══════════════════════════════════════════
   function handleAction(){
     if(dogState === 'idle') dive();
   }
@@ -1767,8 +1817,8 @@ footer {
   });
 
   // Init display
-  bestEl.textContent = bestDive > 0 ? bestDive.toFixed(1) + 's' : '0';
-  const cliffHeightM = Math.round((WATER_Y - CLIFF_TOP) / (BASE_H - CLIFF_TOP) * 15);
+  bestEl.textContent = bestDive > 0 ? bestDive : '0';
+  const cliffHeightM = Math.round((WATER_Y - 20) / (BASE_H - 20) * 30);
   heightEl.textContent = cliffHeightM + 'm';
 
   requestAnimationFrame(loop);
