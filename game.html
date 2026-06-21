@@ -1,0 +1,734 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dive the Dog 🐕 — DODSC</title>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --navy: #0a1628;
+  --navy-light: #112240;
+  --turquoise: #00c9a7;
+  --turquoise-glow: #00e6be;
+  --sea-dark: #064e5c;
+  --white: #ffffff;
+  --text: #c8d6e5;
+  --card-bg: rgba(17,34,64,0.85);
+}
+* { margin:0; padding:0; box-sizing:border-box; }
+html { scroll-behavior:smooth; }
+body {
+  font-family:'Fredoka',sans-serif;
+  background: linear-gradient(180deg, var(--navy) 0%, #0d1f3c 50%, var(--sea-dark) 100%);
+  color: var(--white);
+  min-height:100vh;
+  overflow-x:hidden;
+}
+
+nav {
+  position:sticky; top:0; z-index:100;
+  background: rgba(10,22,40,0.95);
+  backdrop-filter: blur(10px);
+  border-bottom: 1px solid rgba(0,201,167,0.3);
+  padding: 12px 0;
+}
+.nav-inner {
+  max-width:900px; margin:0 auto;
+  display:flex; align-items:center; justify-content:center;
+  gap:8px; flex-wrap:wrap;
+  padding:0 16px;
+}
+.nav-inner a {
+  color:var(--text);
+  text-decoration:none;
+  padding:8px 14px;
+  border-radius:20px;
+  font-size:0.95rem;
+  font-weight:500;
+  transition: all 0.3s;
+}
+.nav-inner a:hover, .nav-inner a.active {
+  color:var(--turquoise);
+  background: rgba(0,201,167,0.15);
+}
+
+.page-header {
+  text-align:center;
+  padding:30px 20px 16px;
+  position:relative; z-index:1;
+}
+.page-header h1 {
+  font-size: clamp(1.8rem, 5vw, 2.8rem);
+  background: linear-gradient(135deg, var(--white), var(--turquoise-glow));
+  -webkit-background-clip:text;
+  -webkit-text-fill-color:transparent;
+  background-clip:text;
+}
+.page-header p { color:var(--text); margin-top:8px; font-size:1rem; }
+
+.game-container {
+  position:relative; z-index:1;
+  max-width:800px;
+  margin:16px auto;
+  padding:0 16px;
+}
+#gameCanvas {
+  width:100%;
+  height:auto;
+  border-radius:16px;
+  display:block;
+  box-shadow: 0 8px 32px rgba(0,201,167,0.2);
+  border: 2px solid rgba(0,201,167,0.3);
+  cursor:pointer;
+}
+
+.score-bar {
+  display:flex; justify-content:space-between; align-items:center;
+  max-width:800px; margin:12px auto 0;
+  padding:0 16px;
+  position:relative; z-index:1;
+}
+.score-bar span {
+  background: var(--card-bg);
+  padding:10px 20px;
+  border-radius:12px;
+  font-weight:600;
+  font-size:1rem;
+  border: 1px solid rgba(0,201,167,0.2);
+}
+.score-bar .score-val { color:var(--turquoise); }
+.instructions {
+  text-align:center;
+  padding:16px;
+  color:var(--text);
+  font-size:0.95rem;
+  position:relative; z-index:1;
+}
+.instructions kbd {
+  background:rgba(255,255,255,0.1);
+  padding:3px 10px;
+  border-radius:6px;
+  border:1px solid rgba(255,255,255,0.2);
+  font-family:'Fredoka',sans-serif;
+}
+
+footer {
+  position:relative; z-index:1;
+  background: rgba(6,15,30,0.9);
+  border-top:1px solid rgba(0,201,167,0.2);
+  padding:40px 20px 24px;
+  text-align:center;
+  margin-top:40px;
+}
+.footer-links {
+  display:flex; gap:20px; justify-content:center; flex-wrap:wrap;
+  margin-bottom:16px;
+}
+.footer-links a {
+  color:var(--text);
+  text-decoration:none;
+  font-size:0.95rem;
+  transition: color 0.3s;
+}
+.footer-links a:hover { color:var(--turquoise); }
+.mint-addr {
+  font-size:0.75rem;
+  color:rgba(200,214,229,0.5);
+  word-break:break-all;
+  margin-top:12px;
+}
+.footer-copy {
+  margin-top:12px;
+  font-size:0.8rem;
+  color:rgba(200,214,229,0.4);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="nav-inner">
+    <a href="index.html">🏠 Home</a>
+    <a href="game.html" class="active">🎮 Play</a>
+    <a href="roadmap.html">📋 Roadmap</a>
+    <a href="security.html">🔒 Security</a>
+    <a href="community.html">🌐 Community</a>
+  </div>
+</nav>
+
+<div class="page-header">
+  <h1>Dive the Dog 🐕</h1>
+  <p>Press SPACE, click, or tap to dive!</p>
+</div>
+
+<div class="score-bar">
+  <span>🐕 Dives: <span class="score-val" id="scoreVal">0</span></span>
+  <span id="stateLabel">Ready to dive!</span>
+</div>
+
+<div class="game-container">
+  <canvas id="gameCanvas" width="800" height="500"></canvas>
+</div>
+
+<div class="instructions">
+  Desktop: <kbd>SPACE</kbd> or click &nbsp;|&nbsp; Mobile: tap anywhere
+</div>
+
+<footer>
+  <div class="footer-links">
+    <a href="https://x.com/DodscoinX" target="_blank" rel="noopener">🐦 X / Twitter</a>
+    <a href="https://www.instagram.com/dodscoin" target="_blank" rel="noopener">📸 Instagram</a>
+    <a href="https://www.tiktok.com/@dodscoin2026" target="_blank" rel="noopener">🎵 TikTok</a>
+    <a href="https://t.me/dodscoin2026" target="_blank" rel="noopener">✈️ Telegram</a>
+  </div>
+  <div class="mint-addr">Mint: 4nsq8dMuf6JqqaZpgbtCMVuRt9bYcrLS1Df5pGb4MWpx</div>
+  <div class="footer-copy">© 2025 DODSC. Not financial advice. DYOR.</div>
+</footer>
+
+<script>
+(function(){
+  const canvas = document.getElementById('gameCanvas');
+  const ctx = canvas.getContext('2d');
+  const scoreEl = document.getElementById('scoreVal');
+  const stateEl = document.getElementById('stateLabel');
+
+  // Audio
+  const AudioCtx = window.AudioContext || window.webkitAudioContext;
+  let audioCtx;
+  function ensureAudio() { if(!audioCtx) audioCtx = new AudioCtx(); }
+
+  function playSplash(){
+    ensureAudio();
+    const dur=0.5;
+    const buf = audioCtx.createBuffer(1, audioCtx.sampleRate*dur, audioCtx.sampleRate);
+    const d = buf.getChannelData(0);
+    for(let i=0;i<d.length;i++){
+      const t=i/audioCtx.sampleRate;
+      d[i]=(Math.random()*2-1)*Math.exp(-t*8)*0.3;
+    }
+    const src = audioCtx.createBufferSource();
+    src.buffer=buf;
+    const filt = audioCtx.createBiquadFilter();
+    filt.type='lowpass';
+    filt.frequency.value=800;
+    src.connect(filt).connect(audioCtx.destination);
+    src.start();
+  }
+
+  function playBubble(){
+    ensureAudio();
+    const osc = audioCtx.createOscillator();
+    const gain = audioCtx.createGain();
+    osc.type='sine';
+    osc.frequency.setValueAtTime(600+Math.random()*400, audioCtx.currentTime);
+    osc.frequency.exponentialRampToValueAtTime(1200, audioCtx.currentTime+0.1);
+    gain.gain.setValueAtTime(0.15, audioCtx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime+0.15);
+    osc.connect(gain).connect(audioCtx.destination);
+    osc.start();
+    osc.stop(audioCtx.currentTime+0.15);
+  }
+
+  // Game state
+  let dives = 0;
+  let dogState = 'idle'; // idle, diving, splashing, swimming, reset
+  let dogX=180, dogY=180;
+  let targetX=180, targetY=180;
+  let dogAngle=0;
+  let splashes=[];
+  let bubbles=[];
+  let fishList=[];
+  let clouds=[];
+  let waterOffset=0;
+  let swimTimer=0;
+  let resetTimer=0;
+  let diveTime=0;
+
+  const WATER_Y = 310;
+
+  // Init fish
+  for(let i=0;i<6;i++){
+    fishList.push({
+      x: Math.random()*800,
+      y: WATER_Y + 30 + Math.random()*120,
+      speed: 0.3+Math.random()*0.8,
+      size: 8+Math.random()*8,
+      color: ['#ff6b9d','#ffd700','#00e6be','#ff9800','#e040fb','#40c4ff'][i%6],
+      dir: Math.random()>0.5?1:-1
+    });
+  }
+  // Init clouds
+  for(let i=0;i<4;i++){
+    clouds.push({x:i*220+Math.random()*60, y:20+Math.random()*60, w:80+Math.random()*60, speed:0.15+Math.random()*0.2});
+  }
+
+  function addSplash(x,y){
+    for(let i=0;i<12;i++){
+      splashes.push({
+        x:x+Math.random()*40-20, y:y,
+        vx:(Math.random()-0.5)*4, vy:-3-Math.random()*5,
+        life:1, size:3+Math.random()*4
+      });
+    }
+    playSplash();
+  }
+
+  function addBubbles(x,y,count){
+    for(let i=0;i<count;i++){
+      bubbles.push({
+        x:x+Math.random()*30-15, y:y+Math.random()*20,
+        vy:-0.5-Math.random()*1.5, vx:(Math.random()-0.5)*0.5,
+        life:1, size:2+Math.random()*5
+      });
+      setTimeout(()=>playBubble(), i*80);
+    }
+  }
+
+  // Draw helpers
+  function drawSky(){
+    const grad = ctx.createLinearGradient(0,0,0,WATER_Y);
+    grad.addColorStop(0,'#0d1f3c');
+    grad.addColorStop(0.4,'#162d50');
+    grad.addColorStop(0.7,'#1a4a5e');
+    grad.addColorStop(1,'#0d3d5e');
+    ctx.fillStyle=grad;
+    ctx.fillRect(0,0,800,WATER_Y);
+  }
+
+  function drawStars(){
+    ctx.fillStyle='rgba(255,255,255,0.6)';
+    const stars=[[50,30],[120,15],[200,50],[300,20],[420,35],[550,18],[650,45],[720,25],[780,55],[350,8]];
+    for(const s of stars){
+      ctx.beginPath();
+      ctx.arc(s[0],s[1],1.2,0,Math.PI*2);
+      ctx.fill();
+    }
+  }
+
+  function drawMoon(){
+    const mx=700, my=50, mr=25;
+    ctx.fillStyle='#ffd54f';
+    ctx.shadowColor='rgba(255,213,79,0.5)';
+    ctx.shadowBlur=30;
+    ctx.beginPath();
+    ctx.arc(mx,my,mr,0,Math.PI*2);
+    ctx.fill();
+    ctx.shadowBlur=0;
+  }
+
+  function drawClouds(){
+    ctx.fillStyle='rgba(255,255,255,0.12)';
+    for(const c of clouds){
+      ctx.beginPath();
+      ctx.ellipse(c.x, c.y, c.w/2, 18, 0, 0, Math.PI*2);
+      ctx.fill();
+      ctx.beginPath();
+      ctx.ellipse(c.x-c.w*0.25, c.y+8, c.w*0.3, 14, 0, 0, Math.PI*2);
+      ctx.fill();
+      ctx.beginPath();
+      ctx.ellipse(c.x+c.w*0.25, c.y+5, c.w*0.35, 15, 0, 0, Math.PI*2);
+      ctx.fill();
+    }
+  }
+
+  function drawCliff(){
+    // Main cliff body
+    const grad = ctx.createLinearGradient(0,WATER_Y-120,0,WATER_Y+20);
+    grad.addColorStop(0,'#8d6e4a');
+    grad.addColorStop(0.3,'#a0825a');
+    grad.addColorStop(0.6,'#7a5c3a');
+    grad.addColorStop(1,'#5a3e22');
+    ctx.fillStyle=grad;
+    ctx.beginPath();
+    ctx.moveTo(0,WATER_Y-80);
+    ctx.lineTo(60,WATER_Y-90);
+    ctx.lineTo(130,WATER_Y-85);
+    ctx.lineTo(180,WATER_Y-40);
+    ctx.lineTo(200,WATER_Y);
+    ctx.lineTo(0,WATER_Y+40);
+    ctx.closePath();
+    ctx.fill();
+
+    // Cliff texture lines
+    ctx.strokeStyle='rgba(0,0,0,0.15)';
+    ctx.lineWidth=1.5;
+    for(let i=0;i<8;i++){
+      const y=WATER_Y-70+i*14;
+      ctx.beginPath();
+      ctx.moveTo(10+Math.random()*20,y);
+      ctx.lineTo(100+Math.random()*80,y+Math.random()*5-2);
+      ctx.stroke();
+    }
+
+    // Moss/grass on top
+    ctx.fillStyle='#2d7a4f';
+    ctx.beginPath();
+    ctx.moveTo(50,WATER_Y-85);
+    for(let x=50;x<175;x+=5){
+      ctx.lineTo(x, WATER_Y-88-Math.sin(x*0.1)*5-Math.random()*3);
+    }
+    ctx.lineTo(175,WATER_Y-50);
+    ctx.lineTo(50,WATER_Y-85);
+    ctx.fill();
+
+    // Small rocks at base
+    ctx.fillStyle='#6b4a2e';
+    ctx.beginPath();
+    ctx.arc(210,WATER_Y+5,12,0,Math.PI*2);
+    ctx.fill();
+    ctx.beginPath();
+    ctx.arc(230,WATER_Y+8,8,0,Math.PI*2);
+    ctx.fill();
+    ctx.fillStyle='#5a3e22';
+    ctx.beginPath();
+    ctx.arc(245,WATER_Y+3,6,0,Math.PI*2);
+    ctx.fill();
+  }
+
+  function drawWater(){
+    const grad = ctx.createLinearGradient(0,WATER_Y,0,500);
+    grad.addColorStop(0,'#12c5b3');
+    grad.addColorStop(0.2,'#0fa898');
+    grad.addColorStop(0.5,'#0d8a80');
+    grad.addColorStop(1,'#064e5c');
+    ctx.fillStyle=grad;
+
+    // Wavy top
+    ctx.beginPath();
+    ctx.moveTo(0,WATER_Y);
+    for(let x=0;x<=800;x+=4){
+      ctx.lineTo(x, WATER_Y + Math.sin((x+waterOffset)*0.02)*6 + Math.sin((x+waterOffset)*0.05)*3);
+    }
+    ctx.lineTo(800,500);
+    ctx.lineTo(0,500);
+    ctx.closePath();
+    ctx.fill();
+
+    // Light rays in water
+    ctx.strokeStyle='rgba(255,255,255,0.06)';
+    ctx.lineWidth=20;
+    for(let i=0;i<5;i++){
+      const rx = 150+i*130;
+      ctx.beginPath();
+      ctx.moveTo(rx, WATER_Y+20);
+      ctx.lineTo(rx+40, 500);
+      ctx.stroke();
+    }
+  }
+
+  function drawFish(){
+    for(const f of fishList){
+      ctx.save();
+      ctx.translate(f.x, f.y);
+      ctx.scale(f.dir,1);
+      ctx.fillStyle=f.color;
+      // Body
+      ctx.beginPath();
+      ctx.ellipse(0,0,f.size,f.size*0.45,0,0,Math.PI*2);
+      ctx.fill();
+      // Tail
+      ctx.beginPath();
+      ctx.moveTo(-f.size,0);
+      ctx.lineTo(-f.size-7,-5);
+      ctx.lineTo(-f.size-7,5);
+      ctx.closePath();
+      ctx.fill();
+      // Eye
+      ctx.fillStyle='white';
+      ctx.beginPath();
+      ctx.arc(f.size*0.4,-1,2.5,0,Math.PI*2);
+      ctx.fill();
+      ctx.fillStyle='black';
+      ctx.beginPath();
+      ctx.arc(f.size*0.45,-1,1.2,0,Math.PI*2);
+      ctx.fill();
+      ctx.restore();
+    }
+  }
+
+  function drawDog(){
+    ctx.save();
+    ctx.translate(dogX, dogY);
+    ctx.rotate(dogAngle);
+
+    const s = 0.8;
+    ctx.scale(s,s);
+
+    // Body (golden retriever)
+    ctx.fillStyle='#daa520';
+    ctx.beginPath();
+    ctx.ellipse(0,0,22,16,0,0,Math.PI*2);
+    ctx.fill();
+
+    // Head
+    ctx.fillStyle='#d4a017';
+    ctx.beginPath();
+    ctx.arc(20,-6,13,0,Math.PI*2);
+    ctx.fill();
+
+    // Ears (floppy)
+    ctx.fillStyle='#b8860b';
+    ctx.beginPath();
+    ctx.ellipse(30,-2,6,10,0.3,0,Math.PI*2);
+    ctx.fill();
+    ctx.beginPath();
+    ctx.ellipse(14,-8,5,9,-0.3,0,Math.PI*2);
+    ctx.fill();
+
+    // Eyes
+    ctx.fillStyle='white';
+    ctx.beginPath();
+    ctx.arc(24,-8,4,0,Math.PI*2);
+    ctx.fill();
+    ctx.beginPath();
+    ctx.arc(17,-8,3.5,0,Math.PI*2);
+    ctx.fill();
+    ctx.fillStyle='#1a1a2e';
+    ctx.beginPath();
+    ctx.arc(25,-8,2,0,Math.PI*2);
+    ctx.fill();
+    ctx.beginPath();
+    ctx.arc(18,-8,1.8,0,Math.PI*2);
+    ctx.fill();
+
+    // Nose
+    ctx.fillStyle='#2d1b0e';
+    ctx.beginPath();
+    ctx.arc(32,-5,3,0,Math.PI*2);
+    ctx.fill();
+
+    // Mouth / smile
+    ctx.strokeStyle='#2d1b0e';
+    ctx.lineWidth=1.2;
+    ctx.beginPath();
+    ctx.arc(28,-2,5,0.1,Math.PI*0.7);
+    ctx.stroke();
+
+    // Tongue when swimming
+    if(dogState==='swimming'){
+      ctx.fillStyle='#ff6b6b';
+      ctx.beginPath();
+      ctx.ellipse(30,3,3,4,0.2,0,Math.PI*2);
+      ctx.fill();
+    }
+
+    // Tail
+    ctx.fillStyle='#daa520';
+    ctx.beginPath();
+    ctx.moveTo(-20,-5);
+    ctx.quadraticCurveTo(-35,-15+Math.sin(Date.now()*0.005)*5, -30,-22);
+    ctx.lineWidth=4;
+    ctx.strokeStyle='#daa520';
+    ctx.lineCap='round';
+    ctx.stroke();
+
+    // Legs
+    ctx.strokeStyle='#b8860b';
+    ctx.lineWidth=3;
+    if(dogState==='idle'){
+      ctx.beginPath(); ctx.moveTo(8,14); ctx.lineTo(8,26); ctx.stroke();
+      ctx.beginPath(); ctx.moveTo(-8,14); ctx.lineTo(-8,26); ctx.stroke();
+    }
+
+    ctx.restore();
+  }
+
+  function drawSplashEffects(){
+    for(const s of splashes){
+      ctx.fillStyle=`rgba(255,255,255,${s.life})`;
+      ctx.beginPath();
+      ctx.arc(s.x,s.y,s.size*s.life,0,Math.PI*2);
+      ctx.fill();
+    }
+    for(const b of bubbles){
+      ctx.strokeStyle=`rgba(255,255,255,${b.life*0.6})`;
+      ctx.lineWidth=1;
+      ctx.beginPath();
+      ctx.arc(b.x,b.y,b.size,0,Math.PI*2);
+      ctx.stroke();
+      // Highlight
+      ctx.fillStyle=`rgba(255,255,255,${b.life*0.3})`;
+      ctx.beginPath();
+      ctx.arc(b.x-b.size*0.3,b.y-b.size*0.3,b.size*0.3,0,Math.PI*2);
+      ctx.fill();
+    }
+  }
+
+  function drawRipples(){
+    if(dogState==='swimming'){
+      const t = Date.now()*0.003;
+      for(let i=0;i<3;i++){
+        const r = 10+i*12+Math.sin(t+i)*3;
+        ctx.strokeStyle=`rgba(255,255,255,${0.3-i*0.08})`;
+        ctx.lineWidth=1.5;
+        ctx.beginPath();
+        ctx.ellipse(dogX, WATER_Y+5, r, r*0.3, 0, 0, Math.PI*2);
+        ctx.stroke();
+      }
+    }
+  }
+
+  function dive(){
+    if(dogState!=='idle') return;
+    dogState='diving';
+    diveTime=0;
+    targetX = 300+Math.random()*100;
+    targetY = WATER_Y;
+    stateEl.textContent='Diving! 🌀';
+    dives++;
+    scoreEl.textContent=dives;
+  }
+
+  function resetDog(){
+    dogState='idle';
+    dogAngle=0;
+    dogX=180;
+    dogY=WATER_Y-80;
+    stateEl.textContent='Ready to dive!';
+    swimTimer=0;
+    resetTimer=0;
+  }
+
+  function triggerDive(){
+    dogState='diving';
+    diveTime=0;
+    targetX = 280+Math.random()*150;
+    targetY = WATER_Y;
+    stateEl.textContent='Diving! 🌀';
+    dives++;
+    scoreEl.textContent=dives;
+  }
+
+  // Game loop
+  let lastTime=0;
+  function loop(time){
+    const dt = Math.min((time-lastTime)/1000, 0.05);
+    lastTime=time;
+
+    waterOffset += 1;
+
+    // Update clouds
+    for(const c of clouds){
+      c.x += c.speed;
+      if(c.x>860) c.x=-80;
+    }
+
+    // Update fish
+    for(const f of fishList){
+      f.x += f.speed*f.dir;
+      if(f.x>840) f.dir=-1;
+      if(f.x<-40) f.dir=1;
+      f.y += Math.sin(time*0.002+f.x*0.01)*0.3;
+    }
+
+    // Update dog position
+    if(dogState==='diving'){
+      diveTime+=dt;
+      const prog = Math.min(diveTime/0.5, 1);
+      const ease = prog<0.5 ? 2*prog*prog : 1-Math.pow(-2*prog+2,2)/2;
+      dogX = 180 + (targetX-180)*ease;
+      dogY = (WATER_Y-80) + (targetY-(WATER_Y-80))*ease;
+      dogAngle = ease * Math.PI/3;
+
+      if(prog>=1){
+        dogState='splashing';
+        addSplash(dogX, WATER_Y);
+        addBubbles(dogX, WATER_Y+20, 8);
+        stateEl.textContent='SPLASH! 💦';
+        resetTimer=0;
+      }
+    } else if(dogState==='splashing'){
+      resetTimer+=dt;
+      if(resetTimer>0.6){
+        dogState='swimming';
+        dogY=WATER_Y+5;
+        dogX=targetX;
+        dogAngle=0;
+        stateEl.textContent='Swimming happily! 🐕';
+        swimTimer=0;
+      }
+    } else if(dogState==='swimming'){
+      swimTimer+=dt;
+      dogX = targetX + Math.sin(swimTimer*1.5)*30;
+      dogY = WATER_Y+5 + Math.sin(swimTimer*2)*3;
+
+      // Occasional bubbles
+      if(Math.random()<0.03) addBubbles(dogX,dogY,1);
+
+      if(swimTimer>4){
+        resetTimer+=dt;
+        dogY = (WATER_Y+5) - resetTimer*20;
+        if(dogY<WATER_Y-80){
+          resetDog();
+        }
+      }
+    }
+
+    // Update splashes
+    for(let i=splashes.length-1;i>=0;i--){
+      const s=splashes[i];
+      s.x+=s.vx;
+      s.y+=s.vy;
+      s.vy+=0.15;
+      s.life-=dt*2;
+      if(s.life<=0) splashes.splice(i,1);
+    }
+    // Update bubbles
+    for(let i=bubbles.length-1;i>=0;i--){
+      const b=bubbles[i];
+      b.x+=b.vx;
+      b.y+=b.vy;
+      b.vx+=Math.sin(time*0.01+b.x)*0.01;
+      b.life-=dt*0.8;
+      if(b.life<=0) bubbles.splice(i,1);
+    }
+
+    // Draw
+    ctx.clearRect(0,0,800,500);
+    drawSky();
+    drawStars();
+    drawMoon();
+    drawClouds();
+    drawCliff();
+    drawWater();
+    drawFish();
+    drawRipples();
+    drawDog();
+    drawSplashEffects();
+
+    requestAnimationFrame(loop);
+  }
+
+  // Controls
+  function handleAction(){
+    if(dogState==='idle') triggerDive();
+  }
+
+  document.addEventListener('keydown', e=>{
+    if(e.code==='Space'){ e.preventDefault(); handleAction(); }
+  });
+  canvas.addEventListener('click', handleAction);
+  canvas.addEventListener('touchstart', e=>{ e.preventDefault(); handleAction(); },{passive:false});
+
+  // Responsive canvas sizing
+  function resizeCanvas(){
+    const w = Math.min(800, window.innerWidth-32);
+    canvas.style.width=w+'px';
+    canvas.style.height=(w*500/800)+'px';
+  }
+  resizeCanvas();
+  window.addEventListener('resize', resizeCanvas);
+
+  requestAnimationFrame(loop);
+})();
+</script>
+</body>
+</html>
