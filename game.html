@@ -272,7 +272,7 @@ footer {
       const pair = data.pairs && data.pairs[0];
       if (pair && pair.fdv) {
         const fdv = pair.fdv;
-        const meters = Math.round(fdv / 20000);
+        const meters = Math.max(1, Math.round(fdv / 20000));
         heightEl.textContent = meters + 'm';
       } else {
         heightEl.textContent = '0m';
@@ -645,7 +645,8 @@ footer {
     cliffGrad.addColorStop(0.3, '#E8DCC8');
     cliffGrad.addColorStop(0.5, '#DDD0B8');
     cliffGrad.addColorStop(0.7, '#D4C5A9');
-    cliffGrad.addColorStop(1, '#C8B898');
+    cliffGrad.addColorStop(0.9, '#E0D4BC');
+    cliffGrad.addColorStop(1, '#E8DCC8');
     ctx.fillStyle = cliffGrad;
 
     // Build cliff shape: left=0, right edge follows cliffEdgeX(y)
