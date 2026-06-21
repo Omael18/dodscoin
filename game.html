@@ -80,7 +80,6 @@ nav {
   border: 1px solid rgba(0,201,167,0.2);
 }
 .score-bar .score-val { color:var(--turquoise); }
-.score-bar .height-val { color:#ffd54f; }
 .score-bar .best-val { color:#ff9800; }
 .game-container {
   position:relative; z-index:1;
@@ -192,7 +191,6 @@ footer {
 
 <div class="score-bar">
   <span>🐕 Dives: <span class="score-val" id="scoreVal">0</span></span>
-  <span>📏 Height: <span class="height-val" id="heightVal">30m</span></span>
   <span>🏆 Best: <span class="best-val" id="bestVal">0</span></span>
   <span id="stateLabel">Ready to dive!</span>
 </div>
@@ -237,7 +235,7 @@ footer {
   const WATER_Y = BASE_H * 0.55; // water surface at ~55% of height
   const CLIFF_W = 190;           // cliff width from left edge
   const CLIFF_TOP = 80;           // cliff starts 80px from top (NOT full height)
-  const CLIFF_BOTTOM = CLIFF_TOP + 60; // cliff ends just below dog
+  const CLIFF_BOTTOM = WATER_Y + 20; // cliff reaches water line
 
   function resizeCanvas() {
     const container = canvas.parentElement;
@@ -256,7 +254,6 @@ footer {
   //  DOM REFS
   // ═══════════════════════════════════════════
   const scoreEl = document.getElementById('scoreVal');
-  const heightEl = document.getElementById('heightVal');
   const bestEl = document.getElementById('bestVal');
   const stateEl = document.getElementById('stateLabel');
   const resetBtn = document.getElementById('resetBtn');
@@ -1941,8 +1938,6 @@ footer {
 
   // Init display
   bestEl.textContent = bestDive > 0 ? bestDive : '0';
-  const cliffHeightM = Math.round((WATER_Y - 20) / (BASE_H - 20) * 30);
-  heightEl.textContent = cliffHeightM + 'm';
 
   requestAnimationFrame(loop);
 })();
