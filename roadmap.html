@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Roadmap 🗺️ — DODSC</title>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --navy: #0a1628;
+  --navy-light: #112240;
+  --turquoise: #00c9a7;
+  --turquoise-glow: #00e6be;
+  --sea-dark: #064e5c;
+  --white: #ffffff;
+  --text: #c8d6e5;
+  --card-bg: rgba(17,34,64,0.85);
+  --green: #00e676;
+  --pink: #ff6b9d;
+  --gold: #ffd700;
+  --purple: #b388ff;
+}
+* { margin:0; padding:0; box-sizing:border-box; }
+html { scroll-behavior:smooth; }
+body {
+  font-family:'Fredoka',sans-serif;
+  background: linear-gradient(180deg, var(--navy) 0%, #0d1f3c 50%, var(--sea-dark) 100%);
+  color: var(--white);
+  min-height:100vh;
+  overflow-x:hidden;
+}
+
+nav {
+  position:sticky; top:0; z-index:100;
+  background: rgba(10,22,40,0.95);
+  backdrop-filter: blur(10px);
+  border-bottom: 1px solid rgba(0,201,167,0.3);
+  padding: 12px 0;
+}
+.nav-inner {
+  max-width:900px; margin:0 auto;
+  display:flex; align-items:center; justify-content:center;
+  gap:8px; flex-wrap:wrap;
+  padding:0 16px;
+}
+.nav-inner a {
+  color:var(--text);
+  text-decoration:none;
+  padding:8px 14px;
+  border-radius:20px;
+  font-size:0.95rem;
+  font-weight:500;
+  transition: all 0.3s;
+}
+.nav-inner a:hover, .nav-inner a.active {
+  color:var(--turquoise);
+  background: rgba(0,201,167,0.15);
+}
+
+.page-header {
+  text-align:center;
+  padding:40px 20px 30px;
+  position:relative; z-index:1;
+}
+.page-header h1 {
+  font-size: clamp(2rem, 5vw, 3rem);
+  background: linear-gradient(135deg, var(--white), var(--turquoise-glow));
+  -webkit-background-clip:text;
+  -webkit-text-fill-color:transparent;
+  background-clip:text;
+}
+
+.timeline {
+  position:relative;
+  max-width:700px;
+  margin:0 auto;
+  padding:0 20px 60px;
+  z-index:1;
+}
+.timeline::before {
+  content:'';
+  position:absolute;
+  left:30px;
+  top:0;
+  bottom:0;
+  width:3px;
+  background: linear-gradient(180deg, var(--turquoise), var(--pink), var(--purple));
+  border-radius:3px;
+}
+
+.phase-card {
+  position:relative;
+  margin-left:60px;
+  margin-bottom:30px;
+  background: var(--card-bg);
+  border:1px solid rgba(0,201,167,0.15);
+  border-radius:16px;
+  padding:24px;
+  transition: transform 0.3s, box-shadow 0.3s;
+}
+.phase-card:hover {
+  transform:translateY(-3px);
+  box-shadow: 0 8px 30px rgba(0,201,167,0.15);
+}
+.phase-card.active {
+  border-color:var(--turquoise);
+  box-shadow: 0 0 20px rgba(0,201,167,0.15);
+}
+
+.phase-dot {
+  position:absolute;
+  left:-44px;
+  top:24px;
+  width:22px;
+  height:22px;
+  border-radius:50%;
+  border:3px solid var(--turquoise);
+  background:var(--navy);
+}
+.phase-card.done .phase-dot {
+  background:var(--turquoise);
+}
+.phase-card.active .phase-dot {
+  background:var(--turquoise);
+  box-shadow: 0 0 12px rgba(0,201,167,0.5);
+  animation: dotPulse 2s infinite;
+}
+@keyframes dotPulse {
+  0%,100% { box-shadow: 0 0 12px rgba(0,201,167,0.5); }
+  50% { box-shadow: 0 0 24px rgba(0,201,167,0.8); }
+}
+
+.phase-badge {
+  display:inline-block;
+  padding:3px 12px;
+  border-radius:20px;
+  font-size:0.75rem;
+  font-weight:600;
+  margin-bottom:10px;
+}
+.badge-done {
+  background:rgba(0,230,118,0.15);
+  color:var(--green);
+}
+.badge-active {
+  background:rgba(0,201,167,0.2);
+  color:var(--turquoise);
+}
+.badge-future {
+  background:rgba(179,136,255,0.15);
+  color:var(--purple);
+}
+
+.phase-card h3 {
+  font-size:1.2rem;
+  margin-bottom:8px;
+}
+.phase-card ul {
+  list-style:none;
+  padding:0;
+}
+.phase-card li {
+  padding:4px 0;
+  color:var(--text);
+  font-size:0.95rem;
+}
+.phase-card li::before {
+  content:'•';
+  color:var(--turquoise);
+  margin-right:8px;
+}
+
+footer {
+  position:relative; z-index:1;
+  background: rgba(6,15,30,0.9);
+  border-top:1px solid rgba(0,201,167,0.2);
+  padding:40px 20px 24px;
+  text-align:center;
+}
+.footer-links {
+  display:flex; gap:20px; justify-content:center; flex-wrap:wrap;
+  margin-bottom:16px;
+}
+.footer-links a {
+  color:var(--text);
+  text-decoration:none;
+  font-size:0.95rem;
+  transition: color 0.3s;
+}
+.footer-links a:hover { color:var(--turquoise); }
+.mint-addr {
+  font-size:0.75rem;
+  color:rgba(200,214,229,0.5);
+  word-break:break-all;
+  margin-top:12px;
+}
+.footer-copy {
+  margin-top:12px;
+  font-size:0.8rem;
+  color:rgba(200,214,229,0.4);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+@media (max-width:600px) {
+  .timeline::before { left:20px; }
+  .phase-card { margin-left:44px; padding:18px; }
+  .phase-dot { left:-36px; width:18px; height:18px; }
+}
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="nav-inner">
+    <a href="index.html">🏠 Home</a>
+    <a href="game.html">🎮 Play</a>
+    <a href="roadmap.html" class="active">📋 Roadmap</a>
+    <a href="security.html">🔒 Security</a>
+    <a href="community.html">🌐 Community</a>
+  </div>
+</nav>
+
+<div class="page-header">
+  <h1>Roadmap 🗺️</h1>
+</div>
+
+<div class="timeline">
+  <!-- Phase 1 -->
+  <div class="phase-card done">
+    <div class="phase-dot"></div>
+    <span class="phase-badge badge-done">✅ DONE</span>
+    <h3>Phase 1: Token Created</h3>
+    <ul>
+      <li>Token-2022 deployed on Solana</li>
+      <li>Mint authority revoked</li>
+      <li>1% transfer tax</li>
+      <li>1,000,000,000 total supply</li>
+    </ul>
+  </div>
+
+  <!-- Phase 2 -->
+  <div class="phase-card done">
+    <div class="phase-dot"></div>
+    <span class="phase-badge badge-done">✅ DONE</span>
+    <h3>Phase 2: Pool Live</h3>
+    <ul>
+      <li>Raydium CPMM pool created</li>
+      <li>17 SOL + 891M DODSC liquidity</li>
+      <li>Trading is live</li>
+    </ul>
+  </div>
+
+  <!-- Phase 3 -->
+  <div class="phase-card done">
+    <div class="phase-dot"></div>
+    <span class="phase-badge badge-done">✅ DONE</span>
+    <h3>Phase 3: LP Locked</h3>
+    <ul>
+      <li>69-day LP lock via StakePoint</li>
+      <li>~3,813 LP tokens locked</li>
+      <li>Rug-proof security verified</li>
+    </ul>
+  </div>
+
+  <!-- Phase 4 -->
+  <div class="phase-card active">
+    <div class="phase-dot"></div>
+    <span class="phase-badge badge-active">🚀 ACTIVE</span>
+    <h3>Phase 4: Growth</h3>
+    <ul>
+      <li>Target: $100K market cap → $30M FDV</li>
+      <li>500+ holders</li>
+      <li>CoinGecko listing</li>
+      <li>Dexscreener boost</li>
+    </ul>
+  </div>
+
+  <!-- Phase 5 -->
+  <div class="phase-card">
+    <div class="phase-dot"></div>
+    <span class="phase-badge badge-future">🌕 UPCOMING</span>
+    <h3>Phase 5: Moon</h3>
+    <ul>
+      <li>Target: $500K market cap → $40M FDV</li>
+      <li>1,000+ holders</li>
+      <li>CEX listing application</li>
+      <li>Community partnerships</li>
+    </ul>
+  </div>
+
+  <!-- Phase 6 -->
+  <div class="phase-card">
+    <div class="phase-dot"></div>
+    <span class="phase-badge badge-future">🌟 BEYOND</span>
+    <h3>Phase 6: Beyond</h3>
+    <ul>
+      <li>Target: $1M market cap → $50M FDV</li>
+      <li>Major CEX listings</li>
+      <li>Merch store</li>
+      <li>NFT collection (Dods the diving dog)</li>
+    </ul>
+  </div>
+</div>
+
+<footer>
+  <div class="footer-links">
+    <a href="https://x.com/DodscoinX" target="_blank" rel="noopener">🐦 X / Twitter</a>
+    <a href="https://www.instagram.com/dodscoin" target="_blank" rel="noopener">📸 Instagram</a>
+    <a href="https://www.tiktok.com/@dodscoin2026" target="_blank" rel="noopener">🎵 TikTok</a>
+    <a href="https://t.me/dodscoin2026" target="_blank" rel="noopener">✈️ Telegram</a>
+  </div>
+  <div class="mint-addr">Mint: 4nsq8dMuf6JqqaZpgbtCMVuRt9bYcrLS1Df5pGb4MWpx</div>
+  <div class="footer-copy">© 2025 DODSC. Not financial advice. DYOR.</div>
+</footer>
+</body>
+</html>
