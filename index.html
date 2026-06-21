@@ -1,1661 +1,371 @@
 <!DOCTYPE html>
-<html lang="fr">
+<html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>DODSC - Dodscoin | Solana Meme Coin 🐕</title>
-    <meta name="description" content="Dodscoin (DODSC) - Le meme coin Solana Token-2022 qui plonge vers la lune! 🚀🐕">
-    <meta name="theme-color" content="#0a1628">
-    <link rel="icon" href="https://plum-healthy-coral-227.mypinata.cloud/ipfs/bafybeigya3gh44dyl5k67yt4on4ralmbuteg3ol5z2fdx7hwftsawaf2xe" type="image/png">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <style>
-        /* ============================================
-           CSS VARIABLES
-           ============================================ */
-        :root {
-            --bg-dark: #0a1628;
-            --bg-navy: #0d1f3c;
-            --bg-ocean: #0c2d48;
-            --accent-cyan: #00d4ff;
-            --accent-teal: #00bfa5;
-            --accent-gold: #ffd700;
-            --accent-orange: #ff6b35;
-            --accent-pink: #ff4081;
-            --accent-purple: #7c4dff;
-            --text-primary: #e8f4fd;
-            --text-secondary: #8bb8d6;
-            --text-muted: #5a7a9a;
-            --card-bg: rgba(13, 31, 60, 0.85);
-            --card-border: rgba(0, 212, 255, 0.2);
-            --glow-cyan: 0 0 20px rgba(0, 212, 255, 0.4);
-            --glow-gold: 0 0 20px rgba(255, 215, 0, 0.4);
-            --font-main: 'Fredoka', sans-serif;
-            --sea-top: #0c2d48;
-            --sea-mid: #0a4a6e;
-            --sea-bottom: #087493;
-            --wave-color: rgba(0, 191, 165, 0.3);
-            --bubble-color: rgba(0, 212, 255, 0.3);
-        }
-
-        /* ============================================
-           RESET & BASE
-           ============================================ */
-        *, *::before, *::after {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        html {
-            scroll-behavior: smooth;
-            scroll-padding-top: 70px;
-        }
-
-        body {
-            font-family: var(--font-main);
-            background: var(--bg-dark);
-            color: var(--text-primary);
-            overflow-x: hidden;
-            line-height: 1.6;
-        }
-
-        /* ============================================
-           NAVBAR
-           ============================================ */
-        .navbar {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            z-index: 1000;
-            background: rgba(10, 22, 40, 0.92);
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
-            border-bottom: 1px solid var(--card-border);
-            padding: 0 20px;
-            height: 64px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-        }
-
-        .nav-logo {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            text-decoration: none;
-            color: var(--accent-cyan);
-            font-weight: 700;
-            font-size: 1.3rem;
-        }
-
-        .nav-logo img {
-            width: 36px;
-            height: 36px;
-            border-radius: 50%;
-        }
-
-        .nav-links {
-            display: flex;
-            gap: 8px;
-            list-style: none;
-        }
-
-        .nav-links a {
-            color: var(--text-secondary);
-            text-decoration: none;
-            padding: 8px 14px;
-            border-radius: 20px;
-            font-size: 0.9rem;
-            font-weight: 500;
-            transition: all 0.3s ease;
-        }
-
-        .nav-links a:hover {
-            color: var(--accent-cyan);
-            background: rgba(0, 212, 255, 0.1);
-        }
-
-        .hamburger {
-            display: none;
-            flex-direction: column;
-            gap: 5px;
-            cursor: pointer;
-            padding: 8px;
-            background: none;
-            border: none;
-        }
-
-        .hamburger span {
-            width: 24px;
-            height: 2px;
-            background: var(--text-primary);
-            border-radius: 2px;
-            transition: all 0.3s ease;
-        }
-
-        /* ============================================
-           HERO SECTION
-           ============================================ */
-        .hero {
-            position: relative;
-            min-height: 100vh;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            text-align: center;
-            padding: 100px 20px 40px;
-            background: linear-gradient(180deg, #0a1628 0%, #0d1f3c 40%, #0c2d48 70%, #0a4a6e 100%);
-            overflow: hidden;
-        }
-
-        /* Stars */
-        .stars {
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            height: 60%;
-            overflow: hidden;
-            z-index: 0;
-        }
-
-        .star {
-            position: absolute;
-            width: 2px;
-            height: 2px;
-            background: white;
-            border-radius: 50%;
-            animation: twinkle 3s ease-in-out infinite alternate;
-        }
-
-        .star:nth-child(1) { top: 8%; left: 12%; animation-delay: 0s; }
-        .star:nth-child(2) { top: 15%; left: 45%; animation-delay: 0.5s; width: 3px; height: 3px; }
-        .star:nth-child(3) { top: 5%; left: 78%; animation-delay: 1s; }
-        .star:nth-child(4) { top: 22%; left: 28%; animation-delay: 1.5s; width: 3px; height: 3px; }
-        .star:nth-child(5) { top: 10%; left: 90%; animation-delay: 0.3s; }
-        .star:nth-child(6) { top: 30%; left: 5%; animation-delay: 0.8s; width: 2px; height: 2px; }
-        .star:nth-child(7) { top: 18%; left: 62%; animation-delay: 1.2s; }
-        .star:nth-child(8) { top: 3%; left: 35%; animation-delay: 2s; width: 3px; height: 3px; }
-        .star:nth-child(9) { top: 25%; left: 82%; animation-delay: 0.7s; }
-        .star:nth-child(10) { top: 12%; left: 55%; animation-delay: 1.8s; }
-        .star:nth-child(11) { top: 35%; left: 20%; animation-delay: 0.4s; width: 2px; height: 2px; }
-        .star:nth-child(12) { top: 8%; left: 68%; animation-delay: 1.1s; }
-        .star:nth-child(13) { top: 40%; left: 40%; animation-delay: 2.2s; }
-        .star:nth-child(14) { top: 28%; left: 92%; animation-delay: 0.6s; width: 3px; height: 3px; }
-        .star:nth-child(15) { top: 45%; left: 15%; animation-delay: 1.4s; }
-        .star:nth-child(16) { top: 20%; left: 8%; animation-delay: 0.9s; width: 2px; height: 2px; }
-        .star:nth-child(17) { top: 38%; left: 72%; animation-delay: 1.7s; }
-        .star:nth-child(18) { top: 2%; left: 52%; animation-delay: 2.5s; width: 3px; height: 3px; }
-        .star:nth-child(19) { top: 42%; left: 88%; animation-delay: 0.2s; }
-        .star:nth-child(20) { top: 33%; left: 58%; animation-delay: 1.3s; }
-
-        @keyframes twinkle {
-            0% { opacity: 0.2; transform: scale(1); }
-            100% { opacity: 1; transform: scale(1.5); }
-        }
-
-        /* Moon */
-        .moon {
-            position: absolute;
-            top: 60px;
-            right: 8%;
-            width: 90px;
-            height: 90px;
-            border-radius: 50%;
-            background: radial-gradient(circle at 35% 35%, #fffde7, #ffd54f, #ffb300);
-            box-shadow: 0 0 40px rgba(255, 213, 79, 0.5), 0 0 80px rgba(255, 213, 79, 0.3), 0 0 120px rgba(255, 213, 79, 0.15);
-            animation: moonGlow 4s ease-in-out infinite alternate;
-            z-index: 1;
-        }
-
-        .moon::before {
-            content: '';
-            position: absolute;
-            top: 20px;
-            left: 25px;
-            width: 15px;
-            height: 15px;
-            border-radius: 50%;
-            background: rgba(255, 179, 0, 0.3);
-        }
-
-        .moon::after {
-            content: '';
-            position: absolute;
-            top: 45px;
-            left: 50px;
-            width: 10px;
-            height: 10px;
-            border-radius: 50%;
-            background: rgba(255, 179, 0, 0.25);
-        }
-
-        @keyframes moonGlow {
-            0% { box-shadow: 0 0 40px rgba(255, 213, 79, 0.5), 0 0 80px rgba(255, 213, 79, 0.3); }
-            100% { box-shadow: 0 0 60px rgba(255, 213, 79, 0.7), 0 0 100px rgba(255, 213, 79, 0.4), 0 0 150px rgba(255, 213, 79, 0.2); }
-        }
-
-        /* Rocket */
-        .rocket {
-            position: absolute;
-            top: 30%;
-            left: 10%;
-            font-size: 2.5rem;
-            animation: rocketFly 8s ease-in-out infinite;
-            z-index: 2;
-            filter: drop-shadow(0 0 8px rgba(255, 107, 53, 0.6));
-        }
-
-        @keyframes rocketFly {
-            0% { transform: translate(0, 0) rotate(-45deg); opacity: 0.8; }
-            25% { transform: translate(120px, -80px) rotate(-35deg); opacity: 1; }
-            50% { transform: translate(250px, -40px) rotate(-40deg); opacity: 0.9; }
-            75% { transform: translate(180px, -120px) rotate(-50deg); opacity: 1; }
-            100% { transform: translate(0, 0) rotate(-45deg); opacity: 0.8; }
-        }
-
-        .rocket-trail {
-            position: absolute;
-            top: 30%;
-            left: 9.5%;
-            width: 4px;
-            height: 0;
-            background: linear-gradient(180deg, #ff6b35, #ff4081, transparent);
-            animation: trail 8s ease-in-out infinite;
-            z-index: 1;
-            border-radius: 2px;
-        }
-
-        @keyframes trail {
-            0% { height: 0; opacity: 0; }
-            10% { height: 40px; opacity: 0.7; }
-            50% { height: 60px; opacity: 0.5; }
-            100% { height: 0; opacity: 0; }
-        }
-
-        /* Hero content */
-        .hero-content {
-            position: relative;
-            z-index: 10;
-        }
-
-        .hero-logo {
-            width: 150px;
-            height: 150px;
-            border-radius: 50%;
-            margin: 0 auto 24px;
-            animation: logoFloat 3s ease-in-out infinite alternate;
-            box-shadow: 0 0 30px rgba(0, 212, 255, 0.4);
-        }
-
-        @keyframes logoFloat {
-            0% { transform: translateY(0); }
-            100% { transform: translateY(-12px); }
-        }
-
-        .hero-title {
-            font-size: 4.5rem;
-            font-weight: 700;
-            color: var(--accent-cyan);
-            text-shadow: 0 0 30px rgba(0, 212, 255, 0.6), 0 0 60px rgba(0, 212, 255, 0.3);
-            margin-bottom: 8px;
-            letter-spacing: 6px;
-            animation: glowPulse 2s ease-in-out infinite alternate;
-        }
-
-        @keyframes glowPulse {
-            0% { text-shadow: 0 0 30px rgba(0, 212, 255, 0.6), 0 0 60px rgba(0, 212, 255, 0.3); }
-            100% { text-shadow: 0 0 40px rgba(0, 212, 255, 0.8), 0 0 80px rgba(0, 212, 255, 0.5), 0 0 120px rgba(0, 212, 255, 0.2); }
-        }
-
-        .hero-subtitle {
-            font-size: 1.3rem;
-            color: var(--text-secondary);
-            margin-bottom: 16px;
-            font-weight: 500;
-        }
-
-        .hero-tagline {
-            font-size: 1rem;
-            color: var(--text-muted);
-            margin-bottom: 36px;
-            font-style: italic;
-        }
-
-        .hero-buttons {
-            display: flex;
-            gap: 16px;
-            justify-content: center;
-            flex-wrap: wrap;
-            margin-bottom: 40px;
-        }
-
-        .btn-primary {
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            padding: 14px 32px;
-            background: linear-gradient(135deg, var(--accent-cyan), var(--accent-teal));
-            color: var(--bg-dark);
-            text-decoration: none;
-            border-radius: 50px;
-            font-weight: 700;
-            font-size: 1rem;
-            font-family: var(--font-main);
-            transition: all 0.3s ease;
-            border: none;
-            cursor: pointer;
-        }
-
-        .btn-primary:hover {
-            transform: translateY(-3px);
-            box-shadow: var(--glow-cyan), 0 8px 32px rgba(0, 212, 255, 0.3);
-        }
-
-        .btn-secondary {
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            padding: 14px 32px;
-            background: transparent;
-            color: var(--accent-cyan);
-            text-decoration: none;
-            border-radius: 50px;
-            font-weight: 700;
-            font-size: 1rem;
-            font-family: var(--font-main);
-            transition: all 0.3s ease;
-            border: 2px solid var(--accent-cyan);
-            cursor: pointer;
-        }
-
-        .btn-secondary:hover {
-            background: rgba(0, 212, 255, 0.1);
-            transform: translateY(-3px);
-            box-shadow: var(--glow-cyan);
-        }
-
-        /* ============================================
-           DIVING DOG SCENE
-           ============================================ */
-        .diving-scene {
-            position: relative;
-            width: 100%;
-            height: 280px;
-            overflow: hidden;
-            z-index: 5;
-            margin-top: 20px;
-        }
-
-        /* Dog */
-        .dog {
-            position: absolute;
-            z-index: 10;
-            animation: dogDive 4s ease-in infinite;
-            left: 50%;
-            transform: translateX(-50%);
-            top: 0;
-        }
-
-        .dog-svg {
-            width: 80px;
-            height: 80px;
-            filter: drop-shadow(0 2px 8px rgba(0,0,0,0.3));
-        }
-
-        @keyframes dogDive {
-            0% { top: -10px; transform: translateX(-50%) rotate(0deg); opacity: 0; }
-            5% { top: 0; opacity: 1; }
-            40% { top: 40px; transform: translateX(-50%) rotate(25deg); opacity: 1; }
-            60% { top: 100px; transform: translateX(-50%) rotate(70deg); opacity: 1; }
-            70% { top: 140px; transform: translateX(-50%) rotate(85deg); opacity: 1; }
-            75% { top: 160px; transform: translateX(-50%) rotate(90deg); opacity: 0; }
-            100% { top: 160px; opacity: 0; }
-        }
-
-        /* Splash */
-        .splash {
-            position: absolute;
-            bottom: 100px;
-            left: 50%;
-            transform: translateX(-50%);
-            z-index: 8;
-            animation: splashAppear 4s ease-in infinite;
-            opacity: 0;
-        }
-
-        @keyframes splashAppear {
-            0%, 72% { opacity: 0; transform: translateX(-50%) scale(0.3); }
-            78% { opacity: 1; transform: translateX(-50%) scale(1.2); }
-            85% { opacity: 0.8; transform: translateX(-50%) scale(1); }
-            100% { opacity: 0; transform: translateX(-50%) scale(0.5); }
-        }
-
-        /* Water surface line */
-        .water-surface {
-            position: absolute;
-            bottom: 100px;
-            left: 0;
-            right: 0;
-            height: 3px;
-            background: linear-gradient(90deg, transparent, rgba(0, 191, 165, 0.6), var(--accent-teal), rgba(0, 191, 165, 0.6), transparent);
-            z-index: 6;
-        }
-
-        /* Sea background */
-        .sea-bg {
-            position: absolute;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            height: 100px;
-            background: linear-gradient(180deg, rgba(10, 74, 110, 0.5), rgba(8, 116, 147, 0.7));
-            z-index: 4;
-        }
-
-        /* Waves */
-        .wave {
-            position: absolute;
-            bottom: 80px;
-            left: -50%;
-            width: 200%;
-            height: 40px;
-            z-index: 5;
-        }
-
-        .wave svg {
-            width: 100%;
-            height: 100%;
-        }
-
-        .wave-1 { animation: waveMove 6s linear infinite; }
-        .wave-2 { animation: waveMove 8s linear infinite reverse; bottom: 70px; opacity: 0.6; }
-        .wave-3 { animation: waveMove 10s linear infinite; bottom: 60px; opacity: 0.4; }
-
-        @keyframes waveMove {
-            0% { transform: translateX(0); }
-            100% { transform: translateX(50%); }
-        }
-
-        /* Bubbles */
-        .bubbles {
-            position: absolute;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            height: 100px;
-            z-index: 7;
-            overflow: hidden;
-        }
-
-        .bubble {
-            position: absolute;
-            bottom: -20px;
-            width: 8px;
-            height: 8px;
-            border-radius: 50%;
-            background: var(--bubble-color);
-            border: 1px solid rgba(0, 212, 255, 0.3);
-            animation: bubbleRise linear infinite;
-        }
-
-        .bubble:nth-child(1) { left: 15%; animation-duration: 4s; animation-delay: 0s; width: 6px; height: 6px; }
-        .bubble:nth-child(2) { left: 30%; animation-duration: 5s; animation-delay: 1s; width: 10px; height: 10px; }
-        .bubble:nth-child(3) { left: 45%; animation-duration: 3.5s; animation-delay: 0.5s; }
-        .bubble:nth-child(4) { left: 60%; animation-duration: 6s; animation-delay: 2s; width: 5px; height: 5px; }
-        .bubble:nth-child(5) { left: 75%; animation-duration: 4.5s; animation-delay: 1.5s; width: 7px; height: 7px; }
-        .bubble:nth-child(6) { left: 85%; animation-duration: 5.5s; animation-delay: 0.3s; }
-        .bubble:nth-child(7) { left: 22%; animation-duration: 4.2s; animation-delay: 2.5s; width: 9px; height: 9px; }
-        .bubble:nth-child(8) { left: 52%; animation-duration: 3.8s; animation-delay: 1.8s; width: 4px; height: 4px; }
-
-        @keyframes bubbleRise {
-            0% { bottom: -20px; opacity: 0; transform: translateX(0); }
-            10% { opacity: 0.7; }
-            50% { opacity: 0.5; transform: translateX(15px); }
-            90% { opacity: 0.3; }
-            100% { bottom: 110px; opacity: 0; transform: translateX(-10px); }
-        }
-
-        /* Fish */
-        .fish {
-            position: absolute;
-            z-index: 6;
-            font-size: 1.2rem;
-            animation: fishSwim linear infinite;
-        }
-
-        .fish:nth-child(1) { bottom: 20px; animation-duration: 12s; animation-delay: 0s; }
-        .fish:nth-child(2) { bottom: 50px; animation-duration: 15s; animation-delay: 3s; font-size: 1rem; }
-        .fish:nth-child(3) { bottom: 35px; animation-duration: 10s; animation-delay: 6s; }
-
-        @keyframes fishSwim {
-            0% { left: -30px; transform: scaleX(1); }
-            49.9% { transform: scaleX(1); }
-            50% { left: calc(100% + 30px); transform: scaleX(-1); }
-            99.9% { transform: scaleX(-1); }
-            100% { left: -30px; transform: scaleX(1); }
-        }
-
-        /* ============================================
-           SECTION COMMON
-           ============================================ */
-        section {
-            padding: 80px 20px;
-            position: relative;
-        }
-
-        .section-container {
-            max-width: 1100px;
-            margin: 0 auto;
-        }
-
-        .section-title {
-            text-align: center;
-            font-size: 2.5rem;
-            font-weight: 700;
-            margin-bottom: 12px;
-            color: var(--accent-cyan);
-            text-shadow: 0 0 20px rgba(0, 212, 255, 0.3);
-        }
-
-        .section-subtitle {
-            text-align: center;
-            font-size: 1.1rem;
-            color: var(--text-secondary);
-            margin-bottom: 48px;
-        }
-
-        /* ============================================
-           ROADMAP
-           ============================================ */
-        .roadmap {
-            background: linear-gradient(180deg, var(--bg-dark), var(--bg-navy));
-        }
-
-        .timeline {
-            position: relative;
-            max-width: 700px;
-            margin: 0 auto;
-        }
-
-        .timeline::before {
-            content: '';
-            position: absolute;
-            left: 28px;
-            top: 0;
-            bottom: 0;
-            width: 3px;
-            background: linear-gradient(180deg, var(--accent-cyan), var(--accent-teal), var(--accent-gold));
-            border-radius: 3px;
-        }
-
-        .timeline-item {
-            position: relative;
-            padding-left: 80px;
-            margin-bottom: 40px;
-        }
-
-        .timeline-item:last-child {
-            margin-bottom: 0;
-        }
-
-        .timeline-dot {
-            position: absolute;
-            left: 14px;
-            top: 4px;
-            width: 32px;
-            height: 32px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.1rem;
-            z-index: 2;
-        }
-
-        .timeline-item:nth-child(1) .timeline-dot { background: var(--accent-cyan); }
-        .timeline-item:nth-child(2) .timeline-dot { background: var(--accent-teal); }
-        .timeline-item:nth-child(3) .timeline-dot { background: var(--accent-purple); }
-        .timeline-item:nth-child(4) .timeline-dot { background: var(--accent-orange); }
-        .timeline-item:nth-child(5) .timeline-dot { background: var(--accent-gold); }
-
-        .timeline-card {
-            background: var(--card-bg);
-            border: 1px solid var(--card-border);
-            border-radius: 16px;
-            padding: 20px 24px;
-            transition: all 0.3s ease;
-        }
-
-        .timeline-card:hover {
-            transform: translateX(6px);
-            border-color: var(--accent-cyan);
-            box-shadow: var(--glow-cyan);
-        }
-
-        .timeline-phase {
-            font-size: 0.85rem;
-            color: var(--accent-cyan);
-            font-weight: 600;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            margin-bottom: 4px;
-        }
-
-        .timeline-title {
-            font-size: 1.2rem;
-            font-weight: 700;
-            margin-bottom: 6px;
-        }
-
-        .timeline-desc {
-            color: var(--text-secondary);
-            font-size: 0.95rem;
-        }
-
-        .timeline-status {
-            display: inline-block;
-            margin-top: 8px;
-            padding: 4px 12px;
-            border-radius: 20px;
-            font-size: 0.8rem;
-            font-weight: 600;
-        }
-
-        .status-done {
-            background: rgba(0, 191, 165, 0.15);
-            color: var(--accent-teal);
-            border: 1px solid rgba(0, 191, 165, 0.3);
-        }
-
-        .status-active {
-            background: rgba(0, 212, 255, 0.15);
-            color: var(--accent-cyan);
-            border: 1px solid rgba(0, 212, 255, 0.3);
-            animation: statusPulse 2s ease-in-out infinite alternate;
-        }
-
-        .status-future {
-            background: rgba(90, 122, 154, 0.15);
-            color: var(--text-muted);
-            border: 1px solid rgba(90, 122, 154, 0.3);
-        }
-
-        @keyframes statusPulse {
-            0% { box-shadow: 0 0 0 rgba(0, 212, 255, 0); }
-            100% { box-shadow: 0 0 12px rgba(0, 212, 255, 0.3); }
-        }
-
-        /* ============================================
-           TOKEN STATS
-           ============================================ */
-        .stats {
-            background: linear-gradient(180deg, var(--bg-navy), var(--bg-ocean));
-        }
-
-        .stats-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-            gap: 20px;
-        }
-
-        .stat-card {
-            background: var(--card-bg);
-            border: 1px solid var(--card-border);
-            border-radius: 16px;
-            padding: 28px 24px;
-            text-align: center;
-            transition: all 0.3s ease;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .stat-card::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            height: 3px;
-            background: linear-gradient(90deg, var(--accent-cyan), var(--accent-teal));
-        }
-
-        .stat-card:hover {
-            transform: translateY(-6px);
-            border-color: var(--accent-cyan);
-            box-shadow: var(--glow-cyan);
-        }
-
-        .stat-icon {
-            font-size: 2rem;
-            margin-bottom: 10px;
-        }
-
-        .stat-value {
-            font-size: 1.5rem;
-            font-weight: 700;
-            color: var(--accent-cyan);
-            margin-bottom: 4px;
-        }
-
-        .stat-label {
-            font-size: 0.9rem;
-            color: var(--text-secondary);
-        }
-
-        .stat-note {
-            font-size: 0.75rem;
-            color: var(--text-muted);
-            margin-top: 4px;
-            font-style: italic;
-        }
-
-        /* ============================================
-           HOW TO BUY
-           ============================================ */
-        .how-to-buy {
-            background: linear-gradient(180deg, var(--bg-ocean), var(--bg-dark));
-        }
-
-        .steps-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 20px;
-            max-width: 900px;
-            margin: 0 auto;
-        }
-
-        .step-card {
-            background: var(--card-bg);
-            border: 1px solid var(--card-border);
-            border-radius: 16px;
-            padding: 28px 20px;
-            text-align: center;
-            transition: all 0.3s ease;
-            position: relative;
-        }
-
-        .step-card:hover {
-            transform: translateY(-6px);
-            border-color: var(--accent-teal);
-            box-shadow: 0 0 20px rgba(0, 191, 165, 0.3);
-        }
-
-        .step-number {
-            width: 48px;
-            height: 48px;
-            border-radius: 50%;
-            background: linear-gradient(135deg, var(--accent-cyan), var(--accent-teal));
-            color: var(--bg-dark);
-            font-weight: 700;
-            font-size: 1.3rem;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin: 0 auto 14px;
-        }
-
-        .step-icon {
-            font-size: 2rem;
-            margin-bottom: 10px;
-        }
-
-        .step-title {
-            font-size: 1rem;
-            font-weight: 700;
-            margin-bottom: 6px;
-        }
-
-        .step-desc {
-            font-size: 0.85rem;
-            color: var(--text-secondary);
-        }
-
-        /* ============================================
-           SECURITY
-           ============================================ */
-        .security {
-            background: linear-gradient(180deg, var(--bg-dark), var(--bg-navy));
-        }
-
-        .security-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-            gap: 20px;
-            max-width: 800px;
-            margin: 0 auto;
-        }
-
-        .security-card {
-            background: var(--card-bg);
-            border: 1px solid rgba(0, 191, 165, 0.3);
-            border-radius: 16px;
-            padding: 24px 20px;
-            display: flex;
-            align-items: center;
-            gap: 16px;
-            transition: all 0.3s ease;
-        }
-
-        .security-card:hover {
-            transform: translateY(-4px);
-            border-color: var(--accent-teal);
-            box-shadow: 0 0 20px rgba(0, 191, 165, 0.3);
-        }
-
-        .security-check {
-            width: 44px;
-            height: 44px;
-            border-radius: 50%;
-            background: rgba(0, 191, 165, 0.15);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.3rem;
-            flex-shrink: 0;
-        }
-
-        .security-info h4 {
-            font-size: 1rem;
-            font-weight: 600;
-            margin-bottom: 2px;
-        }
-
-        .security-info p {
-            font-size: 0.85rem;
-            color: var(--text-secondary);
-        }
-
-        /* ============================================
-           COMMUNITY
-           ============================================ */
-        .community {
-            background: linear-gradient(180deg, var(--bg-navy), var(--bg-ocean));
-        }
-
-        .social-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-            gap: 20px;
-            max-width: 1000px;
-            margin: 0 auto;
-        }
-
-        .social-card {
-            background: var(--card-bg);
-            border: 1px solid var(--card-border);
-            border-radius: 16px;
-            padding: 28px 24px;
-            text-align: center;
-            transition: all 0.3s ease;
-            text-decoration: none;
-            color: inherit;
-            display: block;
-        }
-
-        .social-card:hover {
-            transform: translateY(-6px);
-            border-color: var(--accent-cyan);
-            box-shadow: var(--glow-cyan);
-        }
-
-        .social-icon {
-            font-size: 2.5rem;
-            margin-bottom: 12px;
-        }
-
-        .social-name {
-            font-size: 1.1rem;
-            font-weight: 700;
-            margin-bottom: 6px;
-            color: var(--accent-cyan);
-        }
-
-        .social-desc {
-            font-size: 0.9rem;
-            color: var(--text-secondary);
-        }
-
-        /* ============================================
-           FOOTER
-           ============================================ */
-        .footer {
-            background: var(--bg-dark);
-            border-top: 1px solid var(--card-border);
-            padding: 60px 20px 30px;
-            text-align: center;
-        }
-
-        .footer-logo {
-            width: 60px;
-            height: 60px;
-            border-radius: 50%;
-            margin-bottom: 16px;
-        }
-
-        .footer-text {
-            font-size: 1.1rem;
-            color: var(--text-secondary);
-            margin-bottom: 8px;
-        }
-
-        .footer-made {
-            font-size: 0.95rem;
-            color: var(--text-muted);
-            margin-bottom: 24px;
-        }
-
-        .footer-links {
-            display: flex;
-            justify-content: center;
-            gap: 16px;
-            flex-wrap: wrap;
-            margin-bottom: 24px;
-        }
-
-        .footer-links a {
-            color: var(--accent-cyan);
-            text-decoration: none;
-            font-size: 0.9rem;
-            font-weight: 500;
-            transition: all 0.3s ease;
-            padding: 6px 14px;
-            border-radius: 20px;
-            border: 1px solid transparent;
-        }
-
-        .footer-links a:hover {
-            border-color: var(--accent-cyan);
-            background: rgba(0, 212, 255, 0.1);
-        }
-
-        .footer-mint {
-            font-size: 0.75rem;
-            color: var(--text-muted);
-            word-break: break-all;
-            padding: 12px 16px;
-            background: rgba(13, 31, 60, 0.5);
-            border-radius: 10px;
-            display: inline-block;
-            margin-bottom: 16px;
-            border: 1px solid var(--card-border);
-        }
-
-        .footer-copy {
-            font-size: 0.8rem;
-            color: var(--text-muted);
-        }
-
-        /* ============================================
-           BOTTOM WAVES (global)
-           ============================================ */
-        .bottom-waves {
-            position: relative;
-            height: 80px;
-            overflow: hidden;
-            background: linear-gradient(180deg, var(--bg-ocean), var(--sea-mid));
-        }
-
-        .bottom-waves svg {
-            position: absolute;
-            bottom: 0;
-            width: 200%;
-            height: 80px;
-        }
-
-        .bottom-wave-1 {
-            animation: waveMove 7s linear infinite;
-            opacity: 0.5;
-        }
-
-        .bottom-wave-2 {
-            animation: waveMove 10s linear infinite reverse;
-            opacity: 0.3;
-        }
-
-        /* ============================================
-           RESPONSIVE
-           ============================================ */
-        @media (max-width: 768px) {
-            .nav-links {
-                display: none;
-                position: fixed;
-                top: 64px;
-                left: 0;
-                right: 0;
-                background: rgba(10, 22, 40, 0.98);
-                flex-direction: column;
-                padding: 20px;
-                gap: 4px;
-                border-bottom: 1px solid var(--card-border);
-            }
-
-            .nav-links.active {
-                display: flex;
-            }
-
-            .nav-links a {
-                padding: 12px 16px;
-                font-size: 1rem;
-                border-radius: 10px;
-            }
-
-            .hamburger {
-                display: flex;
-            }
-
-            .hero-title {
-                font-size: 2.8rem;
-            }
-
-            .hero-subtitle {
-                font-size: 1rem;
-            }
-
-            .section-title {
-                font-size: 2rem;
-            }
-
-            .moon {
-                width: 60px;
-                height: 60px;
-                top: 80px;
-                right: 5%;
-            }
-
-            .rocket {
-                font-size: 1.8rem;
-            }
-
-            .timeline::before {
-                left: 18px;
-            }
-
-            .timeline-item {
-                padding-left: 60px;
-            }
-
-            .timeline-dot {
-                left: 4px;
-                width: 28px;
-                height: 28px;
-                font-size: 0.9rem;
-            }
-
-            .steps-grid {
-                grid-template-columns: 1fr 1fr;
-            }
-
-            .social-grid {
-                grid-template-columns: 1fr 1fr;
-            }
-
-            .hero-buttons {
-                flex-direction: column;
-                align-items: center;
-            }
-
-            .btn-primary, .btn-secondary {
-                width: 100%;
-                max-width: 280px;
-                justify-content: center;
-            }
-        }
-
-        @media (max-width: 480px) {
-            .hero-title {
-                font-size: 2.2rem;
-            }
-
-            .steps-grid, .social-grid, .stats-grid, .security-grid {
-                grid-template-columns: 1fr;
-            }
-
-            .section-title {
-                font-size: 1.6rem;
-            }
-
-            .hero-logo {
-                width: 110px;
-                height: 110px;
-            }
-        }
-
-        /* ============================================
-           PREFERS REDUCED MOTION
-           ============================================ */
-        @media (prefers-reduced-motion: reduce) {
-            *, *::before, *::after {
-                animation-duration: 0.01ms !important;
-                animation-iteration-count: 1 !important;
-                transition-duration: 0.01ms !important;
-            }
-
-            html {
-                scroll-behavior: auto;
-            }
-
-            .star, .moon, .rocket, .dog, .splash,
-            .bubble, .fish, .wave, .timeline-card,
-            .stat-card, .step-card, .security-card, .social-card {
-                animation: none !important;
-                transition: none !important;
-            }
-        }
-
-        /* ============================================
-           MOBILE NAV ANIMATION
-           ============================================ */
-        .hamburger.active span:nth-child(1) {
-            transform: rotate(45deg) translate(5px, 5px);
-        }
-
-        .hamburger.active span:nth-child(2) {
-            opacity: 0;
-        }
-
-        .hamburger.active span:nth-child(3) {
-            transform: rotate(-45deg) translate(5px, -5px);
-        }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DODSC — To the Moon 🚀</title>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --navy: #0a1628;
+  --navy-light: #112240;
+  --turquoise: #00c9a7;
+  --turquoise-glow: #00e6be;
+  --sea-dark: #064e5c;
+  --sea-light: #12c5b3;
+  --accent: #ffd700;
+  --white: #ffffff;
+  --text: #c8d6e5;
+  --card-bg: rgba(17,34,64,0.85);
+  --green: #00e676;
+  --pink: #ff6b9d;
+}
+
+* { margin:0; padding:0; box-sizing:border-box; }
+html { scroll-behavior:smooth; }
+body {
+  font-family:'Fredoka',sans-serif;
+  background: linear-gradient(180deg, var(--navy) 0%, #0d1f3c 40%, var(--sea-dark) 75%, #0a3d5c 100%);
+  color: var(--white);
+  min-height:100vh;
+  overflow-x:hidden;
+}
+
+/* Stars background */
+.stars-container {
+  position:fixed; top:0; left:0; width:100%; height:100%;
+  pointer-events:none; z-index:0;
+}
+.star {
+  position:absolute;
+  background:white;
+  border-radius:50%;
+  animation: twinkle 3s infinite alternate;
+}
+@keyframes twinkle {
+  0% { opacity:0.2; transform:scale(1); }
+  100% { opacity:1; transform:scale(1.3); }
+}
+
+/* Moon */
+.moon {
+  position:fixed;
+  top:60px; right:80px;
+  width:80px; height:80px;
+  background: radial-gradient(circle at 35% 35%, #fffde7, #ffd54f, #ffb300);
+  border-radius:50%;
+  box-shadow: 0 0 40px rgba(255,213,79,0.4), 0 0 80px rgba(255,179,0,0.2);
+  z-index:0;
+}
+.moon-crater {
+  position:absolute;
+  border-radius:50%;
+  background:rgba(255,179,0,0.2);
+}
+
+/* Rocket */
+.rocket {
+  position:fixed;
+  top:120px; right:200px;
+  font-size:48px;
+  z-index:0;
+  animation: rocketFloat 4s ease-in-out infinite;
+}
+@keyframes rocketFloat {
+  0%,100% { transform:translateY(0) rotate(-30deg); }
+  50% { transform:translateY(-20px) rotate(-25deg); }
+}
+
+/* Nav */
+nav {
+  position:sticky; top:0; z-index:100;
+  background: rgba(10,22,40,0.95);
+  backdrop-filter: blur(10px);
+  border-bottom: 1px solid rgba(0,201,167,0.3);
+  padding: 12px 0;
+}
+.nav-inner {
+  max-width:900px; margin:0 auto;
+  display:flex; align-items:center; justify-content:center;
+  gap:8px; flex-wrap:wrap;
+  padding:0 16px;
+}
+.nav-inner a {
+  color:var(--text);
+  text-decoration:none;
+  padding:8px 14px;
+  border-radius:20px;
+  font-size:0.95rem;
+  font-weight:500;
+  transition: all 0.3s;
+}
+.nav-inner a:hover, .nav-inner a.active {
+  color:var(--turquoise);
+  background: rgba(0,201,167,0.15);
+}
+
+/* Hero */
+.hero {
+  position:relative; z-index:1;
+  text-align:center;
+  padding: 80px 20px 40px;
+}
+.logo-container {
+  margin-bottom:24px;
+}
+.logo-container img {
+  width:160px; height:160px;
+  border-radius:50%;
+  border: 4px solid var(--turquoise);
+  box-shadow: 0 0 30px rgba(0,201,167,0.4);
+  animation: pulse 2s ease-in-out infinite;
+}
+@keyframes pulse {
+  0%,100% { box-shadow: 0 0 30px rgba(0,201,167,0.4); }
+  50% { box-shadow: 0 0 50px rgba(0,201,167,0.7); }
+}
+.hero h1 {
+  font-size: clamp(2rem, 6vw, 3.5rem);
+  font-weight:700;
+  margin-bottom:12px;
+  background: linear-gradient(135deg, var(--white), var(--turquoise-glow));
+  -webkit-background-clip:text;
+  -webkit-text-fill-color:transparent;
+  background-clip:text;
+}
+.hero p {
+  font-size:1.15rem;
+  color:var(--text);
+  max-width:500px; margin:0 auto 32px;
+  line-height:1.6;
+}
+
+/* CTA Buttons */
+.cta-buttons {
+  display:flex; gap:16px; justify-content:center; flex-wrap:wrap;
+  margin-bottom:20px;
+}
+.cta-btn {
+  display:inline-block;
+  padding:14px 28px;
+  border-radius:30px;
+  font-family:'Fredoka',sans-serif;
+  font-size:1rem;
+  font-weight:600;
+  text-decoration:none;
+  transition: all 0.3s;
+  cursor:pointer;
+}
+.cta-btn.primary {
+  background: linear-gradient(135deg, var(--turquoise), #00a388);
+  color:var(--navy);
+  box-shadow: 0 4px 20px rgba(0,201,167,0.4);
+}
+.cta-btn.primary:hover {
+  transform:translateY(-2px);
+  box-shadow: 0 6px 30px rgba(0,201,167,0.6);
+}
+.cta-btn.secondary {
+  background: rgba(255,255,255,0.1);
+  color:var(--white);
+  border: 2px solid var(--turquoise);
+}
+.cta-btn.secondary:hover {
+  background:rgba(0,201,167,0.2);
+  transform:translateY(-2px);
+}
+
+/* Info cards */
+.info-section {
+  position:relative; z-index:1;
+  max-width:800px; margin:40px auto;
+  padding:0 20px;
+  display:grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px,1fr));
+  gap:20px;
+}
+.info-card {
+  background: var(--card-bg);
+  border:1px solid rgba(0,201,167,0.2);
+  border-radius:16px;
+  padding:24px;
+  text-align:center;
+  transition: transform 0.3s, box-shadow 0.3s;
+}
+.info-card:hover {
+  transform:translateY(-4px);
+  box-shadow: 0 8px 30px rgba(0,201,167,0.2);
+}
+.info-card .icon { font-size:2rem; margin-bottom:10px; }
+.info-card h3 { font-size:1.1rem; color:var(--turquoise); margin-bottom:6px; }
+.info-card p { font-size:0.9rem; color:var(--text); }
+
+/* Sea & Waves */
+.sea-container {
+  position:relative; z-index:1;
+  margin-top:60px;
+  height:180px;
+  overflow:hidden;
+}
+.wave {
+  position:absolute; bottom:0; left:0; width:200%; height:100%;
+}
+.wave svg { width:100%; height:100%; }
+.wave-1 { animation: wave 8s linear infinite; opacity:0.6; }
+.wave-2 { animation: wave 12s linear infinite reverse; opacity:0.4; bottom:10px; }
+.wave-3 { animation: wave 6s linear infinite; opacity:0.3; bottom:20px; }
+@keyframes wave {
+  0% { transform:translateX(0); }
+  100% { transform:translateX(-50%); }
+}
+
+/* Footer */
+footer {
+  position:relative; z-index:1;
+  background: rgba(6,15,30,0.9);
+  border-top:1px solid rgba(0,201,167,0.2);
+  padding:40px 20px 24px;
+  text-align:center;
+}
+.footer-links {
+  display:flex; gap:20px; justify-content:center; flex-wrap:wrap;
+  margin-bottom:16px;
+}
+.footer-links a {
+  color:var(--text);
+  text-decoration:none;
+  font-size:0.95rem;
+  transition: color 0.3s;
+}
+.footer-links a:hover { color:var(--turquoise); }
+.mint-addr {
+  font-size:0.75rem;
+  color:rgba(200,214,229,0.5);
+  word-break:break-all;
+  margin-top:12px;
+}
+.footer-copy {
+  margin-top:12px;
+  font-size:0.8rem;
+  color:rgba(200,214,229,0.4);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+@media (max-width:600px) {
+  .moon { width:50px; height:50px; top:30px; right:30px; }
+  .rocket { font-size:32px; top:80px; right:90px; }
+  .hero { padding:60px 16px 30px; }
+  .logo-container img { width:120px; height:120px; }
+}
+</style>
 </head>
 <body>
 
-    <!-- ============================================
-         NAVBAR
-         ============================================ -->
-    <nav class="navbar">
-        <a href="#" class="nav-logo">
-            <img src="https://plum-healthy-coral-227.mypinata.cloud/ipfs/bafybeigya3gh44dyl5k67yt4on4ralmbuteg3ol5z2fdx7hwftsawaf2xe" alt="DODSC">
-            DODSC
-        </a>
-        <ul class="nav-links" id="navLinks">
-            <li><a href="#hero">Accueil</a></li>
-            <li><a href="#roadmap">Roadmap</a></li>
-            <li><a href="#stats">Stats</a></li>
-            <li><a href="#howto">Acheter</a></li>
-            <li><a href="#security">Sécurité</a></li>
-            <li><a href="#community">Communauté</a></li>
-        </ul>
-        <button class="hamburger" id="hamburger" aria-label="Menu">
-            <span></span>
-            <span></span>
-            <span></span>
-        </button>
-    </nav>
+<!-- Stars -->
+<div class="stars-container" id="stars"></div>
 
-    <!-- ============================================
-         HERO SECTION
-         ============================================ -->
-    <section class="hero" id="hero">
-        <!-- Stars -->
-        <div class="stars">
-            <div class="star"></div>
-            <div class="star"></div>
-            <div class="star"></div>
-            <div class="star"></div>
-            <div class="star"></div>
-            <div class="star"></div>
-            <div class="star"></div>
-            <div class="star"></div>
-            <div class="star"></div>
-            <div class="star"></div>
-            <div class="star"></div>
-            <div class="star"></div>
-            <div class="star"></div>
-            <div class="star"></div>
-            <div class="star"></div>
-            <div class="star"></div>
-            <div class="star"></div>
-            <div class="star"></div>
-            <div class="star"></div>
-            <div class="star"></div>
-        </div>
+<!-- Moon -->
+<div class="moon">
+  <div class="moon-crater" style="width:15px;height:15px;top:18px;left:22px;"></div>
+  <div class="moon-crater" style="width:10px;height:10px;top:35px;left:40px;"></div>
+  <div class="moon-crater" style="width:8px;height:8px;top:50px;left:20px;"></div>
+</div>
 
-        <!-- Moon -->
-        <div class="moon"></div>
+<!-- Rocket -->
+<div class="rocket">🚀</div>
 
-        <!-- Rocket -->
-        <div class="rocket">🚀</div>
-        <div class="rocket-trail"></div>
+<!-- Nav -->
+<nav>
+  <div class="nav-inner">
+    <a href="index.html" class="active">🏠 Home</a>
+    <a href="game.html">🎮 Play</a>
+    <a href="roadmap.html">📋 Roadmap</a>
+    <a href="security.html">🔒 Security</a>
+    <a href="community.html">🌐 Community</a>
+  </div>
+</nav>
 
-        <!-- Hero Content -->
-        <div class="hero-content">
-            <img class="hero-logo" src="https://plum-healthy-coral-227.mypinata.cloud/ipfs/bafybeigya3gh44dyl5k67yt4on4ralmbuteg3ol5z2fdx7hwftsawaf2xe" alt="Dodscoin Logo">
-            <h1 class="hero-title">DODSC</h1>
-            <p class="hero-subtitle">🐕 Solana Token-2022 meme coin</p>
-            <p class="hero-tagline">"Le chien qui plonge vers la lune" 🌊🚀</p>
-            <div class="hero-buttons">
-                <a href="https://raydium.io/swap/?inputMint=sol&outputMint=4nsq8dMuf6JqqaZpgbtCMVuRt9bYcrLS1Df5pGb4MWpx" target="_blank" rel="noopener" class="btn-primary">
-                    🌊 Acheter sur Raydium
-                </a>
-                <a href="https://dexscreener.com/solana/gayrrdeoybdp2tcn6qc5dxqmx5aesockouum1zdvrymg" target="_blank" rel="noopener" class="btn-secondary">
-                    📊 Voir sur Dexscreener
-                </a>
-            </div>
-        </div>
+<!-- Hero -->
+<div class="hero">
+  <div class="logo-container">
+    <img src="https://plum-healthy-coral-227.mypinata.cloud/ipfs/bafybeigya3gh44dyl5k67yt4on4ralmbuteg3ol5z2fdx7hwftsawaf2xe" alt="DODSC Logo">
+  </div>
+  <h1>DODSC — To the Moon 🚀</h1>
+  <p>Dive in with Dodscoin. The Solana meme token that actually dives — literally. Join the pack on the craziest ride to the moon.</p>
+  <div class="cta-buttons">
+    <a href="https://raydium.io/swap/?inputMint=sol&outputMint=4nsq8dMuf6JqqaZpgbtCMVuRt9bYcrLS1Df5pGb4MWpx" class="cta-btn primary" target="_blank" rel="noopener">💎 Buy on Raydium</a>
+    <a href="https://dexscreener.com/solana/gayrrdeoybdp2tcn6qc5dxqmx5aesockouum1zdvrymg" class="cta-btn secondary" target="_blank" rel="noopener">📊 View on Dexscreener</a>
+  </div>
+</div>
 
-        <!-- Diving Dog Scene -->
-        <div class="diving-scene">
-            <!-- Dog diving -->
-            <div class="dog">
-                <svg class="dog-svg" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
-                    <!-- Dog body -->
-                    <ellipse cx="50" cy="55" rx="22" ry="18" fill="#c8956c"/>
-                    <!-- Dog head -->
-                    <circle cx="50" cy="30" r="16" fill="#c8956c"/>
-                    <!-- Ears -->
-                    <ellipse cx="36" cy="20" rx="6" ry="10" fill="#a0704f" transform="rotate(-15 36 20)"/>
-                    <ellipse cx="64" cy="20" rx="6" ry="10" fill="#a0704f" transform="rotate(15 64 20)"/>
-                    <!-- Eyes -->
-                    <circle cx="44" cy="28" r="3" fill="#1a1a2e"/>
-                    <circle cx="56" cy="28" r="3" fill="#1a1a2e"/>
-                    <circle cx="45" cy="27" r="1" fill="white"/>
-                    <circle cx="57" cy="27" r="1" fill="white"/>
-                    <!-- Nose -->
-                    <ellipse cx="50" cy="34" rx="3" ry="2" fill="#2d2d2d"/>
-                    <!-- Mouth -->
-                    <path d="M47 37 Q50 40 53 37" fill="none" stroke="#2d2d2d" stroke-width="1.2"/>
-                    <!-- Tail -->
-                    <path d="M72 50 Q82 40 78 30" fill="none" stroke="#c8956c" stroke-width="4" stroke-linecap="round"/>
-                    <!-- Front legs -->
-                    <line x1="38" y1="68" x2="35" y2="82" stroke="#c8956c" stroke-width="4" stroke-linecap="round"/>
-                    <line x1="62" y1="68" x2="65" y2="82" stroke="#c8956c" stroke-width="4" stroke-linecap="round"/>
-                    <!-- Back legs -->
-                    <line x1="32" y1="60" x2="26" y2="75" stroke="#c8956c" stroke-width="3.5" stroke-linecap="round"/>
-                    <line x1="68" y1="60" x2="74" y2="75" stroke="#c8956c" stroke-width="3.5" stroke-linecap="round"/>
-                    <!-- Tongue -->
-                    <path d="M50 37 Q52 42 48 45" fill="#e74c6f" stroke="#e74c6f" stroke-width="1.5"/>
-                    <!-- Collar -->
-                    <ellipse cx="50" cy="43" rx="12" ry="3" fill="none" stroke="#00d4ff" stroke-width="2"/>
-                    <!-- Bubbles around (scuba style) -->
-                    <circle cx="25" cy="25" r="2" fill="none" stroke="rgba(0,212,255,0.5)" stroke-width="0.5"/>
-                    <circle cx="75" cy="20" r="1.5" fill="none" stroke="rgba(0,212,255,0.5)" stroke-width="0.5"/>
-                    <circle cx="30" cy="15" r="1" fill="none" stroke="rgba(0,212,255,0.5)" stroke-width="0.5"/>
-                </svg>
-            </div>
+<!-- Info Cards -->
+<div class="info-section">
+  <div class="info-card">
+    <div class="icon">🔒</div>
+    <h3>LP Locked</h3>
+    <p>69-day lock via StakePoint. Rug-proof.</p>
+  </div>
+  <div class="info-card">
+    <div class="icon">🚫</div>
+    <h3>Mint Revoked</h3>
+    <p>No new tokens. 1B supply forever.</p>
+  </div>
+  <div class="info-card">
+    <div class="icon">💸</div>
+    <h3>1% Tax</h3>
+    <p>Low transfer tax. Fair for traders.</p>
+  </div>
+</div>
 
-            <!-- Splash effect -->
-            <div class="splash">
-                <svg width="120" height="60" viewBox="0 0 120 60" xmlns="http://www.w3.org/2000/svg">
-                    <!-- Water splash drops -->
-                    <circle cx="60" cy="30" r="3" fill="rgba(0,212,255,0.6)"/>
-                    <circle cx="45" cy="20" r="2" fill="rgba(0,212,255,0.5)"/>
-                    <circle cx="75" cy="18" r="2.5" fill="rgba(0,212,255,0.5)"/>
-                    <circle cx="35" cy="25" r="1.5" fill="rgba(0,212,255,0.4)"/>
-                    <circle cx="85" cy="22" r="1.8" fill="rgba(0,212,255,0.4)"/>
-                    <circle cx="55" cy="12" r="2" fill="rgba(0,212,255,0.6)"/>
-                    <circle cx="68" cy="14" r="1.5" fill="rgba(0,212,255,0.5)"/>
-                    <!-- Splash lines -->
-                    <path d="M50 35 Q40 15 30 10" fill="none" stroke="rgba(0,212,255,0.5)" stroke-width="1.5" stroke-linecap="round"/>
-                    <path d="M60 32 Q60 10 55 5" fill="none" stroke="rgba(0,212,255,0.6)" stroke-width="1.5" stroke-linecap="round"/>
-                    <path d="M70 35 Q80 15 90 10" fill="none" stroke="rgba(0,212,255,0.5)" stroke-width="1.5" stroke-linecap="round"/>
-                </svg>
-            </div>
+<!-- Sea Waves -->
+<div class="sea-container">
+  <div class="wave wave-3">
+    <svg viewBox="0 0 2400 200" preserveAspectRatio="none">
+      <path d="M0,120 C300,80 600,160 900,120 C1200,80 1500,160 1800,120 C2100,80 2400,160 2400,120 L2400,200 L0,200Z" fill="rgba(0,201,167,0.15)"/>
+    </svg>
+  </div>
+  <div class="wave wave-2">
+    <svg viewBox="0 0 2400 200" preserveAspectRatio="none">
+      <path d="M0,100 C400,140 800,60 1200,100 C1600,140 2000,60 2400,100 L2400,200 L0,200Z" fill="rgba(0,201,167,0.25)"/>
+    </svg>
+  </div>
+  <div class="wave wave-1">
+    <svg viewBox="0 0 2400 200" preserveAspectRatio="none">
+      <path d="M0,80 C300,120 600,40 900,80 C1200,120 1500,40 1800,80 C2100,120 2400,40 2400,80 L2400,200 L0,200Z" fill="rgba(0,201,167,0.35)"/>
+    </svg>
+  </div>
+</div>
 
-            <!-- Water surface -->
-            <div class="water-surface"></div>
+<!-- Footer -->
+<footer>
+  <div class="footer-links">
+    <a href="https://x.com/DodscoinX" target="_blank" rel="noopener">🐦 X / Twitter</a>
+    <a href="https://www.instagram.com/dodscoin" target="_blank" rel="noopener">📸 Instagram</a>
+    <a href="https://www.tiktok.com/@dodscoin2026" target="_blank" rel="noopener">🎵 TikTok</a>
+    <a href="https://t.me/dodscoin2026" target="_blank" rel="noopener">✈️ Telegram</a>
+  </div>
+  <div class="mint-addr">Mint: 4nsq8dMuf6JqqaZpgbtCMVuRt9bYcrLS1Df5pGb4MWpx</div>
+  <div class="footer-copy">© 2025 DODSC. Not financial advice. DYOR.</div>
+</footer>
 
-            <!-- Sea background -->
-            <div class="sea-bg"></div>
-
-            <!-- Waves -->
-            <div class="wave wave-1">
-                <svg viewBox="0 0 1200 40" preserveAspectRatio="none">
-                    <path d="M0,20 Q150,0 300,20 T600,20 T900,20 T1200,20 T1500,20 T1800,20 T2100,20 T2400,20 V40 H0 Z" fill="rgba(0,191,165,0.25)"/>
-                </svg>
-            </div>
-            <div class="wave wave-2">
-                <svg viewBox="0 0 1200 40" preserveAspectRatio="none">
-                    <path d="M0,25 Q100,5 200,25 T400,25 T600,25 T800,25 T1000,25 T1200,25 T1400,25 T1600,25 T1800,25 T2000,25 T2400,25 V40 H0 Z" fill="rgba(0,191,165,0.15)"/>
-                </svg>
-            </div>
-            <div class="wave wave-3">
-                <svg viewBox="0 0 1200 40" preserveAspectRatio="none">
-                    <path d="M0,28 Q120,10 240,28 T480,28 T720,28 T960,28 T1200,28 T1440,28 T1680,28 T1920,28 T2160,28 T2400,28 V40 H0 Z" fill="rgba(0,191,165,0.1)"/>
-                </svg>
-            </div>
-
-            <!-- Bubbles -->
-            <div class="bubbles">
-                <div class="bubble"></div>
-                <div class="bubble"></div>
-                <div class="bubble"></div>
-                <div class="bubble"></div>
-                <div class="bubble"></div>
-                <div class="bubble"></div>
-                <div class="bubble"></div>
-                <div class="bubble"></div>
-            </div>
-
-            <!-- Fish -->
-            <div class="fish">🐟</div>
-            <div class="fish">🐠</div>
-            <div class="fish">🐡</div>
-        </div>
-    </section>
-
-    <!-- ============================================
-         ROADMAP SECTION
-         ============================================ -->
-    <section class="roadmap" id="roadmap">
-        <div class="section-container">
-            <h2 class="section-title">🗺️ Roadmap</h2>
-            <p class="section-subtitle">Le voyage du chien de l'eau à la lune</p>
-
-            <div class="timeline">
-                <!-- Phase 1 -->
-                <div class="timeline-item">
-                    <div class="timeline-dot">🐕</div>
-                    <div class="timeline-card">
-                        <div class="timeline-phase">Phase 1</div>
-                        <h3 class="timeline-title">Le chien entre dans l'eau</h3>
-                        <p class="timeline-desc">Création du token DODSC sur Solana Token-2022. Mint authority révoquée, contrat sécurisé.</p>
-                        <span class="timeline-status status-done">✅ Terminé</span>
-                    </div>
-                </div>
-
-                <!-- Phase 2 -->
-                <div class="timeline-item">
-                    <div class="timeline-dot">🌊</div>
-                    <div class="timeline-card">
-                        <div class="timeline-phase">Phase 2</div>
-                        <h3 class="timeline-title">Le chien nage</h3>
-                        <p class="timeline-desc">Pool Raydium live! 17 SOL + 891M DODSC en liquidité. Le chien commence à nager.</p>
-                        <span class="timeline-status status-done">✅ Terminé</span>
-                    </div>
-                </div>
-
-                <!-- Phase 3 -->
-                <div class="timeline-item">
-                    <div class="timeline-dot">🤿</div>
-                    <div class="timeline-card">
-                        <div class="timeline-phase">Phase 3</div>
-                        <h3 class="timeline-title">Le chien plonge</h3>
-                        <p class="timeline-desc">LP locké 69 jours via StakePoint (~2026-08-22). Le chien fait une plongée profonde pour sécuriser les fonds.</p>
-                        <span class="timeline-status status-active">🔄 En cours</span>
-                    </div>
-                </div>
-
-                <!-- Phase 4 -->
-                <div class="timeline-item">
-                    <div class="timeline-dot">🚀</div>
-                    <div class="timeline-card">
-                        <div class="timeline-phase">Phase 4</div>
-                        <h3 class="timeline-title">Le chien vole vers la lune</h3>
-                        <p class="timeline-desc">Construction de la communauté, listings sur DEX supplémentaires, campagne marketing.</p>
-                        <span class="timeline-status status-future">⏳ À venir</span>
-                    </div>
-                </div>
-
-                <!-- Phase 5 -->
-                <div class="timeline-item">
-                    <div class="timeline-dot">🌕</div>
-                    <div class="timeline-card">
-                        <div class="timeline-phase">Phase 5</div>
-                        <h3 class="timeline-title">Le chien atterrit sur la lune</h3>
-                        <p class="timeline-desc">1000 holders atteints! Listing sur CEX, le chien pose le patte sur la lune. 🐕🌙</p>
-                        <span class="timeline-status status-future">⏳ À venir</span>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- ============================================
-         TOKEN STATS SECTION
-         ============================================ -->
-    <section class="stats" id="stats">
-        <div class="section-container">
-            <h2 class="section-title">📊 Token Stats</h2>
-            <p class="section-subtitle">Les chiffres du chien en temps réel</p>
-
-            <div class="stats-grid">
-                <div class="stat-card">
-                    <div class="stat-icon">💰</div>
-                    <div class="stat-value" id="priceDisplay">--</div>
-                    <div class="stat-label">Prix DODSC/SOL</div>
-                    <div class="stat-note">via Dexscreener API</div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-icon">📈</div>
-                    <div class="stat-value" id="mcapDisplay">--</div>
-                    <div class="stat-label">Market Cap</div>
-                    <div class="stat-note">via Dexscreener API</div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-icon">🪙</div>
-                    <div class="stat-value">1,000,000,000</div>
-                    <div class="stat-label">Supply total</div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-icon">💸</div>
-                    <div class="stat-value">1%</div>
-                    <div class="stat-label">Taxe de transfert</div>
-                    <div class="stat-note">Token-2022</div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-icon">🌊</div>
-                    <div class="stat-value">17 SOL</div>
-                    <div class="stat-label">+ 891M DODSC</div>
-                    <div class="stat-note">Liquidity pool</div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-icon">🔒</div>
-                    <div class="stat-value">69 jours</div>
-                    <div class="stat-label">LP Locké</div>
-                    <div class="stat-note">StakePoint ~2026-08-22</div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-icon">✅</div>
-                    <div class="stat-value">Révoquée</div>
-                    <div class="stat-label">Mint Authority</div>
-                    <div class="stat-note">Aucun mint possible</div>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- ============================================
-         HOW TO BUY SECTION
-         ============================================ -->
-    <section class="how-to-buy" id="howto">
-        <div class="section-container">
-            <h2 class="section-title">🛒 Comment Acheter</h2>
-            <p class="section-subtitle">5 étapes pour rejoindre l'aventure du chien</p>
-
-            <div class="steps-grid">
-                <div class="step-card">
-                    <div class="step-number">1</div>
-                    <div class="step-icon">👻</div>
-                    <h3 class="step-title">Ouvre Phantom</h3>
-                    <p class="step-desc">Installe l'extension Phantom Wallet sur ton navigateur</p>
-                </div>
-                <div class="step-card">
-                    <div class="step-number">2</div>
-                    <div class="step-icon">🔗</div>
-                    <h3 class="step-title">Connecte-toi à Raydium</h3>
-                    <p class="step-desc">Va sur Raydium et connecte ton wallet Phantom</p>
-                </div>
-                <div class="step-card">
-                    <div class="step-number">3</div>
-                    <div class="step-icon">💎</div>
-                    <h3 class="step-title">Envoie du SOL</h3>
-                    <p class="step-desc">Assure-toi d'avoir du SOL dans ton wallet pour le swap</p>
-                </div>
-                <div class="step-card">
-                    <div class="step-number">4</div>
-                    <div class="step-icon">🔄</div>
-                    <h3 class="step-title">Échange contre DODSC</h3>
-                    <p class="step-desc">Sélectionne SOL → DODSC et valide la transaction</p>
-                </div>
-                <div class="step-card">
-                    <div class="step-number">5</div>
-                    <div class="step-icon">🐕</div>
-                    <h3 class="step-title">Le chien plonge avec toi</h3>
-                    <p class="step-desc">Bienvenue dans l'équipage! Le chien te souhaite bon plongeon 🌊</p>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- ============================================
-         SECURITY SECTION
-         ============================================ -->
-    <section class="security" id="security">
-        <div class="section-container">
-            <h2 class="section-title">🛡️ Sécurité</h2>
-            <p class="section-subtitle">Le chien protège ses holders</p>
-
-            <div class="security-grid">
-                <div class="security-card">
-                    <div class="security-check">✅</div>
-                    <div class="security-info">
-                        <h4>Mint Authority Révoquée</h4>
-                        <p>Aucun nouveau token ne peut être minté</p>
-                    </div>
-                </div>
-                <div class="security-card">
-                    <div class="security-check">✅</div>
-                    <div class="security-info">
-                        <h4>LP Locké 69 Jours</h4>
-                        <p>StakePoint jusqu'au ~2026-08-22</p>
-                    </div>
-                </div>
-                <div class="security-card">
-                    <div class="security-check">✅</div>
-                    <div class="security-info">
-                        <h4>Taxe 1% Seulement</h4>
-                        <p>Frais de transfert minimes via Token-2022</p>
-                    </div>
-                </div>
-                <div class="security-card">
-                    <div class="security-check">✅</div>
-                    <div class="security-info">
-                        <h4>Liquidity Sécurisée</h4>
-                        <p>17 SOL + 891M DODSC dans le pool</p>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- ============================================
-         COMMUNITY SECTION
-         ============================================ -->
-    <section class="community" id="community">
-        <div class="section-container">
-            <h2 class="section-title">💬 Communauté</h2>
-            <p class="section-subtitle">Rejoins le pack du chien!</p>
-
-            <div class="social-grid">
-                <a href="https://x.com/DodscoinX" target="_blank" rel="noopener" class="social-card">
-                    <div class="social-icon">𝕏</div>
-                    <div class="social-name">X / Twitter</div>
-                    <div class="social-desc">Les meilleurs memes et news du chien en temps réel! 🐕📱</div>
-                </a>
-                <a href="https://www.instagram.com/dodscoin" target="_blank" rel="noopener" class="social-card">
-                    <div class="social-icon">📸</div>
-                    <div class="social-name">Instagram</div>
-                    <div class="social-desc">Les plus belles photos du chien qui plonge! 🏊‍♂️🌊</div>
-                </a>
-                <a href="https://www.tiktok.com/@dodscoin2026" target="_blank" rel="noopener" class="social-card">
-                    <div class="social-icon">🎵</div>
-                    <div class="social-name">TikTok</div>
-                    <div class="social-desc">Vidéos virales du chien qui nage vers la lune! 🚀🌕</div>
-                </a>
-                <a href="https://t.me/dodscoin2026" target="_blank" rel="noopener" class="social-card">
-                    <div class="social-icon">💬</div>
-                    <div class="social-name">Telegram</div>
-                    <div class="social-desc">Rejoins le groupe officiel et parle avec le pack! 🐺</div>
-                </a>
-            </div>
-        </div>
-    </section>
-
-    <!-- ============================================
-         BOTTOM WAVES
-         ============================================ -->
-    <div class="bottom-waves">
-        <svg class="bottom-wave-1" viewBox="0 0 2400 80" preserveAspectRatio="none">
-            <path d="M0,40 Q300,0 600,40 T1200,40 T1800,40 T2400,40 V80 H0 Z" fill="rgba(0,191,165,0.2)"/>
-        </svg>
-        <svg class="bottom-wave-2" viewBox="0 0 2400 80" preserveAspectRatio="none">
-            <path d="M0,50 Q400,10 800,50 T1600,50 T2400,50 V80 H0 Z" fill="rgba(0,191,165,0.1)"/>
-        </svg>
-    </div>
-
-    <!-- ============================================
-         FOOTER
-         ============================================ -->
-    <footer class="footer">
-        <img class="footer-logo" src="https://plum-healthy-coral-227.mypinata.cloud/ipfs/bafybeigya3gh44dyl5k67yt4on4ralmbuteg3ol5z2fdx7hwftsawaf2xe" alt="DODSC">
-        <p class="footer-text">Le chien remercie tous les holders 🐕</p>
-        <p class="footer-made">Made with ❤️ on Solana</p>
-
-        <div class="footer-links">
-            <a href="https://raydium.io/swap/?inputMint=sol&outputMint=4nsq8dMuf6JqqaZpgbtCMVuRt9bYcrLS1Df5pGb4MWpx" target="_blank" rel="noopener">🌊 Raydium</a>
-            <a href="https://dexscreener.com/solana/gayrrdeoybdp2tcn6qc5dxqmx5aesockouum1zdvrymg" target="_blank" rel="noopener">📊 Dexscreener</a>
-            <a href="https://x.com/DodscoinX" target="_blank" rel="noopener">𝕏 X/Twitter</a>
-            <a href="https://t.me/dodscoin2026" target="_blank" rel="noopener">💬 Telegram</a>
-            <a href="https://www.instagram.com/dodscoin" target="_blank" rel="noopener">📸 Instagram</a>
-            <a href="https://www.tiktok.com/@dodscoin2026" target="_blank" rel="noopener">🎵 TikTok</a>
-        </div>
-
-        <div class="footer-mint">
-            Mint: 4nsq8dMuf6JqqaZpgbtCMVuRt9bYcrLS1Df5pGb4MWpx
-        </div>
-
-        <p class="footer-copy">© 2026 Dodscoin. Tous droits réservés. Ce n'est pas un conseil financier. DYOR. 🐕</p>
-    </footer>
-
-    <!-- ============================================
-         JAVASCRIPT
-         ============================================ -->
-    <script>
-        // Mobile nav toggle
-        const hamburger = document.getElementById('hamburger');
-        const navLinks = document.getElementById('navLinks');
-
-        hamburger.addEventListener('click', () => {
-            hamburger.classList.toggle('active');
-            navLinks.classList.toggle('active');
-        });
-
-        // Close mobile nav when clicking a link
-        navLinks.querySelectorAll('a').forEach(link => {
-            link.addEventListener('click', () => {
-                hamburger.classList.remove('active');
-                navLinks.classList.remove('active');
-            });
-        });
-
-        // Fetch live price from Dexscreener API
-        async function fetchPrice() {
-            try {
-                const res = await fetch('https://api.dexscreener.com/latest/dex/pairs/solana/GAYrRDeoyBDP2tcn6qC5dXQmx5AesocKoUuM1ZdvRymG');
-                const data = await res.json();
-                if (data.pairs && data.pairs[0]) {
-                    const pair = data.pairs[0];
-                    const priceUsd = parseFloat(pair.priceUsd);
-                    const mcap = pair.marketCap || pair.fdv;
-                    document.getElementById('priceDisplay').textContent = '$' + priceUsd.toFixed(8);
-                    if (mcap) {
-                        document.getElementById('mcapDisplay').textContent = '$' + Number(mcap).toLocaleString();
-                    }
-                }
-            } catch (e) {
-                console.log('Dexscreener API not available, using placeholder');
-            }
-        }
-
-        fetchPrice();
-        // Refresh price every 60 seconds
-        setInterval(fetchPrice, 60000);
-    </script>
+<script>
+// Generate stars
+(function(){
+  const c = document.getElementById('stars');
+  const count = 80;
+  for(let i=0; i<count; i++){
+    const s = document.createElement('div');
+    s.className='star';
+    const size = Math.random()*3+1;
+    s.style.cssText = `width:${size}px;height:${size}px;top:${Math.random()*70}%;left:${Math.random()*100}%;animation-delay:${Math.random()*3}s;animation-duration:${2+Math.random()*3}s;`;
+    c.appendChild(s);
+  }
+})();
+</script>
 </body>
 </html>
