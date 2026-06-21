@@ -236,8 +236,8 @@ footer {
   const BASE_H = 480;
   const WATER_Y = BASE_H * 0.55; // water surface at ~55% of height
   const CLIFF_W = 190;           // cliff width from left edge
-  const CLIFF_TOP = 0;           // cliff starts at very top of canvas
-  const CLIFF_BOTTOM = WATER_Y + 50; // cliff stops just below water line
+  const CLIFF_TOP = 80;           // cliff starts 80px from top (NOT full height)
+  const CLIFF_BOTTOM = WATER_Y + 30; // cliff ends just below water
 
   function resizeCanvas() {
     const container = canvas.parentElement;
@@ -352,7 +352,7 @@ footer {
   // Dog state machine: 'idle' | 'diving' | 'splashing' | 'swimming' | 'climbing'
   let dogState = 'idle';
   let dogX = CLIFF_W - 30;    // sits near right edge of cliff top
-  let dogY = 50;               // sits on top edge
+  let dogY = CLIFF_TOP + 10;  // sits ON TOP of cliff
   let dogAngle = 0;
   let diveStartX, diveStartY;
   let targetX, targetY;
@@ -440,11 +440,11 @@ footer {
   // ═══════════════════════════════════════════
   // Right edge of cliff at various heights
   function cliffEdgeX(y) {
-    if (y < 30) return CLIFF_W;           // flat top
-    if (y < 60) return CLIFF_W + (y - 30) * 0.15; // slight overhang then inward
-    if (y < 120) return CLIFF_W + 5 + (y - 60) * 0.05;
-    if (y < 200) return CLIFF_W + 8 - (y - 120) * 0.1;
-    if (y < WATER_Y) return CLIFF_W - 4 - (y - 200) * 0.05;
+    if (y < CLIFF_TOP + 10) return CLIFF_W;           // flat top
+    if (y < CLIFF_TOP + 40) return CLIFF_W + (y - CLIFF_TOP - 10) * 0.15; // slight overhang then inward
+    if (y < CLIFF_TOP + 100) return CLIFF_W + 5 + (y - CLIFF_TOP - 40) * 0.05;
+    if (y < WATER_Y - 40) return CLIFF_W + 8 - (y - CLIFF_TOP - 100) * 0.1;
+    if (y < WATER_Y) return CLIFF_W - 4 - (y - WATER_Y + 40) * 0.05;
     return CLIFF_W - 8 + (y - WATER_Y) * 0.3; // base rocks widen
   }
 
@@ -620,9 +620,9 @@ footer {
 
     // Build cliff shape: left=0, right edge follows cliffEdgeX(y)
     ctx.beginPath();
-    ctx.moveTo(0, 0);
+    ctx.moveTo(0, CLIFF_TOP);
     // Top edge across
-    ctx.lineTo(CLIFF_W, 0);
+    ctx.lineTo(CLIFF_W, CLIFF_TOP);
     // Right edge going down with natural profile
     const steps = 40;
     for(let i=0; i<=steps; i++){
@@ -637,7 +637,7 @@ footer {
     // Natural strata lines (varied spacing, wavy, broken, varying opacity)
     ctx.lineWidth = 1;
     const strataYs = [];
-    let sy = 28 + Math.random()*8;
+    let sy = CLIFF_TOP + 10 + Math.random()*8;
     while(sy < CLIFF_BOTTOM - 15){
       strataYs.push(sy);
       sy += 14 + Math.random()*22; // varied spacing between 14-36
@@ -686,7 +686,7 @@ footer {
     ctx.lineWidth = 0.8;
     for(let i=0; i<10; i++){
       const cx = 20 + Math.random()*140;
-      const cy = 30 + Math.random()*180;
+      const cy = CLIFF_TOP + 10 + Math.random()*180;
       ctx.beginPath();
       ctx.moveTo(cx, cy);
       let rx = cx, ry = cy;
@@ -703,7 +703,7 @@ footer {
     ctx.globalAlpha = 0.5;
     for(let i=0; i<8; i++){
       const mx = 30 + Math.random()*140;
-      const my = 2 + Math.random()*5;
+      const my = CLIFF_TOP + 2 + Math.random()*5;
       const mw = 6 + Math.random()*12;
       ctx.beginPath();
       ctx.ellipse(mx, my, mw, 2+Math.random()*2, 0, 0, Math.PI*2);
@@ -713,7 +713,7 @@ footer {
 
     // Light hit on right cliff face
     ctx.fillStyle = 'rgba(255,255,240,0.1)';
-    const faceStart = 40;
+    const faceStart = CLIFF_TOP + 10;
     ctx.beginPath();
     ctx.moveTo(cliffEdgeX(faceStart) - 5, faceStart);
     ctx.lineTo(cliffEdgeX(faceStart) + 3, faceStart);
@@ -1767,7 +1767,7 @@ footer {
     dogState = 'idle';
     dogAngle = 0;
     dogX = CLIFF_W - 30;
-    dogY = 50;
+    dogY = CLIFF_TOP + 10;
     stateEl.textContent = 'Ready to dive!';
     swimTimer = 0;
     resetTimer = 0;
@@ -1913,7 +1913,7 @@ footer {
 
       // Move back toward cliff top
       dogX = targetX + (CLIFF_W - 30 - targetX) * ease;
-      dogY = (WATER_Y + 3) - ease * (WATER_Y + 3 - 50);
+      dogY = (WATER_Y + 3) - ease * (WATER_Y + 3 - (CLIFF_TOP + 10));
 
       if(prog >= 1){
         resetDog();
