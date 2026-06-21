@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Community 🌐 — DODSC</title>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --navy: #0a1628;
+  --navy-light: #112240;
+  --turquoise: #00c9a7;
+  --turquoise-glow: #00e6be;
+  --sea-dark: #064e5c;
+  --white: #ffffff;
+  --text: #c8d6e5;
+  --card-bg: rgba(17,34,64,0.85);
+  --green: #00e676;
+  --pink: #ff6b9d;
+  --gold: #ffd700;
+}
+* { margin:0; padding:0; box-sizing:border-box; }
+html { scroll-behavior:smooth; }
+body {
+  font-family:'Fredoka',sans-serif;
+  background: linear-gradient(180deg, var(--navy) 0%, #0d1f3c 50%, var(--sea-dark) 100%);
+  color: var(--white);
+  min-height:100vh;
+  overflow-x:hidden;
+}
+
+nav {
+  position:sticky; top:0; z-index:100;
+  background: rgba(10,22,40,0.95);
+  backdrop-filter: blur(10px);
+  border-bottom: 1px solid rgba(0,201,167,0.3);
+  padding: 12px 0;
+}
+.nav-inner {
+  max-width:900px; margin:0 auto;
+  display:flex; align-items:center; justify-content:center;
+  gap:8px; flex-wrap:wrap;
+  padding:0 16px;
+}
+.nav-inner a {
+  color:var(--text);
+  text-decoration:none;
+  padding:8px 14px;
+  border-radius:20px;
+  font-size:0.95rem;
+  font-weight:500;
+  transition: all 0.3s;
+}
+.nav-inner a:hover, .nav-inner a.active {
+  color:var(--turquoise);
+  background: rgba(0,201,167,0.15);
+}
+
+.page-header {
+  text-align:center;
+  padding:40px 20px 20px;
+  position:relative; z-index:1;
+}
+.page-header h1 {
+  font-size: clamp(2rem, 5vw, 3rem);
+  background: linear-gradient(135deg, var(--white), var(--turquoise-glow));
+  -webkit-background-clip:text;
+  -webkit-text-fill-color:transparent;
+  background-clip:text;
+}
+.page-header p {
+  color:var(--text);
+  margin-top:8px;
+  font-size:1.05rem;
+}
+
+.cta-banner {
+  text-align:center;
+  padding:30px 20px;
+  position:relative; z-index:1;
+}
+.cta-banner .big-text {
+  font-size: clamp(1.5rem, 4vw, 2.2rem);
+  font-weight:700;
+  color:var(--gold);
+  margin-bottom:8px;
+}
+.cta-banner .sub-text {
+  color:var(--text);
+  font-size:1rem;
+}
+
+.social-grid {
+  max-width:750px;
+  margin:0 auto 50px;
+  padding:0 20px;
+  display:grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px,1fr));
+  gap:20px;
+  position:relative; z-index:1;
+}
+
+.social-card {
+  background: var(--card-bg);
+  border:1px solid rgba(0,201,167,0.15);
+  border-radius:16px;
+  padding:28px;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  text-align:center;
+  transition: transform 0.3s, box-shadow 0.3s;
+  text-decoration:none;
+  color:var(--white);
+}
+.social-card:hover {
+  transform:translateY(-4px);
+  box-shadow: 0 8px 30px rgba(0,201,167,0.15);
+}
+.social-card .social-icon {
+  width:64px;
+  height:64px;
+  border-radius:50%;
+  display:flex; align-items:center; justify-content:center;
+  font-size:1.8rem;
+  margin-bottom:16px;
+}
+.social-card .social-name {
+  font-size:1.2rem;
+  font-weight:600;
+  margin-bottom:4px;
+}
+.social-card .social-handle {
+  color:var(--turquoise);
+  font-size:0.95rem;
+  margin-bottom:10px;
+}
+.social-card .social-desc {
+  color:var(--text);
+  font-size:0.9rem;
+  line-height:1.5;
+}
+
+.icon-x { background:rgba(0,0,0,0.3); }
+.icon-ig { background:linear-gradient(135deg,rgba(131,58,180,0.3),rgba(253,29,29,0.3),rgba(252,176,69,0.3)); }
+.icon-tiktok { background:rgba(0,0,0,0.3); }
+.icon-tg { background:rgba(0,136,204,0.3); }
+
+footer {
+  position:relative; z-index:1;
+  background: rgba(6,15,30,0.9);
+  border-top:1px solid rgba(0,201,167,0.2);
+  padding:40px 20px 24px;
+  text-align:center;
+}
+.footer-links {
+  display:flex; gap:20px; justify-content:center; flex-wrap:wrap;
+  margin-bottom:16px;
+}
+.footer-links a {
+  color:var(--text);
+  text-decoration:none;
+  font-size:0.95rem;
+  transition: color 0.3s;
+}
+.footer-links a:hover { color:var(--turquoise); }
+.mint-addr {
+  font-size:0.75rem;
+  color:rgba(200,214,229,0.5);
+  word-break:break-all;
+  margin-top:12px;
+}
+.footer-copy {
+  margin-top:12px;
+  font-size:0.8rem;
+  color:rgba(200,214,229,0.4);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+@media (max-width:600px) {
+  .social-grid { grid-template-columns: 1fr; }
+}
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="nav-inner">
+    <a href="index.html">🏠 Home</a>
+    <a href="game.html">🎮 Play</a>
+    <a href="roadmap.html">📋 Roadmap</a>
+    <a href="security.html">🔒 Security</a>
+    <a href="community.html" class="active">🌐 Community</a>
+  </div>
+</nav>
+
+<div class="page-header">
+  <h1>Community 🌐</h1>
+  <p>Follow us, join the pack, and let's take DODSC to the moon together!</p>
+</div>
+
+<div class="cta-banner">
+  <div class="big-text">Join the pack! 🐕</div>
+  <div class="sub-text">Where Dods goes, we go. 🚀</div>
+</div>
+
+<div class="social-grid">
+  <a href="https://x.com/DodscoinX" class="social-card" target="_blank" rel="noopener">
+    <div class="social-icon icon-x">🐦</div>
+    <div class="social-name">X / Twitter</div>
+    <div class="social-handle">@DodscoinX</div>
+    <div class="social-desc">Latest updates, memes, and moon missions. Follow for real-time news.</div>
+  </a>
+
+  <a href="https://www.instagram.com/dodscoin" class="social-card" target="_blank" rel="noopener">
+    <div class="social-icon icon-ig">📸</div>
+    <div class="social-name">Instagram</div>
+    <div class="social-handle">@dodscoin</div>
+    <div class="social-desc">Behind the scenes, Dods adventures, and community highlights.</div>
+  </a>
+
+  <a href="https://www.tiktok.com/@dodscoin2026" class="social-card" target="_blank" rel="noopener">
+    <div class="social-icon icon-tiktok">🎵</div>
+    <div class="social-name">TikTok</div>
+    <div class="social-handle">@dodscoin2026</div>
+    <div class="social-desc">Short-form content, diving clips, and viral Dods moments.</div>
+  </a>
+
+  <a href="https://t.me/dodscoin2026" class="social-card" target="_blank" rel="noopener">
+    <div class="social-icon icon-tg">✈️</div>
+    <div class="social-name">Telegram</div>
+    <div class="social-handle">@dodscoin2026</div>
+    <div class="social-desc">Join the community chat. Real talk, alpha, and the dive crew.</div>
+  </a>
+</div>
+
+<footer>
+  <div class="footer-links">
+    <a href="https://x.com/DodscoinX" target="_blank" rel="noopener">🐦 X / Twitter</a>
+    <a href="https://www.instagram.com/dodscoin" target="_blank" rel="noopener">📸 Instagram</a>
+    <a href="https://www.tiktok.com/@dodscoin2026" target="_blank" rel="noopener">🎵 TikTok</a>
+    <a href="https://t.me/dodscoin2026" target="_blank" rel="noopener">✈️ Telegram</a>
+  </div>
+  <div class="mint-addr">Mint: 4nsq8dMuf6JqqaZpgbtCMVuRt9bYcrLS1Df5pGb4MWpx</div>
+  <div class="footer-copy">© 2025 DODSC. Not financial advice. DYOR.</div>
+</footer>
+</body>
+</html>
