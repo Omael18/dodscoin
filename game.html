@@ -80,6 +80,7 @@ nav {
   border: 1px solid rgba(0,201,167,0.2);
 }
 .score-bar .score-val { color:var(--turquoise); }
+.score-bar .height-val { color:#ffd54f; }
 .score-bar .best-val { color:#ff9800; }
 .game-container {
   position:relative; z-index:1;
@@ -191,6 +192,7 @@ footer {
 
 <div class="score-bar">
   <span>🐕 Dives: <span class="score-val" id="scoreVal">0</span></span>
+  <span>📊 Height: <span class="height-val" id="heightVal">0m</span></span>
   <span>🏆 Best: <span class="best-val" id="bestVal">0</span></span>
   <span id="stateLabel">Ready to dive!</span>
 </div>
@@ -254,9 +256,33 @@ footer {
   //  DOM REFS
   // ═══════════════════════════════════════════
   const scoreEl = document.getElementById('scoreVal');
+  const heightEl = document.getElementById('heightVal');
   const bestEl = document.getElementById('bestVal');
   const stateEl = document.getElementById('stateLabel');
   const resetBtn = document.getElementById('resetBtn');
+
+  // ═══════════════════════════════════════════
+  //  MARKETCAP → HEIGHT
+  // ═══════════════════════════════════════════
+  // 1000 mcap = 1m, 1M mcap = 50m
+  async function updateHeight() {
+    try {
+      const res = await fetch('https://api.dexscreener.com/latest/dex/tokens/4nsq8dMuf6JqqaZpgbtCMVuRt9bYcrLS1Df5pGb4MWpx');
+      const data = await res.json();
+      const pair = data.pairs && data.pairs[0];
+      if (pair && pair.fdv) {
+        const fdv = pair.fdv;
+        const meters = Math.round(fdv / 20000);
+        heightEl.textContent = meters + 'm';
+      } else {
+        heightEl.textContent = '0m';
+      }
+    } catch(e) {
+      heightEl.textContent = '?m';
+    }
+  }
+  updateHeight();
+  setInterval(updateHeight, 60000);
 
   // ═══════════════════════════════════════════
   //  AUDIO (Web Audio API)
@@ -1900,8 +1926,8 @@ footer {
     drawSky();
     drawSun();
     drawClouds();
-    drawCliff();       // Cliff first (covers left side)
-    drawWater();       // Water only on right of cliff
+    drawWater();       // Water first
+    drawCliff();       // Cliff on top (visible at water level)
     drawSeaweed();
     drawFish();
     drawBoat();
