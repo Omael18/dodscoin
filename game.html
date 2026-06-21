@@ -237,7 +237,7 @@ footer {
   const WATER_Y = BASE_H * 0.55; // water surface at ~55% of height
   const CLIFF_W = 190;           // cliff width from left edge
   const CLIFF_TOP = 80;           // cliff starts 80px from top (NOT full height)
-  const CLIFF_BOTTOM = WATER_Y + 20; // cliff reaches water line
+  const CLIFF_BOTTOM = WATER_Y; // cliff stops EXACTLY at water line
 
   function resizeCanvas() {
     const container = canvas.parentElement;
@@ -727,18 +727,17 @@ footer {
     ctx.fillStyle = grad;
 
     ctx.beginPath();
-    // Start at cliff edge at water level
-    const startX = cliffEdgeX(WATER_Y);
-    ctx.moveTo(startX, WATER_Y);
-    // Wavy surface to the right
-    for(let x = startX; x <= BASE_W; x += 3){
+    // Start at left edge (water covers full width, cliff draws on top)
+    ctx.moveTo(0, WATER_Y);
+    // Wavy surface across full width
+    for(let x = 0; x <= BASE_W; x += 3){
       const wave = Math.sin((x+waterOffset)*0.018)*4
                  + Math.sin((x+waterOffset)*0.04)*2
                  + Math.sin((x+waterOffset)*0.008)*3;
       ctx.lineTo(x, WATER_Y + wave);
     }
     ctx.lineTo(BASE_W, BASE_H);
-    ctx.lineTo(startX, BASE_H);
+    ctx.lineTo(0, BASE_H);
     ctx.closePath();
     ctx.fill();
 
