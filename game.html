@@ -565,14 +565,38 @@ footer {
   // ═══════════════════════════════════════════
   function drawClouds(){
     for(const c of clouds){
-      ctx.fillStyle = 'rgba(255,255,255,0.85)';
-      const pw = c.w / c.puffs;
-      for(let i=0; i<c.puffs; i++){
-        const ox = (i - (c.puffs-1)/2) * pw * 0.6;
-        const oy = Math.sin(i*1.2)*5;
-        const pr = pw * (0.4 + Math.sin(i*0.8)*0.15);
+      // Fluffy cloud made of overlapping circles of varying sizes and shades
+      const puffs = c.puffs + 2; // more circles for fluffiness
+      const colors = [
+        'rgba(255,255,255,0.92)',
+        'rgba(252,252,255,0.88)',
+        'rgba(248,248,252,0.84)',
+        'rgba(255,255,253,0.90)',
+        'rgba(250,250,255,0.86)'
+      ];
+      const pw = c.w / (c.puffs);
+      // Draw back circles first (slightly darker/larger for depth)
+      for(let i = puffs - 1; i >= 0; i--){
+        const ox = (i - (puffs-1)/2) * pw * 0.55 + Math.sin(i*2.1)*4;
+        const oy = Math.cos(i*1.7)*6;
+        // Vary radius: main body puffs are bigger, edge puffs smaller
+        const distFromCenter = Math.abs(i - (puffs-1)/2) / ((puffs-1)/2);
+        const sizeFactor = 1.0 - distFromCenter * 0.35;
+        const pr = pw * (0.55 + Math.sin(i*0.8)*0.12) * sizeFactor;
+        const ph = c.h * (0.65 + Math.sin(i*1.1)*0.25) * sizeFactor;
+        ctx.fillStyle = colors[i % colors.length];
         ctx.beginPath();
-        ctx.ellipse(c.x+ox, c.y+oy, pr, c.h*(0.7+Math.sin(i)*0.3), 0, 0, Math.PI*2);
+        ctx.ellipse(c.x+ox, c.y+oy, pr, ph, 0, 0, Math.PI*2);
+        ctx.fill();
+      }
+      // Add a few extra small highlight circles on top for extra fluffiness
+      for(let i = 0; i < 3; i++){
+        const ox = (i - 1) * pw * 0.4;
+        const oy = -4 + Math.sin(i*2.3)*3;
+        const pr = pw * 0.28;
+        ctx.fillStyle = 'rgba(255,255,255,0.5)';
+        ctx.beginPath();
+        ctx.ellipse(c.x+ox, c.y+oy, pr, pr*0.7, 0, 0, Math.PI*2);
         ctx.fill();
       }
     }
@@ -610,22 +634,50 @@ footer {
     ctx.closePath();
     ctx.fill();
 
-    // Horizontal strata lines
-    ctx.strokeStyle = 'rgba(160,140,110,0.25)';
+    // Natural strata lines (varied spacing, wavy, broken, varying opacity)
     ctx.lineWidth = 1;
-    const strataCount = 22;
-    for(let i=0; i<strataCount; i++){
-      const y = 25 + i * ((CLIFF_BOTTOM - 20) / strataCount);
+    const strataYs = [];
+    let sy = 28 + Math.random()*8;
+    while(sy < CLIFF_BOTTOM - 15){
+      strataYs.push(sy);
+      sy += 14 + Math.random()*22; // varied spacing between 14-36
+    }
+    for(let i = 0; i < strataYs.length; i++){
+      const y = strataYs[i];
       const ex = cliffEdgeX(y);
-      const startX = 5 + Math.random()*10;
-      const endX = ex - 8 - Math.random()*8;
-      if(endX > startX + 20){
-        ctx.beginPath();
-        ctx.moveTo(startX, y + Math.random()*2);
-        for(let x = startX; x < endX; x += 12){
-          ctx.lineTo(x, y + Math.sin(x*0.05+i)*1.5);
+      // Vary opacity per line
+      const alpha = 0.12 + Math.random()*0.22;
+      const isDark = Math.random() > 0.7;
+      ctx.strokeStyle = isDark
+        ? `rgba(140,120,85,${alpha})`
+        : `rgba(160,140,110,${alpha})`;
+      // Draw as a series of short broken segments
+      const numSegs = 2 + Math.floor(Math.random()*3);
+      for(let s = 0; s < numSegs; s++){
+        const startX = 5 + Math.random()*30 + s * (ex * 0.35);
+        const segLen = 15 + Math.random()*50;
+        const endX = Math.min(startX + segLen, ex - 5 - Math.random()*10);
+        if(endX > startX + 10){
+          ctx.beginPath();
+          ctx.moveTo(startX, y + Math.random()*2 - 1);
+          for(let x = startX; x < endX; x += 8){
+            const wave = Math.sin(x*0.04 + i*1.3)*2.5;
+            ctx.lineTo(x, y + wave + Math.random()*0.6);
+          }
+          ctx.stroke();
         }
+      }
+      // Occasionally add a diagonal crack branching off a stratum
+      if(Math.random() > 0.6){
+        const cx = 20 + Math.random()*120;
+        ctx.beginPath();
+        ctx.strokeStyle = `rgba(130,110,80,${0.08 + Math.random()*0.12})`;
+        ctx.lineWidth = 0.7;
+        ctx.moveTo(cx, y);
+        const angle = 0.4 + Math.random()*0.8;
+        ctx.lineTo(cx + Math.cos(angle)*12, y + Math.sin(angle)*12);
         ctx.stroke();
+        ctx.lineWidth = 1;
       }
     }
 
@@ -959,394 +1011,502 @@ footer {
   }
 
   function drawCollieSitting(){
-    // ── SITTING COLLIE on cliff edge, looking right ──
+    // ── SITTING COLLIE (Lassie/Rough Collie) on cliff edge, looking right ──
+    // Key traits: elongated body, long silky fur, white chest mane, white blaze, folded-tip ears
 
     // Tail - bushy, curving upward, white tip, gently waving
     const tailWave = Math.sin(Date.now()*0.004)*8;
     ctx.strokeStyle = SABLE;
-    ctx.lineWidth = 7;
+    ctx.lineWidth = 8;
     ctx.lineCap = 'round';
     ctx.beginPath();
-    ctx.moveTo(-18, 5);
-    ctx.quadraticCurveTo(-30, -8+tailWave, -32, -22+tailWave);
+    ctx.moveTo(-20, 5);
+    ctx.quadraticCurveTo(-34, -8+tailWave, -38, -26+tailWave);
     ctx.stroke();
-    // Bushy fur strokes on tail
+    // Secondary tail line for bushiness
+    ctx.lineWidth = 5;
     ctx.strokeStyle = SABLE_DARK;
+    ctx.beginPath();
+    ctx.moveTo(-20, 3);
+    ctx.quadraticCurveTo(-36, -4+tailWave, -40, -22+tailWave);
+    ctx.stroke();
+    // Bushy fur strokes on tail (many for long coat)
+    ctx.strokeStyle = SABLE;
     ctx.lineWidth = 1;
-    for(let i=0; i<5; i++){
-      const f = i/5;
-      const tx = -18 + f*(-14);
-      const ty = 5 + f*(-27+tailWave);
+    for(let i=0; i<10; i++){
+      const f = i/10;
+      const tx = -20 + f*(-20);
+      const ty = 4 + f*(-30+tailWave);
       ctx.beginPath();
       ctx.moveTo(tx, ty);
-      ctx.lineTo(tx-3+Math.random()*2, ty-2);
+      ctx.quadraticCurveTo(tx-3, ty-3, tx-5-Math.random(), ty-5);
       ctx.stroke();
     }
-    // White tip
+    // White tip (prominent)
     ctx.strokeStyle = WHITE;
-    ctx.lineWidth = 4;
-    ctx.beginPath();
-    ctx.moveTo(-30, -18+tailWave);
-    ctx.lineTo(-33, -24+tailWave);
-    ctx.stroke();
-
-    // Back legs (sitting position)
-    ctx.strokeStyle = SABLE;
     ctx.lineWidth = 5;
     ctx.lineCap = 'round';
     ctx.beginPath();
+    ctx.moveTo(-35, -20+tailWave);
+    ctx.lineTo(-40, -28+tailWave);
+    ctx.stroke();
+    ctx.strokeStyle = WHITE;
+    ctx.lineWidth = 3;
+    ctx.beginPath();
+    ctx.moveTo(-33, -16+tailWave);
+    ctx.lineTo(-37, -24+tailWave);
+    ctx.stroke();
+
+    // Back legs (sitting position) - slightly thicker
+    ctx.strokeStyle = SABLE;
+    ctx.lineWidth = 6;
+    ctx.lineCap = 'round';
+    ctx.beginPath();
     ctx.moveTo(-12, 12);
-    ctx.quadraticCurveTo(-16, 18, -13, 24);
+    ctx.quadraticCurveTo(-18, 18, -14, 26);
     ctx.stroke();
     ctx.beginPath();
     ctx.moveTo(-2, 14);
-    ctx.quadraticCurveTo(-6, 20, -3, 24);
+    ctx.quadraticCurveTo(-8, 20, -4, 26);
     ctx.stroke();
     // White socks on back paws
     ctx.strokeStyle = WHITE;
-    ctx.lineWidth = 3.5;
+    ctx.lineWidth = 4;
     ctx.beginPath();
-    ctx.moveTo(-14, 23);
-    ctx.lineTo(-12, 26);
+    ctx.moveTo(-16, 24);
+    ctx.lineTo(-14, 28);
     ctx.stroke();
     ctx.beginPath();
-    ctx.moveTo(-4, 23);
-    ctx.lineTo(-2, 26);
+    ctx.moveTo(-6, 24);
+    ctx.lineTo(-4, 28);
     ctx.stroke();
 
-    // Body - elongated, elegant
+    // Body - elongated collie shape (longer than fox, less round)
     ctx.fillStyle = SABLE;
     ctx.beginPath();
-    ctx.ellipse(0, 4, 22, 14, 0, 0, Math.PI*2);
+    ctx.ellipse(2, 2, 26, 13, 0.05, 0, Math.PI*2);
     ctx.fill();
+    // Slight gradient overlay for body shading
+    ctx.fillStyle = SABLE_DARK;
+    ctx.globalAlpha = 0.15;
+    ctx.beginPath();
+    ctx.ellipse(2, 6, 24, 8, 0, 0, Math.PI);
+    ctx.fill();
+    ctx.globalAlpha = 1;
 
-    // Body fur strokes (long flowing fur)
+    // Body fur strokes - MANY curved lines for long flowing coat
+    // Dark fur along back
     ctx.strokeStyle = SABLE_DARK;
-    ctx.lineWidth = 0.8;
-    for(let i=0; i<10; i++){
-      const fx = -16+i*4;
-      const fy = -2+Math.sin(i*0.7)*8;
+    ctx.lineWidth = 0.9;
+    for(let i=0; i<16; i++){
+      const fx = -20+i*3;
+      const fy = -3+Math.sin(i*0.6)*9;
       ctx.beginPath();
       ctx.moveTo(fx, fy);
-      ctx.quadraticCurveTo(fx+1, fy+5, fx+2, fy+9);
+      ctx.quadraticCurveTo(fx+1, fy+5, fx+2, fy+10);
       ctx.stroke();
     }
-    // Lighter fur strokes
+    // Light fur highlights
     ctx.strokeStyle = SABLE_LIGHT;
     ctx.lineWidth = 0.6;
-    for(let i=0; i<8; i++){
-      const fx = -12+i*4;
-      const fy = 0+Math.sin(i*0.9)*7;
+    for(let i=0; i<12; i++){
+      const fx = -18+i*3.5;
+      const fy = -1+Math.sin(i*0.8)*7;
       ctx.beginPath();
       ctx.moveTo(fx, fy);
-      ctx.lineTo(fx+1, fy+6);
+      ctx.lineTo(fx+1, fy+8);
+      ctx.stroke();
+    }
+    // Extra flowing fur along bottom edge (long coat draping)
+    ctx.strokeStyle = SABLE;
+    ctx.lineWidth = 0.7;
+    for(let i=0; i<14; i++){
+      const fx = -22+i*3.5;
+      ctx.beginPath();
+      ctx.moveTo(fx, 10+Math.sin(i*0.5)*3);
+      ctx.quadraticCurveTo(fx+1, 16, fx+3, 18+Math.random()*2);
       ctx.stroke();
     }
 
-    // White chest/mane (big fluffy white area)
+    // White chest/mane (big fluffy white ruff - prominent collie trait)
     ctx.fillStyle = WHITE_WARM;
     ctx.beginPath();
-    ctx.ellipse(14, 4, 10, 12, 0.2, 0, Math.PI*2);
+    ctx.ellipse(16, 2, 12, 14, 0.15, 0, Math.PI*2);
     ctx.fill();
-    // Fluffy fur strokes on chest
-    ctx.strokeStyle = 'rgba(240,240,245,0.6)';
+    // Fluffy fur strokes on chest (many for luxurious mane look)
+    ctx.strokeStyle = 'rgba(240,240,245,0.7)';
     ctx.lineWidth = 0.7;
-    for(let i=0; i<8; i++){
-      const a = -1.0+i*0.3;
+    for(let i=0; i<12; i++){
+      const a = -1.2+i*0.22;
       ctx.beginPath();
-      ctx.moveTo(14+Math.cos(a)*6, 4+Math.sin(a)*8);
-      ctx.lineTo(14+Math.cos(a)*10, 4+Math.sin(a)*12);
+      ctx.moveTo(16+Math.cos(a)*7, 2+Math.sin(a)*9);
+      ctx.lineTo(16+Math.cos(a)*13, 2+Math.sin(a)*14);
+      ctx.stroke();
+    }
+    // Extra white tufts around chest edge
+    ctx.strokeStyle = 'rgba(255,255,255,0.5)';
+    ctx.lineWidth = 1;
+    for(let i=0; i<6; i++){
+      const a = -0.8+i*0.35;
+      ctx.beginPath();
+      ctx.moveTo(16+Math.cos(a)*10, 2+Math.sin(a)*12);
+      ctx.lineTo(16+Math.cos(a)*14, 2+Math.sin(a)*16);
       ctx.stroke();
     }
 
     // White belly
     ctx.fillStyle = WHITE_WARM;
     ctx.beginPath();
-    ctx.ellipse(2, 10, 14, 6, 0, 0, Math.PI*2);
+    ctx.ellipse(2, 10, 16, 6, 0, 0, Math.PI*2);
     ctx.fill();
 
-    // Head - elongated, elegant
+    // Neck fur (connecting head to chest mane)
     ctx.fillStyle = SABLE;
     ctx.beginPath();
-    ctx.ellipse(20, -8, 13, 11, 0, 0, Math.PI*2);
+    ctx.ellipse(14, -6, 10, 8, 0, 0, Math.PI*2);
     ctx.fill();
 
-    // White blaze on face (collie signature)
+    // Head - elongated narrow collie shape (NOT round like fox)
+    ctx.fillStyle = SABLE;
+    ctx.beginPath();
+    ctx.ellipse(22, -10, 11, 10, 0.1, 0, Math.PI*2);
+    ctx.fill();
+
+    // White blaze on face (collie signature - wide stripe from forehead down)
     ctx.fillStyle = WHITE_WARM;
     ctx.beginPath();
-    ctx.moveTo(24, -16);
-    ctx.lineTo(28, -6);
-    ctx.lineTo(24, -2);
-    ctx.lineTo(20, -6);
-    ctx.lineTo(22, -16);
+    ctx.moveTo(24, -18);
+    ctx.quadraticCurveTo(22, -14, 28, -8);
+    ctx.quadraticCurveTo(24, -4, 20, -8);
+    ctx.quadraticCurveTo(22, -14, 22, -18);
     ctx.closePath();
     ctx.fill();
 
-    // Long narrow snout (collie characteristic)
+    // Long narrow snout (collie characteristic - NOT round)
     ctx.fillStyle = SABLE_DARK;
     ctx.beginPath();
-    ctx.ellipse(32, -5, 9, 5, 0.1, 0, Math.PI*2);
+    ctx.ellipse(34, -7, 10, 4.5, 0.12, 0, Math.PI*2);
     ctx.fill();
-    // White on snout
+    // White on snout/cheeks
     ctx.fillStyle = WHITE_WARM;
     ctx.beginPath();
-    ctx.ellipse(32, -3, 5, 3, 0, 0, Math.PI*2);
+    ctx.ellipse(34, -5, 6, 3.5, 0, 0, Math.PI*2);
     ctx.fill();
 
-    // Nose
+    // Nose (large, dark)
     ctx.fillStyle = '#111';
     ctx.beginPath();
-    ctx.arc(40, -5, 2.5, 0, Math.PI*2);
+    ctx.arc(44, -7, 3, 0, Math.PI*2);
     ctx.fill();
 
-    // Mouth
+    // Mouth (slight smile - gentle expression)
     ctx.strokeStyle = '#444';
     ctx.lineWidth = 1;
     ctx.beginPath();
-    ctx.moveTo(40, -3);
-    ctx.quadraticCurveTo(36, 0, 32, -1);
+    ctx.moveTo(44, -5);
+    ctx.quadraticCurveTo(40, -2, 34, -3);
     ctx.stroke();
 
-    // Eyes - warm brown, intelligent
-    // Left eye
+    // Eyes - warm brown, intelligent, gentle
+    // Left eye (larger, more detailed)
     ctx.fillStyle = '#fff';
     ctx.beginPath();
-    ctx.ellipse(24, -10, 4, 4.5, 0, 0, Math.PI*2);
+    ctx.ellipse(26, -12, 4, 5, 0, 0, Math.PI*2);
     ctx.fill();
     ctx.fillStyle = '#6B3A1F';
     ctx.beginPath();
-    ctx.arc(25, -10, 2.8, 0, Math.PI*2);
+    ctx.arc(27, -12, 3, 0, Math.PI*2);
     ctx.fill();
     ctx.fillStyle = '#111';
     ctx.beginPath();
-    ctx.arc(25.5, -10, 1.5, 0, Math.PI*2);
+    ctx.arc(27.5, -12, 1.6, 0, Math.PI*2);
     ctx.fill();
     ctx.fillStyle = '#fff';
     ctx.beginPath();
-    ctx.arc(26.5, -11, 0.8, 0, Math.PI*2);
+    ctx.arc(28.5, -13, 0.9, 0, Math.PI*2);
     ctx.fill();
 
     // Right eye
     ctx.fillStyle = '#fff';
     ctx.beginPath();
-    ctx.ellipse(17, -10, 3.5, 4, 0, 0, Math.PI*2);
+    ctx.ellipse(18, -12, 3.5, 4.5, 0, 0, Math.PI*2);
     ctx.fill();
     ctx.fillStyle = '#6B3A1F';
     ctx.beginPath();
-    ctx.arc(16.5, -10, 2.5, 0, Math.PI*2);
+    ctx.arc(18, -12, 2.5, 0, Math.PI*2);
     ctx.fill();
     ctx.fillStyle = '#111';
     ctx.beginPath();
-    ctx.arc(16, -10, 1.3, 0, Math.PI*2);
+    ctx.arc(17.5, -12, 1.4, 0, Math.PI*2);
     ctx.fill();
     ctx.fillStyle = '#fff';
     ctx.beginPath();
-    ctx.arc(17, -11, 0.7, 0, Math.PI*2);
+    ctx.arc(18.5, -13, 0.7, 0, Math.PI*2);
     ctx.fill();
 
     // Pointed erect ears with tips folded forward (collie trait!)
-    // Left ear
+    // Left ear - tall, triangular, fold at tip
     ctx.fillStyle = SABLE;
     ctx.beginPath();
-    ctx.moveTo(14, -17);
-    ctx.lineTo(9, -30);
-    ctx.lineTo(7, -28); // folded tip
-    ctx.lineTo(13, -19);
+    ctx.moveTo(16, -18);
+    ctx.lineTo(11, -34);
+    ctx.lineTo(8, -31); // folded tip curves forward
+    ctx.lineTo(15, -20);
     ctx.closePath();
     ctx.fill();
+    // Inner ear (lighter)
     ctx.fillStyle = '#8B6F5E';
     ctx.beginPath();
-    ctx.moveTo(14, -18);
-    ctx.lineTo(11, -26);
-    ctx.lineTo(10, -24);
-    ctx.lineTo(13, -19);
+    ctx.moveTo(16, -19);
+    ctx.lineTo(12, -31);
+    ctx.lineTo(10, -29);
+    ctx.lineTo(15, -21);
+    ctx.closePath();
+    ctx.fill();
+    // Fur on ear base
+    ctx.fillStyle = SABLE_LIGHT;
+    ctx.beginPath();
+    ctx.moveTo(16, -18);
+    ctx.lineTo(13, -24);
+    ctx.lineTo(15, -19);
     ctx.closePath();
     ctx.fill();
 
     // Right ear
     ctx.fillStyle = SABLE;
     ctx.beginPath();
-    ctx.moveTo(23, -17);
-    ctx.lineTo(27, -30);
-    ctx.lineTo(29, -28); // folded tip
-    ctx.lineTo(24, -19);
+    ctx.moveTo(25, -18);
+    ctx.lineTo(30, -34);
+    ctx.lineTo(33, -31); // folded tip
+    ctx.lineTo(26, -20);
     ctx.closePath();
     ctx.fill();
     ctx.fillStyle = '#8B6F5E';
     ctx.beginPath();
-    ctx.moveTo(23, -18);
-    ctx.lineTo(26, -26);
-    ctx.lineTo(27, -24);
-    ctx.lineTo(24, -19);
+    ctx.moveTo(25, -19);
+    ctx.lineTo(29, -31);
+    ctx.lineTo(31, -29);
+    ctx.lineTo(26, -21);
+    ctx.closePath();
+    ctx.fill();
+    ctx.fillStyle = SABLE_LIGHT;
+    ctx.beginPath();
+    ctx.moveTo(25, -18);
+    ctx.lineTo(28, -24);
+    ctx.lineTo(26, -19);
     ctx.closePath();
     ctx.fill();
 
-    // Front legs - long and slender
+    // Fur ruff around ears (long collie coat)
     ctx.strokeStyle = SABLE;
+    ctx.lineWidth = 0.8;
+    for(let i=0; i<4; i++){
+      const a = 2.5+i*0.2;
+      ctx.beginPath();
+      ctx.moveTo(18+Math.cos(a)*4, -14+Math.sin(a)*4);
+      ctx.lineTo(18+Math.cos(a)*7, -14+Math.sin(a)*7);
+      ctx.stroke();
+    }
+
+    // Front legs - long, elegant, slightly thick
+    ctx.strokeStyle = SABLE;
+    ctx.lineWidth = 6;
+    ctx.lineCap = 'round';
+    ctx.beginPath();
+    ctx.moveTo(10, 12);
+    ctx.lineTo(10, 26);
+    ctx.stroke();
+    ctx.beginPath();
+    ctx.moveTo(18, 10);
+    ctx.lineTo(18, 24);
+    ctx.stroke();
+    // White socks on front paws (prominent)
+    ctx.strokeStyle = WHITE;
     ctx.lineWidth = 5;
     ctx.lineCap = 'round';
     ctx.beginPath();
-    ctx.moveTo(8, 14);
-    ctx.lineTo(8, 26);
+    ctx.moveTo(10, 23);
+    ctx.lineTo(10, 30);
     ctx.stroke();
     ctx.beginPath();
-    ctx.moveTo(16, 12);
-    ctx.lineTo(16, 24);
+    ctx.moveTo(18, 21);
+    ctx.lineTo(18, 28);
     ctx.stroke();
-    // White socks on front paws
-    ctx.strokeStyle = WHITE;
-    ctx.lineWidth = 4;
-    ctx.beginPath();
-    ctx.moveTo(8, 24);
-    ctx.lineTo(8, 28);
-    ctx.stroke();
-    ctx.beginPath();
-    ctx.moveTo(16, 22);
-    ctx.lineTo(16, 26);
-    ctx.stroke();
+    // Slight sable accent on leg top
+    ctx.strokeStyle = SABLE_DARK;
+    ctx.lineWidth = 0.5;
+    for(let i=0; i<3; i++){
+      const ly = 12+i*3;
+      ctx.beginPath();
+      ctx.moveTo(8, ly);
+      ctx.lineTo(7, ly+4);
+      ctx.stroke();
+      ctx.beginPath();
+      ctx.moveTo(20, ly);
+      ctx.lineTo(21, ly+4);
+      ctx.stroke();
+    }
   }
 
   function drawCollieDiving(){
     // ── DIVING: body stretched out, long fur streaming ──
     const t = Date.now()*0.005;
 
-    // Tail streaming behind
+    // Tail streaming behind - bushy with white tip
     const tailWave = Math.sin(t)*6;
     ctx.strokeStyle = SABLE;
-    ctx.lineWidth = 6;
+    ctx.lineWidth = 7;
     ctx.lineCap = 'round';
     ctx.beginPath();
-    ctx.moveTo(-22, -2);
-    ctx.quadraticCurveTo(-35, -5+tailWave, -40, -12+tailWave);
+    ctx.moveTo(-24, -2);
+    ctx.quadraticCurveTo(-38, -5+tailWave, -44, -14+tailWave);
     ctx.stroke();
-    // Fur flowing back
+    // Secondary tail line for bushiness
+    ctx.lineWidth = 4;
     ctx.strokeStyle = SABLE_DARK;
+    ctx.beginPath();
+    ctx.moveTo(-24, 0);
+    ctx.quadraticCurveTo(-40, -2+tailWave, -46, -10+tailWave);
+    ctx.stroke();
+    // Fur flowing back (long coat)
+    ctx.strokeStyle = SABLE;
     ctx.lineWidth = 0.8;
-    for(let i=0; i<4; i++){
-      const f = i/4;
-      const tx = -22 + f*(-18);
-      const ty = -2 + f*(-10+tailWave);
+    for(let i=0; i<8; i++){
+      const f = i/8;
+      const tx = -24 + f*(-22);
+      const ty = -2 + f*(-12+tailWave);
       ctx.beginPath();
       ctx.moveTo(tx, ty);
-      ctx.lineTo(tx-2, ty-4-Math.sin(t+i)*2);
+      ctx.lineTo(tx-2, ty-5-Math.sin(t+i)*2);
       ctx.stroke();
     }
-    // White tip
+    // White tip (prominent)
     ctx.strokeStyle = WHITE;
-    ctx.lineWidth = 3;
+    ctx.lineWidth = 4;
     ctx.beginPath();
-    ctx.moveTo(-38, -10+tailWave);
-    ctx.lineTo(-41, -14+tailWave);
+    ctx.moveTo(-42, -12+tailWave);
+    ctx.lineTo(-46, -16+tailWave);
     ctx.stroke();
 
-    // Body - stretched, elongated
+    // Body - stretched, elongated collie shape
     ctx.fillStyle = SABLE;
     ctx.beginPath();
-    ctx.ellipse(0, 0, 28, 10, 0, 0, Math.PI*2);
+    ctx.ellipse(0, 0, 30, 10, 0, 0, Math.PI*2);
     ctx.fill();
+    // Shading
+    ctx.fillStyle = SABLE_DARK;
+    ctx.globalAlpha = 0.12;
+    ctx.beginPath();
+    ctx.ellipse(0, 4, 28, 6, 0, 0, Math.PI);
+    ctx.fill();
+    ctx.globalAlpha = 1;
 
     // Long fur streaming upward (against gravity during dive)
     ctx.strokeStyle = SABLE_DARK;
-    ctx.lineWidth = 0.8;
-    for(let i=0; i<8; i++){
-      const fx = -18+i*6;
+    ctx.lineWidth = 0.9;
+    for(let i=0; i<12; i++){
+      const fx = -22+i*5;
       ctx.beginPath();
       ctx.moveTo(fx, -3);
-      ctx.lineTo(fx+1, -12-Math.sin(t+i)*4);
+      ctx.lineTo(fx+1, -14-Math.sin(t+i)*4);
       ctx.stroke();
     }
     ctx.strokeStyle = SABLE_LIGHT;
-    for(let i=0; i<6; i++){
-      const fx = -14+i*5;
+    for(let i=0; i<10; i++){
+      const fx = -18+i*5;
       ctx.beginPath();
       ctx.moveTo(fx, -1);
-      ctx.lineTo(fx+1, -8-Math.sin(t+i)*3);
+      ctx.lineTo(fx+1, -10-Math.sin(t+i)*3);
       ctx.stroke();
     }
 
     // White belly
     ctx.fillStyle = WHITE_WARM;
     ctx.beginPath();
-    ctx.ellipse(2, 5, 18, 5, 0, 0, Math.PI*2);
+    ctx.ellipse(2, 5, 20, 5, 0, 0, Math.PI*2);
     ctx.fill();
 
-    // White collar
+    // White collar (large chest mane)
     ctx.fillStyle = WHITE_WARM;
     ctx.beginPath();
-    ctx.ellipse(16, -2, 7, 8, 0.2, 0, Math.PI*2);
+    ctx.ellipse(18, -2, 8, 9, 0.2, 0, Math.PI*2);
     ctx.fill();
 
-    // Head
+    // Head - elongated collie shape
     ctx.fillStyle = SABLE;
     ctx.beginPath();
-    ctx.ellipse(24, -3, 11, 9, 0.2, 0, Math.PI*2);
+    ctx.ellipse(26, -3, 11, 9, 0.2, 0, Math.PI*2);
     ctx.fill();
 
     // White blaze
     ctx.fillStyle = WHITE_WARM;
     ctx.beginPath();
-    ctx.moveTo(26, -9);
-    ctx.lineTo(30, -3);
-    ctx.lineTo(26, 1);
-    ctx.lineTo(23, -3);
+    ctx.moveTo(28, -10);
+    ctx.quadraticCurveTo(26, -6, 32, 0);
+    ctx.quadraticCurveTo(28, 3, 24, -1);
+    ctx.quadraticCurveTo(26, -6, 26, -10);
     ctx.closePath();
     ctx.fill();
 
-    // Snout
+    // Long snout
     ctx.fillStyle = SABLE_DARK;
     ctx.beginPath();
-    ctx.ellipse(32, -2, 8, 4, 0.2, 0, Math.PI*2);
+    ctx.ellipse(34, -2, 9, 4, 0.2, 0, Math.PI*2);
     ctx.fill();
     ctx.fillStyle = '#111';
     ctx.beginPath();
-    ctx.arc(39, -2, 2, 0, Math.PI*2);
+    ctx.arc(42, -2, 2.2, 0, Math.PI*2);
     ctx.fill();
 
-    // Eyes
+    // Eye
     ctx.fillStyle = '#fff';
     ctx.beginPath();
-    ctx.arc(26, -6, 3, 0, Math.PI*2);
+    ctx.arc(28, -6, 3, 0, Math.PI*2);
     ctx.fill();
     ctx.fillStyle = '#6B3A1F';
     ctx.beginPath();
-    ctx.arc(26.5, -6, 2, 0, Math.PI*2);
+    ctx.arc(28.5, -6, 2, 0, Math.PI*2);
+    ctx.fill();
+    ctx.fillStyle = '#111';
+    ctx.beginPath();
+    ctx.arc(29, -6, 1, 0, Math.PI*2);
     ctx.fill();
 
-    // Ears pinned back
+    // Ears pinned back (but taller, collie-like)
     ctx.fillStyle = SABLE;
     ctx.beginPath();
     ctx.moveTo(19, -10);
-    ctx.lineTo(13, -18);
-    ctx.lineTo(17, -8);
+    ctx.lineTo(12, -20);
+    ctx.lineTo(16, -8);
     ctx.closePath();
     ctx.fill();
     ctx.beginPath();
-    ctx.moveTo(25, -10);
-    ctx.lineTo(29, -18);
-    ctx.lineTo(23, -8);
+    ctx.moveTo(27, -10);
+    ctx.lineTo(32, -20);
+    ctx.lineTo(25, -8);
     ctx.closePath();
     ctx.fill();
 
-    // Paws stretched out
+    // Paws stretched out (with white socks)
     ctx.strokeStyle = SABLE;
-    ctx.lineWidth = 4;
+    ctx.lineWidth = 5;
     ctx.beginPath();
     ctx.moveTo(8, 8);
-    ctx.lineTo(5, 16);
+    ctx.lineTo(5, 18);
     ctx.stroke();
     ctx.beginPath();
     ctx.moveTo(16, 8);
-    ctx.lineTo(18, 16);
+    ctx.lineTo(18, 18);
     ctx.stroke();
     ctx.strokeStyle = WHITE;
-    ctx.lineWidth = 3;
+    ctx.lineWidth = 4;
     ctx.beginPath();
-    ctx.moveTo(5, 14);
-    ctx.lineTo(4, 18);
+    ctx.moveTo(5, 15);
+    ctx.lineTo(4, 20);
     ctx.stroke();
     ctx.beginPath();
-    ctx.moveTo(18, 14);
-    ctx.lineTo(19, 18);
+    ctx.moveTo(18, 15);
+    ctx.lineTo(19, 20);
     ctx.stroke();
   }
 
@@ -1354,134 +1514,159 @@ footer {
     // ── SWIMMING: head above water, fur wet and flat ──
     const t = Date.now()*0.006;
 
-    // Body partially submerged
+    // Body partially submerged (elongated)
     ctx.fillStyle = SABLE;
     ctx.beginPath();
-    ctx.ellipse(0, 2, 22, 8, 0, 0, Math.PI*2);
+    ctx.ellipse(0, 2, 24, 9, 0, 0, Math.PI*2);
     ctx.fill();
+    // Shading on body
+    ctx.fillStyle = SABLE_DARK;
+    ctx.globalAlpha = 0.1;
+    ctx.beginPath();
+    ctx.ellipse(0, 5, 22, 5, 0, 0, Math.PI);
+    ctx.fill();
+    ctx.globalAlpha = 1;
+
+    // Wet fur strokes (flatter, closer to body)
+    ctx.strokeStyle = SABLE_DARK;
+    ctx.lineWidth = 0.6;
+    for(let i=0; i<8; i++){
+      const fx = -16+i*4;
+      ctx.beginPath();
+      ctx.moveTo(fx, -2);
+      ctx.lineTo(fx, 3);
+      ctx.stroke();
+    }
 
     // Wet white belly
     ctx.fillStyle = '#E8E4E0';
     ctx.beginPath();
-    ctx.ellipse(3, 6, 15, 4, 0, 0, Math.PI*2);
+    ctx.ellipse(3, 6, 16, 5, 0, 0, Math.PI*2);
     ctx.fill();
 
-    // White collar (wet, flat)
+    // White collar (wet, flat but prominent)
     ctx.fillStyle = '#E8E4E0';
     ctx.beginPath();
-    ctx.ellipse(12, -1, 7, 6, 0.2, 0, Math.PI*2);
+    ctx.ellipse(14, -1, 8, 7, 0.2, 0, Math.PI*2);
     ctx.fill();
 
-    // Head above water
+    // Neck
     ctx.fillStyle = SABLE;
     ctx.beginPath();
-    ctx.ellipse(18, -10, 11, 9, 0, 0, Math.PI*2);
+    ctx.ellipse(16, -6, 8, 7, 0, 0, Math.PI*2);
     ctx.fill();
 
-    // White blaze
+    // Head above water - elongated collie shape
+    ctx.fillStyle = SABLE;
+    ctx.beginPath();
+    ctx.ellipse(20, -10, 11, 9, 0, 0, Math.PI*2);
+    ctx.fill();
+
+    // White blaze (curved, wider)
     ctx.fillStyle = WHITE_WARM;
     ctx.beginPath();
-    ctx.moveTo(20, -16);
-    ctx.lineTo(25, -10);
-    ctx.lineTo(20, -5);
-    ctx.lineTo(16, -10);
+    ctx.moveTo(22, -17);
+    ctx.quadraticCurveTo(20, -13, 27, -7);
+    ctx.quadraticCurveTo(23, -4, 17, -8);
+    ctx.quadraticCurveTo(20, -13, 20, -17);
     ctx.closePath();
     ctx.fill();
 
-    // Snout
+    // Long snout
     ctx.fillStyle = SABLE_DARK;
     ctx.beginPath();
-    ctx.ellipse(26, -8, 7, 5, 0.1, 0, Math.PI*2);
+    ctx.ellipse(28, -8, 8, 5, 0.1, 0, Math.PI*2);
     ctx.fill();
     ctx.fillStyle = '#ddd';
     ctx.beginPath();
-    ctx.ellipse(26, -6, 4, 2.5, 0, 0, Math.PI*2);
+    ctx.ellipse(28, -6, 5, 3, 0, 0, Math.PI*2);
     ctx.fill();
     ctx.fillStyle = '#111';
     ctx.beginPath();
-    ctx.arc(32, -8, 2, 0, Math.PI*2);
+    ctx.arc(35, -8, 2.2, 0, Math.PI*2);
     ctx.fill();
 
     // Mouth slightly open, tongue
     ctx.fillStyle = '#ff6b6b';
     ctx.beginPath();
-    ctx.ellipse(28, -3, 3, 4, 0.1, 0, Math.PI*2);
+    ctx.ellipse(30, -3, 3, 4, 0.1, 0, Math.PI*2);
     ctx.fill();
 
     // Eyes
     ctx.fillStyle = '#fff';
     ctx.beginPath();
-    ctx.ellipse(22, -14, 3.5, 4, 0, 0, Math.PI*2);
+    ctx.ellipse(24, -14, 3.5, 4, 0, 0, Math.PI*2);
     ctx.fill();
     ctx.fillStyle = '#6B3A1F';
     ctx.beginPath();
-    ctx.arc(22.5, -14, 2.3, 0, Math.PI*2);
+    ctx.arc(24.5, -14, 2.3, 0, Math.PI*2);
     ctx.fill();
     ctx.fillStyle = '#111';
     ctx.beginPath();
-    ctx.arc(23, -14, 1.2, 0, Math.PI*2);
+    ctx.arc(25, -14, 1.2, 0, Math.PI*2);
     ctx.fill();
     ctx.fillStyle = '#fff';
     ctx.beginPath();
-    ctx.arc(23.8, -15, 0.6, 0, Math.PI*2);
+    ctx.arc(25.8, -15, 0.6, 0, Math.PI*2);
     ctx.fill();
 
-    // Ears (pointed, above water)
+    // Ears (pointed, above water, taller collie ears)
     ctx.fillStyle = SABLE;
     ctx.beginPath();
-    ctx.moveTo(14, -17);
-    ctx.lineTo(10, -28);
-    ctx.lineTo(8, -26); // folded tip
-    ctx.lineTo(13, -19);
+    ctx.moveTo(16, -17);
+    ctx.lineTo(11, -30);
+    ctx.lineTo(9, -28); // folded tip
+    ctx.lineTo(15, -19);
     ctx.closePath();
     ctx.fill();
     ctx.fillStyle = '#8B6F5E';
     ctx.beginPath();
-    ctx.moveTo(14, -18);
+    ctx.moveTo(16, -18);
+    ctx.lineTo(12, -27);
     ctx.lineTo(11, -25);
-    ctx.lineTo(10, -23);
-    ctx.lineTo(13, -19);
+    ctx.lineTo(15, -19);
     ctx.closePath();
     ctx.fill();
 
     ctx.fillStyle = SABLE;
     ctx.beginPath();
-    ctx.moveTo(22, -17);
-    ctx.lineTo(26, -28);
-    ctx.lineTo(28, -26); // folded tip
-    ctx.lineTo(23, -19);
+    ctx.moveTo(24, -17);
+    ctx.lineTo(29, -30);
+    ctx.lineTo(31, -28); // folded tip
+    ctx.lineTo(25, -19);
     ctx.closePath();
     ctx.fill();
     ctx.fillStyle = '#8B6F5E';
     ctx.beginPath();
-    ctx.moveTo(22, -18);
-    ctx.lineTo(25, -25);
-    ctx.lineTo(26, -23);
-    ctx.lineTo(23, -19);
+    ctx.moveTo(24, -18);
+    ctx.lineTo(28, -27);
+    ctx.lineTo(29, -25);
+    ctx.lineTo(25, -19);
     ctx.closePath();
     ctx.fill();
 
     // Paddling legs
     const legAnim = Math.sin(t*3);
     ctx.strokeStyle = SABLE;
-    ctx.lineWidth = 3;
+    ctx.lineWidth = 4;
     ctx.beginPath();
     ctx.moveTo(-5, 8);
-    ctx.lineTo(-5+legAnim*4, 14);
+    ctx.lineTo(-5+legAnim*4, 15);
     ctx.stroke();
     ctx.beginPath();
     ctx.moveTo(5, 8);
-    ctx.lineTo(5-legAnim*4, 14);
+    ctx.lineTo(5-legAnim*4, 15);
     ctx.stroke();
+    // White socks on paddling paws
     ctx.strokeStyle = WHITE;
-    ctx.lineWidth = 2.5;
+    ctx.lineWidth = 3;
     ctx.beginPath();
-    ctx.moveTo(-5+legAnim*4, 12);
-    ctx.lineTo(-5+legAnim*5, 16);
+    ctx.moveTo(-5+legAnim*4, 13);
+    ctx.lineTo(-5+legAnim*5, 17);
     ctx.stroke();
     ctx.beginPath();
-    ctx.moveTo(5-legAnim*4, 12);
-    ctx.lineTo(5-legAnim*5, 16);
+    ctx.moveTo(5-legAnim*4, 13);
+    ctx.lineTo(5-legAnim*5, 17);
     ctx.stroke();
   }
 
