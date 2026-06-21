@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Security 🔒 — DODSC</title>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --navy: #0a1628;
+  --navy-light: #112240;
+  --turquoise: #00c9a7;
+  --turquoise-glow: #00e6be;
+  --sea-dark: #064e5c;
+  --white: #ffffff;
+  --text: #c8d6e5;
+  --card-bg: rgba(17,34,64,0.85);
+  --green: #00e676;
+  --pink: #ff6b9d;
+}
+* { margin:0; padding:0; box-sizing:border-box; }
+html { scroll-behavior:smooth; }
+body {
+  font-family:'Fredoka',sans-serif;
+  background: linear-gradient(180deg, var(--navy) 0%, #0d1f3c 50%, var(--sea-dark) 100%);
+  color: var(--white);
+  min-height:100vh;
+  overflow-x:hidden;
+}
+
+nav {
+  position:sticky; top:0; z-index:100;
+  background: rgba(10,22,40,0.95);
+  backdrop-filter: blur(10px);
+  border-bottom: 1px solid rgba(0,201,167,0.3);
+  padding: 12px 0;
+}
+.nav-inner {
+  max-width:900px; margin:0 auto;
+  display:flex; align-items:center; justify-content:center;
+  gap:8px; flex-wrap:wrap;
+  padding:0 16px;
+}
+.nav-inner a {
+  color:var(--text);
+  text-decoration:none;
+  padding:8px 14px;
+  border-radius:20px;
+  font-size:0.95rem;
+  font-weight:500;
+  transition: all 0.3s;
+}
+.nav-inner a:hover, .nav-inner a.active {
+  color:var(--turquoise);
+  background: rgba(0,201,167,0.15);
+}
+
+.page-header {
+  text-align:center;
+  padding:40px 20px 30px;
+  position:relative; z-index:1;
+}
+.page-header h1 {
+  font-size: clamp(2rem, 5vw, 3rem);
+  background: linear-gradient(135deg, var(--white), var(--turquoise-glow));
+  -webkit-background-clip:text;
+  -webkit-text-fill-color:transparent;
+  background-clip:text;
+}
+
+.security-grid {
+  max-width:750px;
+  margin:0 auto 50px;
+  padding:0 20px;
+  display:grid;
+  grid-template-columns: 1fr;
+  gap:16px;
+  position:relative; z-index:1;
+}
+
+.sec-card {
+  background: var(--card-bg);
+  border:1px solid rgba(0,230,118,0.2);
+  border-radius:16px;
+  padding:24px;
+  display:flex;
+  gap:16px;
+  align-items:flex-start;
+  transition: transform 0.3s, box-shadow 0.3s;
+}
+.sec-card:hover {
+  transform:translateY(-3px);
+  box-shadow: 0 8px 30px rgba(0,230,118,0.1);
+}
+.sec-icon {
+  font-size:2rem;
+  min-width:48px;
+  height:48px;
+  display:flex; align-items:center; justify-content:center;
+  background:rgba(0,230,118,0.1);
+  border-radius:12px;
+  flex-shrink:0;
+}
+.sec-content h3 {
+  font-size:1.1rem;
+  margin-bottom:4px;
+}
+.sec-content h3 .status {
+  color:var(--green);
+  font-size:0.85rem;
+}
+.sec-content p {
+  color:var(--text);
+  font-size:0.9rem;
+  line-height:1.5;
+}
+
+.faq-section {
+  max-width:750px;
+  margin:0 auto 50px;
+  padding:0 20px;
+  position:relative; z-index:1;
+}
+.faq-section h2 {
+  font-size:1.6rem;
+  text-align:center;
+  margin-bottom:24px;
+  color:var(--turquoise);
+}
+.faq-item {
+  background: var(--card-bg);
+  border:1px solid rgba(0,201,167,0.12);
+  border-radius:14px;
+  margin-bottom:12px;
+  overflow:hidden;
+}
+.faq-q {
+  padding:18px 24px;
+  cursor:pointer;
+  font-weight:600;
+  font-size:1rem;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  transition: background 0.3s;
+  user-select:none;
+}
+.faq-q:hover { background:rgba(0,201,167,0.08); }
+.faq-q .arrow {
+  transition: transform 0.3s;
+  font-size:1.2rem;
+}
+.faq-item.open .faq-q .arrow { transform:rotate(180deg); }
+.faq-a {
+  max-height:0;
+  overflow:hidden;
+  transition: max-height 0.35s ease, padding 0.35s;
+  padding:0 24px;
+  color:var(--text);
+  font-size:0.95rem;
+  line-height:1.6;
+}
+.faq-item.open .faq-a {
+  max-height:200px;
+  padding:0 24px 18px;
+}
+
+footer {
+  position:relative; z-index:1;
+  background: rgba(6,15,30,0.9);
+  border-top:1px solid rgba(0,201,167,0.2);
+  padding:40px 20px 24px;
+  text-align:center;
+}
+.footer-links {
+  display:flex; gap:20px; justify-content:center; flex-wrap:wrap;
+  margin-bottom:16px;
+}
+.footer-links a {
+  color:var(--text);
+  text-decoration:none;
+  font-size:0.95rem;
+  transition: color 0.3s;
+}
+.footer-links a:hover { color:var(--turquoise); }
+.mint-addr {
+  font-size:0.75rem;
+  color:rgba(200,214,229,0.5);
+  word-break:break-all;
+  margin-top:12px;
+}
+.footer-copy {
+  margin-top:12px;
+  font-size:0.8rem;
+  color:rgba(200,214,229,0.4);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="nav-inner">
+    <a href="index.html">🏠 Home</a>
+    <a href="game.html">🎮 Play</a>
+    <a href="roadmap.html">📋 Roadmap</a>
+    <a href="security.html" class="active">🔒 Security</a>
+    <a href="community.html">🌐 Community</a>
+  </div>
+</nav>
+
+<div class="page-header">
+  <h1>Security 🔒</h1>
+</div>
+
+<div class="security-grid">
+  <div class="sec-card">
+    <div class="sec-icon">🚫</div>
+    <div class="sec-content">
+      <h3>Mint Authority: <span class="status">REVOKED</span></h3>
+      <p>No new tokens can ever be created. Total supply fixed at 1 billion DODSC forever.</p>
+    </div>
+  </div>
+  <div class="sec-card">
+    <div class="sec-icon">🔐</div>
+    <div class="sec-content">
+      <h3>Liquidity Pool: <span class="status">LOCKED 69 DAYS</span></h3>
+      <p>Locked via StakePoint. Unlocks around August 22, 2026. ~3,813 LP tokens secured.</p>
+    </div>
+  </div>
+  <div class="sec-card">
+    <div class="sec-icon">💸</div>
+    <div class="sec-content">
+      <h3>Transfer Tax: <span class="status">ONLY 1%</span></h3>
+      <p>Low tax, fair for traders. Built on the Token-2022 standard.</p>
+    </div>
+  </div>
+  <div class="sec-card">
+    <div class="sec-icon">💧</div>
+    <div class="sec-content">
+      <h3>Liquidity: <span class="status">17 SOL + 891M DODSC</span></h3>
+      <p>Deep pool for trading on Raydium CPMM.</p>
+    </div>
+  </div>
+  <div class="sec-card">
+    <div class="sec-icon">✅</div>
+    <div class="sec-content">
+      <h3>Contract: <span class="status">VERIFIED</span></h3>
+      <p>Solana Token-2022 standard. Publicly auditable on Solscan.</p>
+    </div>
+  </div>
+</div>
+
+<div class="faq-section">
+  <h2>FAQ 🤔</h2>
+
+  <div class="faq-item">
+    <div class="faq-q" onclick="toggleFaq(this)">
+      Is the mint authority really revoked?
+      <span class="arrow">▼</span>
+    </div>
+    <div class="faq-a">Yes, verified on-chain. The mint authority was revoked at launch, meaning no additional tokens can ever be minted. The total supply of 1,000,000,000 DODSC is permanently fixed.</div>
+  </div>
+
+  <div class="faq-item">
+    <div class="faq-q" onclick="toggleFaq(this)">
+      Can the developer rug pull?
+      <span class="arrow">▼</span>
+    </div>
+    <div class="faq-a">The LP is locked via StakePoint for 69 days, and the mint authority is revoked. This means the developer cannot create new tokens or withdraw liquidity during the lock period.</div>
+  </div>
+
+  <div class="faq-item">
+    <div class="faq-q" onclick="toggleFaq(this)">
+      What happens after 69 days?
+      <span class="arrow">▼</span>
+    </div>
+    <div class="faq-a">The LP unlocks around August 22, 2026. After that, the community decides what happens next — whether to re-lock, extend, or take other governance actions.</div>
+  </div>
+
+  <div class="faq-item">
+    <div class="faq-q" onclick="toggleFaq(this)">
+      Is the contract audited?
+      <span class="arrow">▼</span>
+    </div>
+    <div class="faq-a">DODSC is built on Solana's Token-2022 standard, which is a well-established and fully auditable standard. The contract is publicly verifiable on Solscan.</div>
+  </div>
+</div>
+
+<footer>
+  <div class="footer-links">
+    <a href="https://x.com/DodscoinX" target="_blank" rel="noopener">🐦 X / Twitter</a>
+    <a href="https://www.instagram.com/dodscoin" target="_blank" rel="noopener">📸 Instagram</a>
+    <a href="https://www.tiktok.com/@dodscoin2026" target="_blank" rel="noopener">🎵 TikTok</a>
+    <a href="https://t.me/dodscoin2026" target="_blank" rel="noopener">✈️ Telegram</a>
+  </div>
+  <div class="mint-addr">Mint: 4nsq8dMuf6JqqaZpgbtCMVuRt9bYcrLS1Df5pGb4MWpx</div>
+  <div class="footer-copy">© 2025 DODSC. Not financial advice. DYOR.</div>
+</footer>
+
+<script>
+function toggleFaq(el){
+  const item = el.parentElement;
+  item.classList.toggle('open');
+}
+</script>
+</body>
+</html>
