@@ -713,6 +713,51 @@ footer {
     ctx.restore();
   }
 
+  function drawCliffWaterPatch(){
+    // Covers the blue wave where the cliff enters the water.
+    // This makes the underwater part look like visible limestone, not water.
+    ctx.save();
+    const rightEdge = cliffEdgeX(WATER_Y) + 22;
+    const patchTop = WATER_Y - 10;
+    const patchBottom = WATER_Y + 75;
+
+    const grad = ctx.createLinearGradient(0, patchTop, 0, patchBottom);
+    grad.addColorStop(0, '#F1E8D8');
+    grad.addColorStop(0.45, '#D8C7A6');
+    grad.addColorStop(1, '#C6B28D');
+    ctx.fillStyle = grad;
+
+    ctx.beginPath();
+    ctx.moveTo(0, patchTop);
+    ctx.lineTo(rightEdge - 8, patchTop);
+    ctx.lineTo(rightEdge + 10, WATER_Y + 25);
+    ctx.lineTo(rightEdge + 28, patchBottom);
+    ctx.lineTo(0, patchBottom);
+    ctx.closePath();
+    ctx.fill();
+
+    // Clear limestone edge line so it does not look like dark water.
+    ctx.strokeStyle = 'rgba(245,235,210,0.9)';
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    ctx.moveTo(rightEdge - 8, patchTop);
+    ctx.lineTo(rightEdge + 10, WATER_Y + 25);
+    ctx.lineTo(rightEdge + 28, patchBottom);
+    ctx.stroke();
+
+    // A few fixed rock lines, no animation.
+    ctx.strokeStyle = 'rgba(120,100,75,0.18)';
+    ctx.lineWidth = 1;
+    for(let i=0; i<4; i++){
+      const y = patchTop + 18 + i*14;
+      ctx.beginPath();
+      ctx.moveTo(12, y);
+      ctx.lineTo(rightEdge - 18, y + Math.sin(i)*2);
+      ctx.stroke();
+    }
+    ctx.restore();
+  }
+
   // ═══════════════════════════════════════════
   //  DRAWING: WATER (to the RIGHT of cliff)
   // ═══════════════════════════════════════════
@@ -1927,7 +1972,8 @@ footer {
     drawSun();
     drawClouds();
     drawWater();       // Water first
-    drawCliff();       // Cliff on top (visible at water level)
+    drawCliff();       // Cliff on top
+    drawCliffWaterPatch(); // Rock stays visible where it enters water
     drawFish();
     drawBoat();
     drawSwimRipples();
