@@ -1,2014 +1,473 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>🐕 Dive the Dog — DODSC</title>
-<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&display=swap" rel="stylesheet">
-<style>
-:root {
-  --navy: #0a1628;
-  --navy-light: #112240;
-  --turquoise: #00c9a7;
-  --turquoise-glow: #00e6be;
-  --sea-dark: #064e5c;
-  --white: #ffffff;
-  --text: #c8d6e5;
-  --card-bg: rgba(17,34,64,0.85);
-}
-* { margin:0; padding:0; box-sizing:border-box; }
-html { scroll-behavior:smooth; }
-body {
-  font-family:'Fredoka',sans-serif;
-  background: linear-gradient(180deg, var(--navy) 0%, #0d1f3c 50%, var(--sea-dark) 100%);
-  color: var(--white);
-  min-height:100vh;
-  overflow-x:hidden;
-}
-nav {
-  position:sticky; top:0; z-index:100;
-  background: rgba(10,22,40,0.95);
-  backdrop-filter: blur(10px);
-  border-bottom: 1px solid rgba(0,201,167,0.3);
-  padding: 12px 0;
-}
-.nav-inner {
-  max-width:900px; margin:0 auto;
-  display:flex; align-items:center; justify-content:center;
-  gap:8px; flex-wrap:wrap;
-  padding:0 16px;
-}
-.nav-inner a {
-  color:var(--text);
-  text-decoration:none;
-  padding:8px 14px;
-  border-radius:20px;
-  font-size:0.95rem;
-  font-weight:500;
-  transition: all 0.3s;
-}
-.nav-inner a:hover, .nav-inner a.active {
-  color:var(--turquoise);
-  background: rgba(0,201,167,0.15);
-}
-.page-header {
-  text-align:center;
-  padding:30px 20px 16px;
-  position:relative; z-index:1;
-}
-.page-header h1 {
-  font-size: clamp(1.8rem, 5vw, 2.8rem);
-  background: linear-gradient(135deg, var(--white), var(--turquoise-glow));
-  -webkit-background-clip:text;
-  -webkit-text-fill-color:transparent;
-  background-clip:text;
-}
-.page-header p { color:var(--text); margin-top:8px; font-size:1rem; }
-.score-bar {
-  display:flex; justify-content:space-between; align-items:center;
-  flex-wrap:wrap; gap:8px;
-  max-width:820px; margin:12px auto 0;
-  padding:0 16px;
-  position:relative; z-index:1;
-}
-.score-bar span {
-  background: var(--card-bg);
-  padding:10px 20px;
-  border-radius:12px;
-  font-weight:600;
-  font-size:1rem;
-  border: 1px solid rgba(0,201,167,0.2);
-}
-.score-bar .score-val { color:var(--turquoise); }
-.score-bar .height-val { color:#ffd54f; }
-.score-bar .best-val { color:#ff9800; }
-.game-container {
-  position:relative; z-index:1;
-  max-width:820px;
-  margin:16px auto;
-  padding:0 16px;
-}
-#gameCanvas {
-  width:100%;
-  border-radius:16px;
-  display:block;
-  box-shadow: 0 8px 32px rgba(0,201,167,0.2);
-  border: 2px solid rgba(0,201,167,0.3);
-  cursor:pointer;
-}
-.instructions {
-  text-align:center;
-  padding:16px;
-  color:var(--text);
-  font-size:0.95rem;
-  position:relative; z-index:1;
-}
-.instructions kbd {
-  background:rgba(255,255,255,0.1);
-  padding:3px 10px;
-  border-radius:6px;
-  border:1px solid rgba(255,255,255,0.2);
-  font-family:'Fredoka',sans-serif;
-}
-.game-controls {
-  display:flex; justify-content:center; align-items:center;
-  gap:12px; padding:8px 0;
-  position:relative; z-index:1;
-  max-width:820px; margin:0 auto;
-}
-.game-controls a, .game-controls button {
-  background: rgba(17,34,64,0.85);
-  color:var(--text);
-  text-decoration:none;
-  padding:8px 16px;
-  border-radius:10px;
-  font-family:'Fredoka',sans-serif;
-  font-size:0.85rem;
-  font-weight:500;
-  border: 1px solid rgba(0,201,167,0.2);
-  cursor:pointer;
-  transition: all 0.3s;
-}
-.game-controls a:hover, .game-controls button:hover {
-  color:var(--turquoise);
-  border-color:var(--turquoise);
-}
-.game-controls .back-link { margin-right:auto; }
-.game-controls .reset-btn { margin-left:auto; }
-footer {
-  position:relative; z-index:1;
-  background: rgba(6,15,30,0.9);
-  border-top:1px solid rgba(0,201,167,0.2);
-  padding:40px 20px 24px;
-  text-align:center;
-  margin-top:40px;
-}
-.footer-links {
-  display:flex; gap:20px; justify-content:center; flex-wrap:wrap;
-  margin-bottom:16px;
-}
-.footer-links a {
-  color:var(--text);
-  text-decoration:none;
-  font-size:0.95rem;
-  transition: color 0.3s;
-}
-.footer-links a:hover { color:var(--turquoise); }
-.mint-addr {
-  font-size:0.75rem;
-  color:rgba(200,214,229,0.5);
-  word-break:break-all;
-  margin-top:12px;
-}
-.footer-copy {
-  margin-top:12px;
-  font-size:0.8rem;
-  color:rgba(200,214,229,0.4);
-}
-@media (prefers-reduced-motion: reduce) {
-  *, *::before, *::after {
-    animation-duration: 0.01ms !important;
-    transition-duration: 0.01ms !important;
-  }
-}
-</style>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>DODSC — Dodsdog Dive</title>
+  <style>
+    :root{
+      --navy:#07182f;
+      --blue:#0b3d6e;
+      --turquoise:#23d6c8;
+      --gold:#ffd166;
+      --white:#f7f7f7;
+      --rock:#eadcc5;
+      --rock2:#cdbb9b;
+    }
+    *{box-sizing:border-box}
+    body{
+      margin:0;
+      min-height:100vh;
+      font-family:Inter,system-ui,Arial,sans-serif;
+      color:white;
+      background:linear-gradient(180deg,#8fd7ff 0%,#d9f4ff 52%,#0b5f8f 53%,#063755 100%);
+    }
+    nav{
+      display:flex;
+      justify-content:center;
+      gap:10px;
+      flex-wrap:wrap;
+      padding:14px;
+      background:rgba(3,18,38,.82);
+      border-bottom:1px solid rgba(255,255,255,.15);
+      position:sticky;
+      top:0;
+      z-index:10;
+      backdrop-filter:blur(8px);
+    }
+    nav a{
+      color:#eafaff;
+      text-decoration:none;
+      font-weight:800;
+      padding:9px 13px;
+      border-radius:999px;
+      border:1px solid rgba(255,255,255,.16);
+      background:rgba(255,255,255,.08);
+    }
+    nav a:hover{background:rgba(35,214,200,.2)}
+    .wrap{max-width:980px;margin:0 auto;padding:18px 14px 30px}
+    .title{text-align:center;margin:10px 0 14px}
+    .title h1{margin:0;font-size:clamp(2rem,6vw,4rem);letter-spacing:-.04em;text-shadow:0 4px 0 rgba(0,0,0,.2)}
+    .title p{margin:8px 0 0;color:#062947;font-weight:800}
+    .scorebar{
+      display:flex;
+      justify-content:center;
+      gap:10px;
+      flex-wrap:wrap;
+      margin:12px auto;
+    }
+    .pill{
+      background:rgba(3,18,38,.8);
+      border:1px solid rgba(255,255,255,.18);
+      border-radius:999px;
+      padding:9px 13px;
+      font-weight:900;
+      box-shadow:0 10px 25px rgba(0,0,0,.16);
+    }
+    .pill b{color:var(--gold)}
+    .gamebox{
+      position:relative;
+      background:#8fd7ff;
+      border:4px solid rgba(255,255,255,.85);
+      border-radius:24px;
+      overflow:hidden;
+      box-shadow:0 25px 70px rgba(0,0,0,.28);
+    }
+    canvas{display:block;width:100%;height:auto;touch-action:manipulation;cursor:pointer}
+    .controls{text-align:center;color:#062947;font-weight:900;margin-top:12px;line-height:1.45}
+    button{
+      border:0;
+      border-radius:999px;
+      padding:11px 18px;
+      font-weight:1000;
+      background:linear-gradient(135deg,#ffd166,#ff9f1c);
+      color:#221400;
+      cursor:pointer;
+      box-shadow:0 10px 25px rgba(0,0,0,.18);
+    }
+  </style>
 </head>
 <body>
-
 <nav>
-  <div class="nav-inner">
-    <a href="index.html">🏠 Home</a>
-    <a href="game.html" class="active">🎮 Play</a>
-    <a href="roadmap.html">📋 Roadmap</a>
-    <a href="security.html">🔒 Security</a>
-    <a href="community.html">🌐 Community</a>
-  </div>
+  <a href="index.html">Home</a>
+  <a href="game.html">Game</a>
+  <a href="roadmap.html">Roadmap</a>
+  <a href="security.html">Security</a>
+  <a href="community.html">Community</a>
 </nav>
 
-<div class="page-header">
-  <h1>🐕 Dive the Dog — DODSC</h1>
-  <p>Watch Dodsdog dive off the calanque into the Mediterranean!</p>
-</div>
+<main class="wrap">
+  <section class="title">
+    <h1>🐕 Dodsdog Dive</h1>
+    <p>Jump from the Marseille calanque — avoid the boat!</p>
+  </section>
 
-<div class="score-bar">
-  <span>🐕 Dives: <span class="score-val" id="scoreVal">0</span></span>
-  <span>📊 Height: <span class="height-val" id="heightVal">0m</span></span>
-  <span>🏆 Best: <span class="best-val" id="bestVal">0</span></span>
-  <span id="stateLabel">Ready to dive!</span>
-</div>
-
-<div class="game-container">
-  <canvas id="gameCanvas"></canvas>
-</div>
-
-<div class="game-controls">
-  <a href="index.html" class="back-link">← Back to Home</a>
-  <button class="reset-btn" id="resetBtn">🔄 Reset</button>
-</div>
-
-<div class="instructions">
-  Press <kbd>SPACE</kbd> or tap to dive! &nbsp;Avoid the boat!
-</div>
-
-<footer>
-  <div class="footer-links">
-    <a href="https://x.com/DodscoinX" target="_blank" rel="noopener">🐦 X / Twitter</a>
-    <a href="https://www.instagram.com/dodscoin" target="_blank" rel="noopener">📸 Instagram</a>
-    <a href="https://www.tiktok.com/@dodscoin2026" target="_blank" rel="noopener">🎵 TikTok</a>
-    <a href="https://t.me/dodscoin2026" target="_blank" rel="noopener">✈️ Telegram</a>
+  <div class="scorebar">
+    <div class="pill">🐕 Dives: <b id="dives">0</b></div>
+    <div class="pill">📊 Marketcap height: <b id="height">1m</b></div>
+    <div class="pill">🏆 Best: <b id="best">0</b></div>
+    <div class="pill" id="status">Ready</div>
   </div>
-  <div class="mint-addr">Mint: 4nsq8dMuf6JqqaZpgbtCMVuRt9bYcrLS1Df5pGb4MWpx</div>
-  <div class="footer-copy">© 2025 DODSC. Not financial advice. DYOR.</div>
-</footer>
+
+  <section class="gamebox">
+    <canvas id="game" width="900" height="520" aria-label="Dodsdog cliff diving game"></canvas>
+  </section>
+
+  <div class="controls">
+    <p>Click / tap / press SPACE to jump. Land in the sea ✅ — hit the boat ❌</p>
+    <button id="reset">Reset score</button>
+  </div>
+</main>
 
 <script>
-(function(){
-  'use strict';
-
-  // ═══════════════════════════════════════════
-  //  CANVAS SETUP
-  // ═══════════════════════════════════════════
-  const canvas = document.getElementById('gameCanvas');
+(() => {
+  const canvas = document.getElementById('game');
   const ctx = canvas.getContext('2d');
-  const dpr = window.devicePixelRatio || 1;
+  const W = canvas.width;
+  const H = canvas.height;
 
-  const BASE_W = 800;
-  const BASE_H = 480;
-  const WATER_Y = BASE_H * 0.55; // water surface at ~55% of height
-  const CLIFF_W = 190;           // cliff width from left edge
-  const CLIFF_TOP = 80;           // cliff starts 80px from top (NOT full height)
-  const CLIFF_BOTTOM = WATER_Y + 65; // cliff continues underwater so rock stays visible
+  const divesEl = document.getElementById('dives');
+  const bestEl = document.getElementById('best');
+  const heightEl = document.getElementById('height');
+  const statusEl = document.getElementById('status');
+  const resetBtn = document.getElementById('reset');
 
-  function resizeCanvas() {
-    const container = canvas.parentElement;
-    const w = Math.min(800, container.clientWidth - 32);
-    const h = w * (BASE_H / BASE_W);
-    canvas.style.width = w + 'px';
-    canvas.style.height = h + 'px';
-    canvas.width = w * dpr;
-    canvas.height = h * dpr;
-    ctx.setTransform(dpr * (w / BASE_W), 0, 0, dpr * (h / BASE_H), 0, 0);
+  const WATER_Y = 285;
+  const CLIFF_TOP = 110;
+  const CLIFF_LEFT = 0;
+  const CLIFF_RIGHT_TOP = 220;
+  const CLIFF_RIGHT_WATER = 185;
+  const CLIFF_BOTTOM = 360; // visible under water, but not full image height
+
+  const DOG_START = { x: 188, y: CLIFF_TOP - 14 };
+  let dog = { x: DOG_START.x, y: DOG_START.y, vx: 0, vy: 0, angle: 0, state: 'ready' };
+
+  let boat = { x: 520, y: WATER_Y + 30, w: 125, h: 38, dir: 1, speed: 125 };
+  let dives = 0;
+  let best = Number(localStorage.getItem('dodsdog-best') || 0);
+  let last = performance.now();
+  let splashes = [];
+  bestEl.textContent = best;
+
+  // Marketcap height: practical rule requested by user:
+  // 1000 mcap starts at 1m, 1M mcap = 50m.
+  function mcapToMeters(mcap){
+    if(!mcap || mcap <= 0) return 1;
+    if(mcap <= 1000) return 1;
+    if(mcap >= 1000000) return 50;
+    return Math.max(1, Math.round(1 + ((mcap - 1000) / 999000) * 49));
   }
-  resizeCanvas();
-  window.addEventListener('resize', resizeCanvas);
 
-  // ═══════════════════════════════════════════
-  //  DOM REFS
-  // ═══════════════════════════════════════════
-  const scoreEl = document.getElementById('scoreVal');
-  const heightEl = document.getElementById('heightVal');
-  const bestEl = document.getElementById('bestVal');
-  const stateEl = document.getElementById('stateLabel');
-  const resetBtn = document.getElementById('resetBtn');
-
-  // ═══════════════════════════════════════════
-  //  MARKETCAP → HEIGHT
-  // ═══════════════════════════════════════════
-  // 1000 mcap = 1m, 1M mcap = 50m
-  async function updateHeight() {
-    try {
-      const res = await fetch('https://api.dexscreener.com/latest/dex/tokens/4nsq8dMuf6JqqaZpgbtCMVuRt9bYcrLS1Df5pGb4MWpx');
+  async function updateHeight(){
+    try{
+      const res = await fetch('https://api.dexscreener.com/latest/dex/tokens/4nsq8dMuf6JqqaZpgbtCMVuRt9bYcrLS1Df5pGb4MWpx', {cache:'no-store'});
       const data = await res.json();
       const pair = data.pairs && data.pairs[0];
-      if (pair && pair.fdv) {
-        const fdv = pair.fdv;
-        const meters = Math.max(1, Math.round(fdv / 20000));
-        heightEl.textContent = meters + 'm';
-      } else {
-        heightEl.textContent = '0m';
-      }
-    } catch(e) {
-      heightEl.textContent = '?m';
+      const mcap = Number(pair?.marketCap || pair?.fdv || 0);
+      heightEl.textContent = mcapToMeters(mcap) + 'm';
+    }catch(e){
+      heightEl.textContent = '1m';
     }
   }
   updateHeight();
   setInterval(updateHeight, 60000);
 
-  // ═══════════════════════════════════════════
-  //  AUDIO (Web Audio API)
-  // ═══════════════════════════════════════════
-  const AudioCtx = window.AudioContext || window.webkitAudioContext;
-  let audioCtx;
-  function ensureAudio() { if(!audioCtx) audioCtx = new AudioCtx(); }
-
-  function playSplash(){
-    ensureAudio();
-    const dur = 0.6;
-    const buf = audioCtx.createBuffer(1, audioCtx.sampleRate*dur, audioCtx.sampleRate);
-    const d = buf.getChannelData(0);
-    for(let i=0; i<d.length; i++){
-      const t = i/audioCtx.sampleRate;
-      d[i] = (Math.random()*2-1)*Math.exp(-t*6)*0.35
-            + Math.sin(t*80)*Math.exp(-t*10)*0.25;
-    }
-    const src = audioCtx.createBufferSource();
-    src.buffer = buf;
-    const filt = audioCtx.createBiquadFilter();
-    filt.type = 'lowpass';
-    filt.frequency.value = 1200;
-    src.connect(filt).connect(audioCtx.destination);
-    src.start();
+  function resetDog(){
+    dog = { x: DOG_START.x, y: DOG_START.y, vx: 0, vy: 0, angle: 0, state: 'ready' };
+    statusEl.textContent = 'Ready';
   }
 
-  function playBubble(){
-    ensureAudio();
-    const osc = audioCtx.createOscillator();
-    const gain = audioCtx.createGain();
-    osc.type = 'sine';
-    const f0 = 500 + Math.random()*500;
-    osc.frequency.setValueAtTime(f0, audioCtx.currentTime);
-    osc.frequency.exponentialRampToValueAtTime(f0*2, audioCtx.currentTime+0.08);
-    gain.gain.setValueAtTime(0.12, audioCtx.currentTime);
-    gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime+0.12);
-    osc.connect(gain).connect(audioCtx.destination);
-    osc.start();
-    osc.stop(audioCtx.currentTime+0.12);
+  function jump(){
+    if(dog.state !== 'ready') return;
+    dog.state = 'jumping';
+    dog.vx = 250;
+    dog.vy = -135;
+    dog.angle = -0.15;
+    statusEl.textContent = 'Jump!';
   }
 
-  function playBark(){
-    ensureAudio();
-    const dur = 0.18;
-    const buf = audioCtx.createBuffer(1, audioCtx.sampleRate*dur, audioCtx.sampleRate);
-    const d = buf.getChannelData(0);
-    for(let i=0; i<d.length; i++){
-      const t = i/audioCtx.sampleRate;
-      d[i] = Math.sin(t*600)*Math.exp(-t*18)*0.3
-            + Math.sin(t*1200)*Math.exp(-t*22)*0.15
-            + (Math.random()*2-1)*Math.exp(-t*30)*0.1;
-    }
-    const src = audioCtx.createBufferSource();
-    src.buffer = buf;
-    const filt = audioCtx.createBiquadFilter();
-    filt.type = 'bandpass';
-    filt.frequency.value = 800;
-    filt.Q.value = 2;
-    src.connect(filt).connect(audioCtx.destination);
-    src.start();
-  }
-
-  function playCrash(){
-    ensureAudio();
-    const dur = 0.4;
-    const buf = audioCtx.createBuffer(1, audioCtx.sampleRate*dur, audioCtx.sampleRate);
-    const d = buf.getChannelData(0);
-    for(let i=0; i<d.length; i++){
-      const t = i/audioCtx.sampleRate;
-      d[i] = (Math.random()*2-1)*Math.exp(-t*8)*0.5
-            + Math.sin(t*200)*Math.exp(-t*12)*0.3
-            + Math.sin(t*150)*Math.exp(-t*6)*0.2;
-    }
-    const src = audioCtx.createBufferSource();
-    src.buffer = buf;
-    const filt = audioCtx.createBiquadFilter();
-    filt.type = 'lowpass';
-    filt.frequency.value = 800;
-    src.connect(filt).connect(audioCtx.destination);
-    src.start();
-  }
-
-  // ═══════════════════════════════════════════
-  //  GAME STATE
-  // ═══════════════════════════════════════════
-  let dives = parseInt(localStorage.getItem('dods_dives') || '0');
-  let bestDive = parseInt(localStorage.getItem('dods_best') || '0');
-
-  // Dog state machine: 'idle' | 'diving' | 'splashing' | 'swimming' | 'climbing'
-  let dogState = 'idle';
-  let dogX = CLIFF_W - 30;    // sits near right edge of cliff top
-  let dogY = CLIFF_TOP + 10;  // sits ON TOP of cliff
-  let dogAngle = 0;
-  let diveStartX, diveStartY;
-  let targetX, targetY;
-  let diveTime = 0;
-  let swimTimer = 0;
-  let resetTimer = 0;
-  let climbProgress = 0;
-
-  // Boat
-  let boatX = 450;
-  let boatDir = 1;
-  let boatBobPhase = 0;
-  let boatWobble = 0;
-
-  // Effects
-  let splashes = [];
-  let bubbles = [];
-  let ripples = [];
-  let floatingText = []; // for SPLASH!/CRASH! text
-
-  // Environment
-  let waterOffset = 0;
-  let sunAngle = 0;
-
-  // Fish
-  let fishList = [];
-  const fishTypes = [
-    { name:'dorade', color:'#FFD700', stripeColor:'#DAA520', size:10 },
-    { name:'raie', color:'#87CEEB', stripeColor:'#4682B4', size:12 },
-    { name:'poisson rouge', color:'#FF6347', stripeColor:'#DC143C', size:7 },
-    { name:'sardine', color:'#C0C0C0', stripeColor:'#A9A9A9', size:6 },
-  ];
-  for(let i=0; i<8; i++){
-    const ft = fishTypes[i % fishTypes.length];
-    fishList.push({
-      x: CLIFF_W + 30 + Math.random() * (BASE_W - CLIFF_W - 60),
-      y: WATER_Y + 30 + Math.random() * (BASE_H - WATER_Y - 60),
-      speed: 0.3 + Math.random()*0.7,
-      size: ft.size,
-      color: ft.color,
-      stripeColor: ft.stripeColor,
-      dir: Math.random()>0.5 ? 1 : -1,
-      wobble: Math.random()*Math.PI*2
-    });
-  }
-
-  // Clouds
-  let clouds = [];
-  for(let i=0; i<5; i++){
-    clouds.push({
-      x: i*180 + Math.random()*60,
-      y: 15 + Math.random()*50,
-      w: 70 + Math.random()*80,
-      h: 20 + Math.random()*15,
-      speed: 0.08 + Math.random()*0.12,
-      puffs: 3 + Math.floor(Math.random()*3)
-    });
-  }
-
-  // Seaweed
-  let seaweedList = [];
-  for(let i=0; i<8; i++){
-    seaweedList.push({
-      x: CLIFF_W + 40 + Math.random()*(BASE_W - CLIFF_W - 80),
-      baseY: BASE_H - 5,
-      height: 20 + Math.random()*40,
-      phase: Math.random()*Math.PI*2,
-      color: `hsl(${120+Math.random()*30}, ${50+Math.random()*20}%, ${30+Math.random()*15}%)`
-    });
-  }
-
-  // Pebbles on sandy bottom
-  let pebbles = [];
-  for(let i=0; i<20; i++){
-    pebbles.push({
-      x: CLIFF_W + 20 + Math.random()*(BASE_W - CLIFF_W - 40),
-      y: BASE_H - 3 - Math.random()*8,
-      r: 2 + Math.random()*4,
-      color: `hsl(${30+Math.random()*20}, ${20+Math.random()*15}%, ${55+Math.random()*20}%)`
-    });
-  }
-
-  // ═══════════════════════════════════════════
-  //  CLIFF GEOMETRY (detailed profile)
-  // ═══════════════════════════════════════════
-  // Right edge of cliff at various heights
-  function cliffEdgeX(y) {
-    if (y < CLIFF_TOP + 10) return CLIFF_W;           // flat top
-    if (y < CLIFF_TOP + 40) return CLIFF_W + (y - CLIFF_TOP - 10) * 0.15; // slight overhang then inward
-    if (y < CLIFF_TOP + 100) return CLIFF_W + 5 + (y - CLIFF_TOP - 40) * 0.05;
-    if (y < WATER_Y - 40) return CLIFF_W + 8 - (y - CLIFF_TOP - 100) * 0.1;
-    if (y < WATER_Y) return CLIFF_W - 4 - (y - WATER_Y + 40) * 0.05;
-    return CLIFF_W - 8 + (y - WATER_Y) * 0.3; // base rocks widen
-  }
-
-  // ═══════════════════════════════════════════
-  //  EFFECTS HELPERS
-  // ═══════════════════════════════════════════
-  function addSplash(x, y){
-    // Water droplets
-    for(let i=0; i<18; i++){
-      const angle = -Math.PI/2 + (Math.random()-0.5)*Math.PI*0.8;
-      const speed = 3 + Math.random()*6;
+  function addSplash(x,y,good=true){
+    for(let i=0;i<20;i++){
       splashes.push({
-        x: x + Math.random()*30 - 15,
-        y: y,
-        vx: Math.cos(angle)*speed,
-        vy: Math.sin(angle)*speed,
-        life: 1,
-        size: 2 + Math.random()*4,
-        isDroplet: true
+        x,y,
+        vx:(Math.random()-.5)*170,
+        vy:-Math.random()*160 - 30,
+        life: good ? .9 : .65,
+        color: good ? 'rgba(255,255,255,.85)' : 'rgba(255,90,90,.9)'
       });
     }
-    // Foam rings
-    ripples.push({ x: x, y: y, radius: 5, maxRadius: 60, life: 1 });
-    ripples.push({ x: x, y: y, radius: 2, maxRadius: 40, life: 1, delay: 0.15 });
-    // Bubbles
-    for(let i=0; i<12; i++){
-      bubbles.push({
-        x: x + Math.random()*20 - 10,
-        y: y + 10 + Math.random()*20,
-        vy: -0.8 - Math.random()*1.5,
-        vx: (Math.random()-0.5)*0.4,
-        life: 1,
-        size: 2 + Math.random()*5
-      });
-    }
-    playSplash();
   }
 
-  function addBubble(x, y){
-    bubbles.push({
-      x: x + Math.random()*10 - 5,
-      y: y,
-      vy: -0.5 - Math.random(),
-      vx: (Math.random()-0.5)*0.3,
-      life: 1,
-      size: 1.5 + Math.random()*3
-    });
-    playBubble();
+  function hitBoat(){
+    return dog.x > boat.x - 22 && dog.x < boat.x + boat.w + 22 && dog.y > boat.y - 35 && dog.y < boat.y + boat.h + 24;
   }
 
-  function addFloatingText(x, y, text, color){
-    floatingText.push({
-      x: x, y: y,
-      text: text,
-      color: color,
-      life: 1,
-      vy: -1.5
-    });
-  }
-
-  // ═══════════════════════════════════════════
-  //  DRAWING: SKY
-  // ═══════════════════════════════════════════
   function drawSky(){
-    const grad = ctx.createLinearGradient(0, 0, 0, WATER_Y);
-    grad.addColorStop(0, '#4A90D9');
-    grad.addColorStop(0.5, '#6BB3E8');
-    grad.addColorStop(0.85, '#87CEEB');
-    grad.addColorStop(1, '#A8D8EA');
-    ctx.fillStyle = grad;
-    ctx.fillRect(0, 0, BASE_W, WATER_Y);
+    const sky = ctx.createLinearGradient(0,0,0,WATER_Y);
+    sky.addColorStop(0,'#7dcfff');
+    sky.addColorStop(1,'#dff7ff');
+    ctx.fillStyle = sky;
+    ctx.fillRect(0,0,W,WATER_Y);
 
-    // Haze near horizon
-    const haze = ctx.createLinearGradient(0, WATER_Y-40, 0, WATER_Y);
-    haze.addColorStop(0, 'rgba(255,255,255,0)');
-    haze.addColorStop(1, 'rgba(255,255,255,0.15)');
-    ctx.fillStyle = haze;
-    ctx.fillRect(0, WATER_Y-40, BASE_W, 40);
+    // sun
+    ctx.fillStyle = '#ffd166';
+    ctx.beginPath(); ctx.arc(765,78,42,0,Math.PI*2); ctx.fill();
+    ctx.fillStyle = 'rgba(255,209,102,.2)';
+    ctx.beginPath(); ctx.arc(765,78,70,0,Math.PI*2); ctx.fill();
+
+    // static clouds
+    drawCloud(115,70,1.0); drawCloud(430,95,.8); drawCloud(655,145,.65);
   }
 
-  // ═══════════════════════════════════════════
-  //  DRAWING: SUN (animated rays)
-  // ═══════════════════════════════════════════
-  function drawSun(){
-    const sx = BASE_W - 90, sy = 55, sr = 35;
-    // Glow
-    ctx.save();
-    ctx.shadowColor = 'rgba(255,220,80,0.6)';
-    ctx.shadowBlur = 50;
-    ctx.fillStyle = '#FFD93D';
-    ctx.beginPath();
-    ctx.arc(sx, sy, sr, 0, Math.PI*2);
-    ctx.fill();
-    ctx.restore();
+  function drawCloud(x,y,s){
+    ctx.fillStyle='rgba(255,255,255,.9)';
+    const puffs=[[-35,6,22],[-14,-5,28],[10,0,24],[32,8,19],[0,13,31]];
+    for(const [px,py,r] of puffs){ctx.beginPath();ctx.arc(x+px*s,y+py*s,r*s,0,Math.PI*2);ctx.fill();}
+  }
 
-    // Rays
-    ctx.save();
-    ctx.strokeStyle = 'rgba(255,210,80,0.3)';
-    ctx.lineWidth = 2.5;
-    for(let i=0; i<12; i++){
-      const a = (i/12)*Math.PI*2 + sunAngle;
+  function cliffXAt(y){
+    if(y <= CLIFF_TOP) return CLIFF_RIGHT_TOP;
+    if(y >= CLIFF_BOTTOM) return CLIFF_RIGHT_WATER + 34;
+    const t = (y - CLIFF_TOP) / (CLIFF_BOTTOM - CLIFF_TOP);
+    return CLIFF_RIGHT_TOP - 35*t + Math.sin(t*Math.PI*2)*10;
+  }
+
+  function drawWater(){
+    const water = ctx.createLinearGradient(0,WATER_Y,0,H);
+    water.addColorStop(0,'#48e0d6');
+    water.addColorStop(.35,'#16aeb3');
+    water.addColorStop(1,'#08718d');
+    ctx.fillStyle = water;
+    ctx.fillRect(0,WATER_Y,W,H-WATER_Y);
+
+    // surface line
+    ctx.strokeStyle='rgba(255,255,255,.45)';
+    ctx.lineWidth=3;
+    ctx.beginPath();
+    for(let x=0;x<=W;x+=8){
+      const y = WATER_Y + Math.sin(x*.035 + performance.now()*.002)*3;
+      if(x===0) ctx.moveTo(x,y); else ctx.lineTo(x,y);
+    }
+    ctx.stroke();
+
+    // light waves, no dark black patch
+    ctx.strokeStyle='rgba(255,255,255,.22)';
+    ctx.lineWidth=2;
+    for(let r=0;r<5;r++){
       ctx.beginPath();
-      ctx.moveTo(sx + Math.cos(a)*(sr+6), sy + Math.sin(a)*(sr+6));
-      ctx.lineTo(sx + Math.cos(a)*(sr+22), sy + Math.sin(a)*(sr+22));
+      const y = WATER_Y + 45 + r*33;
+      for(let x=235;x<W;x+=10){
+        const yy = y + Math.sin(x*.03+r)*3;
+        if(x===235) ctx.moveTo(x,yy); else ctx.lineTo(x,yy);
+      }
       ctx.stroke();
     }
-    ctx.restore();
-
-    // Inner bright circle
-    ctx.fillStyle = '#FFEB85';
-    ctx.beginPath();
-    ctx.arc(sx, sy, sr*0.6, 0, Math.PI*2);
-    ctx.fill();
   }
-
-  // ═══════════════════════════════════════════
-  //  DRAWING: CLOUDS
-  // ═══════════════════════════════════════════
-  function drawClouds(){
-    for(const c of clouds){
-      // Fluffy cloud made of overlapping circles of varying sizes and shades
-      const puffs = c.puffs + 2; // more circles for fluffiness
-      const colors = [
-        'rgba(255,255,255,0.92)',
-        'rgba(252,252,255,0.88)',
-        'rgba(248,248,252,0.84)',
-        'rgba(255,255,253,0.90)',
-        'rgba(250,250,255,0.86)'
-      ];
-      const pw = c.w / (c.puffs);
-      // Draw back circles first (slightly darker/larger for depth)
-      for(let i = puffs - 1; i >= 0; i--){
-        const ox = (i - (puffs-1)/2) * pw * 0.55 + Math.sin(i*2.1)*4;
-        const oy = Math.cos(i*1.7)*6;
-        // Vary radius: main body puffs are bigger, edge puffs smaller
-        const distFromCenter = Math.abs(i - (puffs-1)/2) / ((puffs-1)/2);
-        const sizeFactor = 1.0 - distFromCenter * 0.35;
-        const pr = pw * (0.55 + Math.sin(i*0.8)*0.12) * sizeFactor;
-        const ph = c.h * (0.65 + Math.sin(i*1.1)*0.25) * sizeFactor;
-        ctx.fillStyle = colors[i % colors.length];
-        ctx.beginPath();
-        ctx.ellipse(c.x+ox, c.y+oy, pr, ph, 0, 0, Math.PI*2);
-        ctx.fill();
-      }
-      // Add a few extra small highlight circles on top for extra fluffiness
-      for(let i = 0; i < 3; i++){
-        const ox = (i - 1) * pw * 0.4;
-        const oy = -4 + Math.sin(i*2.3)*3;
-        const pr = pw * 0.28;
-        ctx.fillStyle = 'rgba(255,255,255,0.5)';
-        ctx.beginPath();
-        ctx.ellipse(c.x+ox, c.y+oy, pr, pr*0.7, 0, 0, Math.PI*2);
-        ctx.fill();
-      }
-    }
-  }
-
-  // ═══════════════════════════════════════════
-  //  DRAWING: CLIFF (white limestone, LEFT side)
-  // ═══════════════════════════════════════════
-  // Seeded random for cliff (no animation)
-  function seededRandom(seed) {
-    let x = Math.sin(seed) * 10000;
-    return x - Math.floor(x);
-  }
-  let cliffSeed = 42;
 
   function drawCliff(){
-    ctx.save();
-
-    // Main limestone body gradient
-    const cliffGrad = ctx.createLinearGradient(0, CLIFF_TOP, 0, CLIFF_BOTTOM);
-    cliffGrad.addColorStop(0, '#F5F0E8');
-    cliffGrad.addColorStop(0.15, '#EDE6D8');
-    cliffGrad.addColorStop(0.3, '#E8DCC8');
-    cliffGrad.addColorStop(0.5, '#DDD0B8');
-    cliffGrad.addColorStop(0.7, '#D4C5A9');
-    cliffGrad.addColorStop(0.9, '#E0D4BC');
-    cliffGrad.addColorStop(1, '#E8DCC8');
-    ctx.fillStyle = cliffGrad;
-
-    // Build cliff shape: left=0, right edge follows cliffEdgeX(y)
+    // Main static white limestone rock. Drawn AFTER water so rock remains visible under water.
+    const grad = ctx.createLinearGradient(0,CLIFF_TOP,0,CLIFF_BOTTOM);
+    grad.addColorStop(0,'#f4eadb');
+    grad.addColorStop(.5,'#ddcdb1');
+    grad.addColorStop(1,'#c6b28d');
+    ctx.fillStyle = grad;
     ctx.beginPath();
-    ctx.moveTo(0, CLIFF_TOP);
-    ctx.lineTo(CLIFF_W, CLIFF_TOP);
-    const steps = 40;
-    for(let i=0; i<=steps; i++){
-      const y = CLIFF_TOP + (i/steps) * (CLIFF_BOTTOM - CLIFF_TOP);
-      ctx.lineTo(cliffEdgeX(y), y);
+    ctx.moveTo(CLIFF_LEFT,CLIFF_TOP);
+    ctx.lineTo(CLIFF_RIGHT_TOP,CLIFF_TOP);
+    for(let i=0;i<=24;i++){
+      const y = CLIFF_TOP + (CLIFF_BOTTOM-CLIFF_TOP)*(i/24);
+      ctx.lineTo(cliffXAt(y),y);
     }
-    ctx.lineTo(0, CLIFF_BOTTOM);
+    ctx.lineTo(CLIFF_LEFT,CLIFF_BOTTOM);
     ctx.closePath();
     ctx.fill();
 
-    // Static strata lines (seeded, no animation)
-    cliffSeed = 42;
-    ctx.lineWidth = 1;
-    let sy = CLIFF_TOP + 12;
-    while(sy < CLIFF_BOTTOM - 5){
-      const ex = cliffEdgeX(sy);
-      const alpha = 0.15 + seededRandom(cliffSeed++) * 0.15;
-      ctx.strokeStyle = seededRandom(cliffSeed++) > 0.7
-        ? `rgba(140,120,85,${alpha})`
-        : `rgba(160,140,110,${alpha})`;
-      const startX = 8 + seededRandom(cliffSeed++) * 25;
-      const endX = ex - 8 - seededRandom(cliffSeed++) * 8;
-      if(endX > startX + 15){
-        ctx.beginPath();
-        ctx.moveTo(startX, sy);
-        for(let x = startX; x < endX; x += 10){
-          ctx.lineTo(x, sy + Math.sin(x*0.04)*2);
-        }
-        ctx.stroke();
-      }
-      sy += 16 + seededRandom(cliffSeed++) * 18;
-    }
+    // lighter face at water contact so it never looks blue/black
+    ctx.fillStyle='rgba(245,234,216,.72)';
+    ctx.beginPath();
+    ctx.moveTo(0,WATER_Y-8);
+    ctx.lineTo(cliffXAt(WATER_Y)+10,WATER_Y-8);
+    ctx.lineTo(cliffXAt(CLIFF_BOTTOM),CLIFF_BOTTOM);
+    ctx.lineTo(0,CLIFF_BOTTOM);
+    ctx.closePath();
+    ctx.fill();
 
-    // Static cracks
-    ctx.strokeStyle = 'rgba(120,100,75,0.18)';
-    ctx.lineWidth = 0.8;
-    for(let i=0; i<6; i++){
-      const cx = 25 + seededRandom(cliffSeed++) * 130;
-      const cy = CLIFF_TOP + 12 + seededRandom(cliffSeed++) * 40;
+    // fixed rock strata, no random in draw = no shaking
+    ctx.strokeStyle='rgba(110,88,58,.22)';
+    ctx.lineWidth=2;
+    const lines = [132,154,181,207,232,257,286,316,342];
+    for(const y of lines){
       ctx.beginPath();
-      ctx.moveTo(cx, cy);
-      ctx.lineTo(cx + (seededRandom(cliffSeed++)-0.5)*10, cy + 8 + seededRandom(cliffSeed++)*8);
+      ctx.moveTo(12,y);
+      ctx.lineTo(cliffXAt(y)-18,y+Math.sin(y*.05)*2);
       ctx.stroke();
     }
 
-    // Static green on top edge
-    ctx.fillStyle = '#7aaa5a';
-    ctx.globalAlpha = 0.4;
-    for(let i=0; i<5; i++){
-      const mx = 35 + seededRandom(cliffSeed++) * 120;
-      const my = CLIFF_TOP + 3;
-      const mw = 8 + seededRandom(cliffSeed++) * 10;
-      ctx.beginPath();
-      ctx.ellipse(mx, my, mw, 2, 0, 0, Math.PI*2);
-      ctx.fill();
+    // edge highlight
+    ctx.strokeStyle='rgba(255,250,235,.9)';
+    ctx.lineWidth=3;
+    ctx.beginPath();
+    ctx.moveTo(CLIFF_RIGHT_TOP,CLIFF_TOP);
+    for(let i=0;i<=24;i++){
+      const y = CLIFF_TOP + (CLIFF_BOTTOM-CLIFF_TOP)*(i/24);
+      ctx.lineTo(cliffXAt(y),y);
     }
-    ctx.globalAlpha = 1;
-
-    ctx.restore();
-  }
-
-  function drawCliffWaterPatch(){
-    // Covers the blue wave where the cliff enters the water.
-    // This makes the underwater part look like visible limestone, not water.
-    ctx.save();
-    const rightEdge = cliffEdgeX(WATER_Y) + 22;
-    const patchTop = WATER_Y - 10;
-    const patchBottom = WATER_Y + 75;
-
-    const grad = ctx.createLinearGradient(0, patchTop, 0, patchBottom);
-    grad.addColorStop(0, '#F1E8D8');
-    grad.addColorStop(0.45, '#D8C7A6');
-    grad.addColorStop(1, '#C6B28D');
-    ctx.fillStyle = grad;
-
-    ctx.beginPath();
-    ctx.moveTo(0, patchTop);
-    ctx.lineTo(rightEdge - 8, patchTop);
-    ctx.lineTo(rightEdge + 10, WATER_Y + 25);
-    ctx.lineTo(rightEdge + 28, patchBottom);
-    ctx.lineTo(0, patchBottom);
-    ctx.closePath();
-    ctx.fill();
-
-    // Clear limestone edge line so it does not look like dark water.
-    ctx.strokeStyle = 'rgba(245,235,210,0.9)';
-    ctx.lineWidth = 2;
-    ctx.beginPath();
-    ctx.moveTo(rightEdge - 8, patchTop);
-    ctx.lineTo(rightEdge + 10, WATER_Y + 25);
-    ctx.lineTo(rightEdge + 28, patchBottom);
     ctx.stroke();
 
-    // A few fixed rock lines, no animation.
-    ctx.strokeStyle = 'rgba(120,100,75,0.18)';
-    ctx.lineWidth = 1;
-    for(let i=0; i<4; i++){
-      const y = patchTop + 18 + i*14;
-      ctx.beginPath();
-      ctx.moveTo(12, y);
-      ctx.lineTo(rightEdge - 18, y + Math.sin(i)*2);
-      ctx.stroke();
-    }
-    ctx.restore();
-  }
-
-  // ═══════════════════════════════════════════
-  //  DRAWING: WATER (to the RIGHT of cliff)
-  // ═══════════════════════════════════════════
-  function drawWater(){
-    // Main water body - turquoise gradient
-    const grad = ctx.createLinearGradient(0, WATER_Y, 0, BASE_H);
-    grad.addColorStop(0, '#40E0D0');
-    grad.addColorStop(0.15, '#20B2AA');
-    grad.addColorStop(0.4, '#1A9E96');
-    grad.addColorStop(0.7, '#008B8B');
-    grad.addColorStop(1, '#006666');
-    ctx.fillStyle = grad;
-
+    // tiny static green top, not animated
+    ctx.fillStyle='rgba(104,150,67,.55)';
     ctx.beginPath();
-    // Start at left edge (water covers full width, cliff draws on top)
-    ctx.moveTo(0, WATER_Y);
-    // Wavy surface across full width
-    for(let x = 0; x <= BASE_W; x += 3){
-      const wave = Math.sin((x+waterOffset)*0.018)*4
-                 + Math.sin((x+waterOffset)*0.04)*2
-                 + Math.sin((x+waterOffset)*0.008)*3;
-      ctx.lineTo(x, WATER_Y + wave);
-    }
-    ctx.lineTo(BASE_W, BASE_H);
-    ctx.lineTo(0, BASE_H);
-    ctx.closePath();
-    ctx.fill();
-
-    // Sandy bottom (only in water area)
-    const sandGrad = ctx.createLinearGradient(0, BASE_H-25, 0, BASE_H);
-    sandGrad.addColorStop(0, 'rgba(244,228,193,0)');
-    sandGrad.addColorStop(0.4, 'rgba(244,228,193,0.3)');
-    sandGrad.addColorStop(1, 'rgba(244,228,193,0.6)');
-    ctx.fillStyle = sandGrad;
-    ctx.fillRect(CLIFF_W - 20, BASE_H-25, BASE_W - CLIFF_W + 20, 25);
-
-    // Pebbles
-    for(const p of pebbles){
-      ctx.fillStyle = p.color;
-      ctx.beginPath();
-      ctx.ellipse(p.x, p.y, p.r, p.r*0.6, 0, 0, Math.PI*2);
-      ctx.fill();
-    }
-
-    // God rays (light penetrating surface)
-    ctx.save();
-    ctx.globalAlpha = 0.07;
-    ctx.fillStyle = '#ffffff';
-    for(let i=0; i<6; i++){
-      const rx = CLIFF_W + 60 + i*95 + Math.sin(waterOffset*0.005+i)*15;
-      const topW = 15 + Math.sin(i*2)*5;
-      const botW = 50 + Math.sin(i*3)*20;
-      ctx.beginPath();
-      ctx.moveTo(rx - topW/2, WATER_Y+10);
-      ctx.lineTo(rx + topW/2, WATER_Y+10);
-      ctx.lineTo(rx + botW/2, BASE_H);
-      ctx.lineTo(rx - botW/2, BASE_H);
-      ctx.closePath();
-      ctx.fill();
-    }
-    ctx.restore();
-
-    // Foam where water meets cliff
-    const foamX = cliffEdgeX(WATER_Y);
-    ctx.fillStyle = 'rgba(255,255,255,0.5)';
-    for(let i=0; i<12; i++){
-      const fx = foamX + Math.random()*25;
-      const fy = WATER_Y - 2 + Math.random()*6;
-      const fw = 5 + Math.random()*10;
-      ctx.beginPath();
-      ctx.ellipse(fx, fy, fw, 2+Math.random()*2, 0, 0, Math.PI*2);
-      ctx.fill();
-    }
-
-    // Gentle wave highlights on surface
-    ctx.strokeStyle = 'rgba(255,255,255,0.3)';
-    ctx.lineWidth = 1.5;
-    for(let i=0; i<3; i++){
-      ctx.beginPath();
-      const startX2 = CLIFF_W + 60 + i*150;
-      for(let x=startX2; x<startX2+60; x+=3){
-        const wy = WATER_Y + Math.sin((x+waterOffset)*0.018)*4 - 2;
-        if(x===startX2) ctx.moveTo(x, wy); else ctx.lineTo(x, wy);
-      }
-      ctx.stroke();
-    }
+    ctx.ellipse(82,CLIFF_TOP+3,58,7,0,0,Math.PI*2); ctx.fill();
+    ctx.beginPath();
+    ctx.ellipse(156,CLIFF_TOP+2,47,6,0,0,Math.PI*2); ctx.fill();
   }
 
-  // ═══════════════════════════════════════════
-  //  DRAWING: SEAWEED
-  // ═══════════════════════════════════════════
-  function drawSeaweed(){
-    for(const sw of seaweedList){
-      const t = waterOffset * 0.015;
-      ctx.strokeStyle = sw.color;
-      ctx.lineWidth = 3;
-      ctx.lineCap = 'round';
-      ctx.beginPath();
-      ctx.moveTo(sw.x, sw.baseY);
-      const segments = 5;
-      for(let i=1; i<=segments; i++){
-        const frac = i/segments;
-        const sway = Math.sin(t + sw.phase + frac*2) * 8 * frac;
-        ctx.lineTo(sw.x + sway, sw.baseY - sw.height * frac);
-      }
-      ctx.stroke();
-      // Leaf tips
-      ctx.fillStyle = sw.color;
-      const tipSway = Math.sin(t + sw.phase + 2) * 8;
-      ctx.beginPath();
-      ctx.ellipse(sw.x + tipSway, sw.baseY - sw.height, 3, 6, tipSway*0.05, 0, Math.PI*2);
-      ctx.fill();
-    }
-  }
-
-  // ═══════════════════════════════════════════
-  //  DRAWING: FISH
-  // ═══════════════════════════════════════════
-  function drawFish(){
-    for(const f of fishList){
-      ctx.save();
-      ctx.translate(f.x, f.y);
-      ctx.scale(f.dir, 1);
-      // Body
-      ctx.fillStyle = f.color;
-      ctx.beginPath();
-      ctx.ellipse(0, 0, f.size, f.size*0.45, 0, 0, Math.PI*2);
-      ctx.fill();
-      // Stripe
-      ctx.fillStyle = f.stripeColor;
-      ctx.beginPath();
-      ctx.ellipse(f.size*0.1, 0, f.size*0.3, f.size*0.35, 0, 0, Math.PI*2);
-      ctx.fill();
-      // Tail
-      ctx.fillStyle = f.color;
-      ctx.beginPath();
-      ctx.moveTo(-f.size, 0);
-      ctx.lineTo(-f.size-8, -6);
-      ctx.lineTo(-f.size-8, 6);
-      ctx.closePath();
-      ctx.fill();
-      // Fin
-      ctx.beginPath();
-      ctx.moveTo(-2, -f.size*0.4);
-      ctx.lineTo(3, -f.size*0.7);
-      ctx.lineTo(6, -f.size*0.35);
-      ctx.closePath();
-      ctx.fill();
-      // Eye
-      ctx.fillStyle = 'white';
-      ctx.beginPath();
-      ctx.arc(f.size*0.4, -1, 2.5, 0, Math.PI*2);
-      ctx.fill();
-      ctx.fillStyle = '#111';
-      ctx.beginPath();
-      ctx.arc(f.size*0.45, -1, 1.3, 0, Math.PI*2);
-      ctx.fill();
-      ctx.restore();
-    }
-  }
-
-  // ═══════════════════════════════════════════
-  //  DRAWING: BOAT (Pointu Provençal)
-  // ═══════════════════════════════════════════
   function drawBoat(){
-    const bx = boatX;
-    const by = WATER_Y - 2 + Math.sin(boatBobPhase)*3;
-    const wobbleAngle = Math.sin(boatWobble)*0.15;
-
     ctx.save();
-    ctx.translate(bx, by);
-    ctx.rotate(wobbleAngle);
-
-    // Hull - wooden pointed boat
-    ctx.fillStyle = '#8B6914';
+    ctx.translate(boat.x, boat.y);
+    ctx.fillStyle='#ffffff';
     ctx.beginPath();
-    ctx.moveTo(-35, 0);
-    ctx.quadraticCurveTo(-38, 8, -30, 12);
-    ctx.lineTo(25, 12);
-    ctx.quadraticCurveTo(42, 8, 45, 0);
-    ctx.quadraticCurveTo(42, -4, 25, -3);
-    ctx.lineTo(-30, -3);
-    ctx.quadraticCurveTo(-38, -4, -35, 0);
-    ctx.closePath();
+    ctx.moveTo(0,20); ctx.lineTo(boat.w,20); ctx.lineTo(boat.w-20,boat.h); ctx.lineTo(18,boat.h); ctx.closePath();
     ctx.fill();
+    ctx.fillStyle='#e63946';
+    ctx.fillRect(28,6,48,16);
+    ctx.fillStyle='#ffd166';
+    ctx.fillRect(82,10,20,10);
+    ctx.strokeStyle='rgba(255,255,255,.6)';
+    ctx.lineWidth=2;
+    ctx.beginPath(); ctx.moveTo(-20,boat.h+5); ctx.lineTo(boat.w+20,boat.h+5); ctx.stroke();
+    ctx.restore();
+  }
 
-    // Hull stripe
-    ctx.strokeStyle = '#6B4914';
-    ctx.lineWidth = 1.5;
-    ctx.beginPath();
-    ctx.moveTo(-30, 5);
-    ctx.lineTo(30, 5);
-    ctx.stroke();
+  function drawDodsdog(){
+    ctx.save();
+    ctx.translate(dog.x,dog.y);
+    ctx.rotate(dog.angle);
 
-    // Bow (pointed front)
-    ctx.fillStyle = '#9B7924';
-    ctx.beginPath();
-    ctx.moveTo(45, 0);
-    ctx.lineTo(55, -1);
-    ctx.lineTo(45, 5);
-    ctx.closePath();
-    ctx.fill();
+    // shadow on cliff/water
+    if(dog.state === 'ready'){
+      ctx.fillStyle='rgba(0,0,0,.18)';
+      ctx.beginPath(); ctx.ellipse(0,28,35,8,0,0,Math.PI*2); ctx.fill();
+    }
 
-    // Mast
-    ctx.strokeStyle = '#5C4033';
-    ctx.lineWidth = 2.5;
-    ctx.beginPath();
-    ctx.moveTo(5, -3);
-    ctx.lineTo(5, -55);
-    ctx.stroke();
+    // body sable
+    ctx.fillStyle='#b8792f';
+    ctx.beginPath(); ctx.ellipse(-8,2,34,18,0,0,Math.PI*2); ctx.fill();
 
-    // Sail (white triangle)
-    ctx.fillStyle = '#FFFFFF';
-    ctx.globalAlpha = 0.9;
-    ctx.beginPath();
-    ctx.moveTo(5, -50);
-    ctx.lineTo(5, -10);
-    ctx.lineTo(35, -15);
-    ctx.closePath();
-    ctx.fill();
-    ctx.globalAlpha = 1;
+    // long white chest
+    ctx.fillStyle='#fff7ef';
+    ctx.beginPath(); ctx.ellipse(8,6,16,20,-.2,0,Math.PI*2); ctx.fill();
 
-    // Red/white striped canopy hint
-    ctx.fillStyle = '#E63946';
-    ctx.globalAlpha = 0.6;
-    ctx.fillRect(-20, -8, 40, 3);
-    ctx.globalAlpha = 1;
+    // tail
+    ctx.strokeStyle='#b8792f'; ctx.lineWidth=12; ctx.lineCap='round';
+    ctx.beginPath(); ctx.moveTo(-38,2); ctx.quadraticCurveTo(-60,-20,-44,-36); ctx.stroke();
+    ctx.strokeStyle='#fff7ef'; ctx.lineWidth=7;
+    ctx.beginPath(); ctx.moveTo(-47,-30); ctx.lineTo(-41,-38); ctx.stroke();
 
-    // Interior seat
-    ctx.fillStyle = '#7B5914';
-    ctx.fillRect(-15, -2, 30, 5);
+    // legs/paws
+    ctx.strokeStyle='#8f5a24'; ctx.lineWidth=8; ctx.lineCap='round';
+    ctx.beginPath(); ctx.moveTo(-16,15); ctx.lineTo(-18,31); ctx.moveTo(10,15); ctx.lineTo(13,31); ctx.stroke();
+    ctx.strokeStyle='#fff7ef'; ctx.lineWidth=7;
+    ctx.beginPath(); ctx.moveTo(-18,25); ctx.lineTo(-20,33); ctx.moveTo(13,25); ctx.lineTo(15,33); ctx.stroke();
+
+    // neck/head
+    ctx.fillStyle='#b8792f';
+    ctx.beginPath(); ctx.ellipse(25,-13,18,15,-.15,0,Math.PI*2); ctx.fill();
+    ctx.beginPath(); ctx.ellipse(42,-11,14,9,0,0,Math.PI*2); ctx.fill();
+
+    // white face blaze/snout
+    ctx.fillStyle='#fff7ef';
+    ctx.beginPath(); ctx.ellipse(39,-10,8,6,0,0,Math.PI*2); ctx.fill();
+    ctx.fillRect(25,-24,8,18);
+
+    // ears
+    ctx.fillStyle='#7b471d';
+    ctx.beginPath(); ctx.moveTo(16,-24); ctx.lineTo(20,-48); ctx.lineTo(30,-25); ctx.closePath(); ctx.fill();
+    ctx.beginPath(); ctx.moveTo(31,-25); ctx.lineTo(38,-45); ctx.lineTo(43,-22); ctx.closePath(); ctx.fill();
+
+    // eye/nose
+    ctx.fillStyle='#1b120b';
+    ctx.beginPath(); ctx.arc(31,-16,2.5,0,Math.PI*2); ctx.fill();
+    ctx.beginPath(); ctx.arc(54,-11,3.2,0,Math.PI*2); ctx.fill();
+
+    // collar DODSC
+    ctx.strokeStyle='#23d6c8'; ctx.lineWidth=4;
+    ctx.beginPath(); ctx.moveTo(11,-7); ctx.lineTo(23,-5); ctx.stroke();
 
     ctx.restore();
   }
 
-  // ═══════════════════════════════════════════
-  //  DRAWING: COLLIE/LASSIE DOG
-  // ═══════════════════════════════════════════
-  // Sable/brown colors
-  const SABLE = '#B8860B';      // dark goldenrod / sable
-  const SABLE_LIGHT = '#C4883A'; // lighter sable
-  const SABLE_DARK = '#8B6508';  // darker sable
-  const WHITE = '#FFFFFF';
-  const WHITE_WARM = '#F8F4EE';
-
-  function drawCollie(){
-    ctx.save();
-    ctx.translate(dogX, dogY);
-    ctx.rotate(dogAngle);
-
-    if(dogState === 'idle') drawCollieSitting();
-    else if(dogState === 'diving') drawCollieDiving();
-    else if(dogState === 'swimming') drawCollieSwimming();
-    else if(dogState === 'climbing') drawCollieClimbing();
-
-    ctx.restore();
-  }
-
-  function drawCollieSitting(){
-    // ── SITTING COLLIE (Dodsdog/Rough Collie) on cliff edge, looking right ──
-    // Key traits: elongated body, long silky fur, white chest mane, white blaze, folded-tip ears
-
-    // Tail - bushy, curving upward, white tip, gently waving
-    const tailWave = Math.sin(Date.now()*0.004)*8;
-    ctx.strokeStyle = SABLE;
-    ctx.lineWidth = 8;
-    ctx.lineCap = 'round';
-    ctx.beginPath();
-    ctx.moveTo(-20, 5);
-    ctx.quadraticCurveTo(-34, -8+tailWave, -38, -26+tailWave);
-    ctx.stroke();
-    // Secondary tail line for bushiness
-    ctx.lineWidth = 5;
-    ctx.strokeStyle = SABLE_DARK;
-    ctx.beginPath();
-    ctx.moveTo(-20, 3);
-    ctx.quadraticCurveTo(-36, -4+tailWave, -40, -22+tailWave);
-    ctx.stroke();
-    // Bushy fur strokes on tail (many for long coat)
-    ctx.strokeStyle = SABLE;
-    ctx.lineWidth = 1;
-    for(let i=0; i<10; i++){
-      const f = i/10;
-      const tx = -20 + f*(-20);
-      const ty = 4 + f*(-30+tailWave);
-      ctx.beginPath();
-      ctx.moveTo(tx, ty);
-      ctx.quadraticCurveTo(tx-3, ty-3, tx-5-Math.random(), ty-5);
-      ctx.stroke();
-    }
-    // White tip (prominent)
-    ctx.strokeStyle = WHITE;
-    ctx.lineWidth = 5;
-    ctx.lineCap = 'round';
-    ctx.beginPath();
-    ctx.moveTo(-35, -20+tailWave);
-    ctx.lineTo(-40, -28+tailWave);
-    ctx.stroke();
-    ctx.strokeStyle = WHITE;
-    ctx.lineWidth = 3;
-    ctx.beginPath();
-    ctx.moveTo(-33, -16+tailWave);
-    ctx.lineTo(-37, -24+tailWave);
-    ctx.stroke();
-
-    // Back legs (sitting position) - slightly thicker
-    ctx.strokeStyle = SABLE;
-    ctx.lineWidth = 6;
-    ctx.lineCap = 'round';
-    ctx.beginPath();
-    ctx.moveTo(-12, 12);
-    ctx.quadraticCurveTo(-18, 18, -14, 26);
-    ctx.stroke();
-    ctx.beginPath();
-    ctx.moveTo(-2, 14);
-    ctx.quadraticCurveTo(-8, 20, -4, 26);
-    ctx.stroke();
-    // White socks on back paws
-    ctx.strokeStyle = WHITE;
-    ctx.lineWidth = 4;
-    ctx.beginPath();
-    ctx.moveTo(-16, 24);
-    ctx.lineTo(-14, 28);
-    ctx.stroke();
-    ctx.beginPath();
-    ctx.moveTo(-6, 24);
-    ctx.lineTo(-4, 28);
-    ctx.stroke();
-
-    // Body - elongated collie shape (longer than fox, less round)
-    ctx.fillStyle = SABLE;
-    ctx.beginPath();
-    ctx.ellipse(2, 2, 26, 13, 0.05, 0, Math.PI*2);
-    ctx.fill();
-    // Slight gradient overlay for body shading
-    ctx.fillStyle = SABLE_DARK;
-    ctx.globalAlpha = 0.15;
-    ctx.beginPath();
-    ctx.ellipse(2, 6, 24, 8, 0, 0, Math.PI);
-    ctx.fill();
-    ctx.globalAlpha = 1;
-
-    // Body fur strokes - MANY curved lines for long flowing coat
-    // Dark fur along back
-    ctx.strokeStyle = SABLE_DARK;
-    ctx.lineWidth = 0.9;
-    for(let i=0; i<16; i++){
-      const fx = -20+i*3;
-      const fy = -3+Math.sin(i*0.6)*9;
-      ctx.beginPath();
-      ctx.moveTo(fx, fy);
-      ctx.quadraticCurveTo(fx+1, fy+5, fx+2, fy+10);
-      ctx.stroke();
-    }
-    // Light fur highlights
-    ctx.strokeStyle = SABLE_LIGHT;
-    ctx.lineWidth = 0.6;
-    for(let i=0; i<12; i++){
-      const fx = -18+i*3.5;
-      const fy = -1+Math.sin(i*0.8)*7;
-      ctx.beginPath();
-      ctx.moveTo(fx, fy);
-      ctx.lineTo(fx+1, fy+8);
-      ctx.stroke();
-    }
-    // Extra flowing fur along bottom edge (long coat draping)
-    ctx.strokeStyle = SABLE;
-    ctx.lineWidth = 0.7;
-    for(let i=0; i<14; i++){
-      const fx = -22+i*3.5;
-      ctx.beginPath();
-      ctx.moveTo(fx, 10+Math.sin(i*0.5)*3);
-      ctx.quadraticCurveTo(fx+1, 16, fx+3, 18+Math.random()*2);
-      ctx.stroke();
-    }
-
-    // White chest/mane (big fluffy white ruff - prominent collie trait)
-    ctx.fillStyle = WHITE_WARM;
-    ctx.beginPath();
-    ctx.ellipse(16, 2, 12, 14, 0.15, 0, Math.PI*2);
-    ctx.fill();
-    // Fluffy fur strokes on chest (many for luxurious mane look)
-    ctx.strokeStyle = 'rgba(240,240,245,0.7)';
-    ctx.lineWidth = 0.7;
-    for(let i=0; i<12; i++){
-      const a = -1.2+i*0.22;
-      ctx.beginPath();
-      ctx.moveTo(16+Math.cos(a)*7, 2+Math.sin(a)*9);
-      ctx.lineTo(16+Math.cos(a)*13, 2+Math.sin(a)*14);
-      ctx.stroke();
-    }
-    // Extra white tufts around chest edge
-    ctx.strokeStyle = 'rgba(255,255,255,0.5)';
-    ctx.lineWidth = 1;
-    for(let i=0; i<6; i++){
-      const a = -0.8+i*0.35;
-      ctx.beginPath();
-      ctx.moveTo(16+Math.cos(a)*10, 2+Math.sin(a)*12);
-      ctx.lineTo(16+Math.cos(a)*14, 2+Math.sin(a)*16);
-      ctx.stroke();
-    }
-
-    // White belly
-    ctx.fillStyle = WHITE_WARM;
-    ctx.beginPath();
-    ctx.ellipse(2, 10, 16, 6, 0, 0, Math.PI*2);
-    ctx.fill();
-
-    // Neck fur (connecting head to chest mane)
-    ctx.fillStyle = SABLE;
-    ctx.beginPath();
-    ctx.ellipse(14, -6, 10, 8, 0, 0, Math.PI*2);
-    ctx.fill();
-
-    // Head - elongated narrow collie shape (NOT round like fox)
-    ctx.fillStyle = SABLE;
-    ctx.beginPath();
-    ctx.ellipse(22, -10, 11, 10, 0.1, 0, Math.PI*2);
-    ctx.fill();
-
-    // White blaze on face (collie signature - wide stripe from forehead down)
-    ctx.fillStyle = WHITE_WARM;
-    ctx.beginPath();
-    ctx.moveTo(24, -18);
-    ctx.quadraticCurveTo(22, -14, 28, -8);
-    ctx.quadraticCurveTo(24, -4, 20, -8);
-    ctx.quadraticCurveTo(22, -14, 22, -18);
-    ctx.closePath();
-    ctx.fill();
-
-    // Long narrow snout (collie characteristic - NOT round)
-    ctx.fillStyle = SABLE_DARK;
-    ctx.beginPath();
-    ctx.ellipse(34, -7, 10, 4.5, 0.12, 0, Math.PI*2);
-    ctx.fill();
-    // White on snout/cheeks
-    ctx.fillStyle = WHITE_WARM;
-    ctx.beginPath();
-    ctx.ellipse(34, -5, 6, 3.5, 0, 0, Math.PI*2);
-    ctx.fill();
-
-    // Nose (large, dark)
-    ctx.fillStyle = '#111';
-    ctx.beginPath();
-    ctx.arc(44, -7, 3, 0, Math.PI*2);
-    ctx.fill();
-
-    // Mouth (slight smile - gentle expression)
-    ctx.strokeStyle = '#444';
-    ctx.lineWidth = 1;
-    ctx.beginPath();
-    ctx.moveTo(44, -5);
-    ctx.quadraticCurveTo(40, -2, 34, -3);
-    ctx.stroke();
-
-    // Eyes - warm brown, intelligent, gentle
-    // Left eye (larger, more detailed)
-    ctx.fillStyle = '#fff';
-    ctx.beginPath();
-    ctx.ellipse(26, -12, 4, 5, 0, 0, Math.PI*2);
-    ctx.fill();
-    ctx.fillStyle = '#6B3A1F';
-    ctx.beginPath();
-    ctx.arc(27, -12, 3, 0, Math.PI*2);
-    ctx.fill();
-    ctx.fillStyle = '#111';
-    ctx.beginPath();
-    ctx.arc(27.5, -12, 1.6, 0, Math.PI*2);
-    ctx.fill();
-    ctx.fillStyle = '#fff';
-    ctx.beginPath();
-    ctx.arc(28.5, -13, 0.9, 0, Math.PI*2);
-    ctx.fill();
-
-    // Right eye
-    ctx.fillStyle = '#fff';
-    ctx.beginPath();
-    ctx.ellipse(18, -12, 3.5, 4.5, 0, 0, Math.PI*2);
-    ctx.fill();
-    ctx.fillStyle = '#6B3A1F';
-    ctx.beginPath();
-    ctx.arc(18, -12, 2.5, 0, Math.PI*2);
-    ctx.fill();
-    ctx.fillStyle = '#111';
-    ctx.beginPath();
-    ctx.arc(17.5, -12, 1.4, 0, Math.PI*2);
-    ctx.fill();
-    ctx.fillStyle = '#fff';
-    ctx.beginPath();
-    ctx.arc(18.5, -13, 0.7, 0, Math.PI*2);
-    ctx.fill();
-
-    // Pointed erect ears with tips folded forward (collie trait!)
-    // Left ear - tall, triangular, fold at tip
-    ctx.fillStyle = SABLE;
-    ctx.beginPath();
-    ctx.moveTo(16, -18);
-    ctx.lineTo(11, -34);
-    ctx.lineTo(8, -31); // folded tip curves forward
-    ctx.lineTo(15, -20);
-    ctx.closePath();
-    ctx.fill();
-    // Inner ear (lighter)
-    ctx.fillStyle = '#8B6F5E';
-    ctx.beginPath();
-    ctx.moveTo(16, -19);
-    ctx.lineTo(12, -31);
-    ctx.lineTo(10, -29);
-    ctx.lineTo(15, -21);
-    ctx.closePath();
-    ctx.fill();
-    // Fur on ear base
-    ctx.fillStyle = SABLE_LIGHT;
-    ctx.beginPath();
-    ctx.moveTo(16, -18);
-    ctx.lineTo(13, -24);
-    ctx.lineTo(15, -19);
-    ctx.closePath();
-    ctx.fill();
-
-    // Right ear
-    ctx.fillStyle = SABLE;
-    ctx.beginPath();
-    ctx.moveTo(25, -18);
-    ctx.lineTo(30, -34);
-    ctx.lineTo(33, -31); // folded tip
-    ctx.lineTo(26, -20);
-    ctx.closePath();
-    ctx.fill();
-    ctx.fillStyle = '#8B6F5E';
-    ctx.beginPath();
-    ctx.moveTo(25, -19);
-    ctx.lineTo(29, -31);
-    ctx.lineTo(31, -29);
-    ctx.lineTo(26, -21);
-    ctx.closePath();
-    ctx.fill();
-    ctx.fillStyle = SABLE_LIGHT;
-    ctx.beginPath();
-    ctx.moveTo(25, -18);
-    ctx.lineTo(28, -24);
-    ctx.lineTo(26, -19);
-    ctx.closePath();
-    ctx.fill();
-
-    // Fur ruff around ears (long collie coat)
-    ctx.strokeStyle = SABLE;
-    ctx.lineWidth = 0.8;
-    for(let i=0; i<4; i++){
-      const a = 2.5+i*0.2;
-      ctx.beginPath();
-      ctx.moveTo(18+Math.cos(a)*4, -14+Math.sin(a)*4);
-      ctx.lineTo(18+Math.cos(a)*7, -14+Math.sin(a)*7);
-      ctx.stroke();
-    }
-
-    // Front legs - long, elegant, slightly thick
-    ctx.strokeStyle = SABLE;
-    ctx.lineWidth = 6;
-    ctx.lineCap = 'round';
-    ctx.beginPath();
-    ctx.moveTo(10, 12);
-    ctx.lineTo(10, 26);
-    ctx.stroke();
-    ctx.beginPath();
-    ctx.moveTo(18, 10);
-    ctx.lineTo(18, 24);
-    ctx.stroke();
-    // White socks on front paws (prominent)
-    ctx.strokeStyle = WHITE;
-    ctx.lineWidth = 5;
-    ctx.lineCap = 'round';
-    ctx.beginPath();
-    ctx.moveTo(10, 23);
-    ctx.lineTo(10, 30);
-    ctx.stroke();
-    ctx.beginPath();
-    ctx.moveTo(18, 21);
-    ctx.lineTo(18, 28);
-    ctx.stroke();
-    // Slight sable accent on leg top
-    ctx.strokeStyle = SABLE_DARK;
-    ctx.lineWidth = 0.5;
-    for(let i=0; i<3; i++){
-      const ly = 12+i*3;
-      ctx.beginPath();
-      ctx.moveTo(8, ly);
-      ctx.lineTo(7, ly+4);
-      ctx.stroke();
-      ctx.beginPath();
-      ctx.moveTo(20, ly);
-      ctx.lineTo(21, ly+4);
-      ctx.stroke();
-    }
-  }
-
-  function drawCollieDiving(){
-    // ── DIVING: body stretched out, long fur streaming ──
-    const t = Date.now()*0.005;
-
-    // Tail streaming behind - bushy with white tip
-    const tailWave = Math.sin(t)*6;
-    ctx.strokeStyle = SABLE;
-    ctx.lineWidth = 7;
-    ctx.lineCap = 'round';
-    ctx.beginPath();
-    ctx.moveTo(-24, -2);
-    ctx.quadraticCurveTo(-38, -5+tailWave, -44, -14+tailWave);
-    ctx.stroke();
-    // Secondary tail line for bushiness
-    ctx.lineWidth = 4;
-    ctx.strokeStyle = SABLE_DARK;
-    ctx.beginPath();
-    ctx.moveTo(-24, 0);
-    ctx.quadraticCurveTo(-40, -2+tailWave, -46, -10+tailWave);
-    ctx.stroke();
-    // Fur flowing back (long coat)
-    ctx.strokeStyle = SABLE;
-    ctx.lineWidth = 0.8;
-    for(let i=0; i<8; i++){
-      const f = i/8;
-      const tx = -24 + f*(-22);
-      const ty = -2 + f*(-12+tailWave);
-      ctx.beginPath();
-      ctx.moveTo(tx, ty);
-      ctx.lineTo(tx-2, ty-5-Math.sin(t+i)*2);
-      ctx.stroke();
-    }
-    // White tip (prominent)
-    ctx.strokeStyle = WHITE;
-    ctx.lineWidth = 4;
-    ctx.beginPath();
-    ctx.moveTo(-42, -12+tailWave);
-    ctx.lineTo(-46, -16+tailWave);
-    ctx.stroke();
-
-    // Body - stretched, elongated collie shape
-    ctx.fillStyle = SABLE;
-    ctx.beginPath();
-    ctx.ellipse(0, 0, 30, 10, 0, 0, Math.PI*2);
-    ctx.fill();
-    // Shading
-    ctx.fillStyle = SABLE_DARK;
-    ctx.globalAlpha = 0.12;
-    ctx.beginPath();
-    ctx.ellipse(0, 4, 28, 6, 0, 0, Math.PI);
-    ctx.fill();
-    ctx.globalAlpha = 1;
-
-    // Long fur streaming upward (against gravity during dive)
-    ctx.strokeStyle = SABLE_DARK;
-    ctx.lineWidth = 0.9;
-    for(let i=0; i<12; i++){
-      const fx = -22+i*5;
-      ctx.beginPath();
-      ctx.moveTo(fx, -3);
-      ctx.lineTo(fx+1, -14-Math.sin(t+i)*4);
-      ctx.stroke();
-    }
-    ctx.strokeStyle = SABLE_LIGHT;
-    for(let i=0; i<10; i++){
-      const fx = -18+i*5;
-      ctx.beginPath();
-      ctx.moveTo(fx, -1);
-      ctx.lineTo(fx+1, -10-Math.sin(t+i)*3);
-      ctx.stroke();
-    }
-
-    // White belly
-    ctx.fillStyle = WHITE_WARM;
-    ctx.beginPath();
-    ctx.ellipse(2, 5, 20, 5, 0, 0, Math.PI*2);
-    ctx.fill();
-
-    // White collar (large chest mane)
-    ctx.fillStyle = WHITE_WARM;
-    ctx.beginPath();
-    ctx.ellipse(18, -2, 8, 9, 0.2, 0, Math.PI*2);
-    ctx.fill();
-
-    // Head - elongated collie shape
-    ctx.fillStyle = SABLE;
-    ctx.beginPath();
-    ctx.ellipse(26, -3, 11, 9, 0.2, 0, Math.PI*2);
-    ctx.fill();
-
-    // White blaze
-    ctx.fillStyle = WHITE_WARM;
-    ctx.beginPath();
-    ctx.moveTo(28, -10);
-    ctx.quadraticCurveTo(26, -6, 32, 0);
-    ctx.quadraticCurveTo(28, 3, 24, -1);
-    ctx.quadraticCurveTo(26, -6, 26, -10);
-    ctx.closePath();
-    ctx.fill();
-
-    // Long snout
-    ctx.fillStyle = SABLE_DARK;
-    ctx.beginPath();
-    ctx.ellipse(34, -2, 9, 4, 0.2, 0, Math.PI*2);
-    ctx.fill();
-    ctx.fillStyle = '#111';
-    ctx.beginPath();
-    ctx.arc(42, -2, 2.2, 0, Math.PI*2);
-    ctx.fill();
-
-    // Eye
-    ctx.fillStyle = '#fff';
-    ctx.beginPath();
-    ctx.arc(28, -6, 3, 0, Math.PI*2);
-    ctx.fill();
-    ctx.fillStyle = '#6B3A1F';
-    ctx.beginPath();
-    ctx.arc(28.5, -6, 2, 0, Math.PI*2);
-    ctx.fill();
-    ctx.fillStyle = '#111';
-    ctx.beginPath();
-    ctx.arc(29, -6, 1, 0, Math.PI*2);
-    ctx.fill();
-
-    // Ears pinned back (but taller, collie-like)
-    ctx.fillStyle = SABLE;
-    ctx.beginPath();
-    ctx.moveTo(19, -10);
-    ctx.lineTo(12, -20);
-    ctx.lineTo(16, -8);
-    ctx.closePath();
-    ctx.fill();
-    ctx.beginPath();
-    ctx.moveTo(27, -10);
-    ctx.lineTo(32, -20);
-    ctx.lineTo(25, -8);
-    ctx.closePath();
-    ctx.fill();
-
-    // Paws stretched out (with white socks)
-    ctx.strokeStyle = SABLE;
-    ctx.lineWidth = 5;
-    ctx.beginPath();
-    ctx.moveTo(8, 8);
-    ctx.lineTo(5, 18);
-    ctx.stroke();
-    ctx.beginPath();
-    ctx.moveTo(16, 8);
-    ctx.lineTo(18, 18);
-    ctx.stroke();
-    ctx.strokeStyle = WHITE;
-    ctx.lineWidth = 4;
-    ctx.beginPath();
-    ctx.moveTo(5, 15);
-    ctx.lineTo(4, 20);
-    ctx.stroke();
-    ctx.beginPath();
-    ctx.moveTo(18, 15);
-    ctx.lineTo(19, 20);
-    ctx.stroke();
-  }
-
-  function drawCollieSwimming(){
-    // ── SWIMMING: head above water, fur wet and flat ──
-    const t = Date.now()*0.006;
-
-    // Body partially submerged (elongated)
-    ctx.fillStyle = SABLE;
-    ctx.beginPath();
-    ctx.ellipse(0, 2, 24, 9, 0, 0, Math.PI*2);
-    ctx.fill();
-    // Shading on body
-    ctx.fillStyle = SABLE_DARK;
-    ctx.globalAlpha = 0.1;
-    ctx.beginPath();
-    ctx.ellipse(0, 5, 22, 5, 0, 0, Math.PI);
-    ctx.fill();
-    ctx.globalAlpha = 1;
-
-    // Wet fur strokes (flatter, closer to body)
-    ctx.strokeStyle = SABLE_DARK;
-    ctx.lineWidth = 0.6;
-    for(let i=0; i<8; i++){
-      const fx = -16+i*4;
-      ctx.beginPath();
-      ctx.moveTo(fx, -2);
-      ctx.lineTo(fx, 3);
-      ctx.stroke();
-    }
-
-    // Wet white belly
-    ctx.fillStyle = '#E8E4E0';
-    ctx.beginPath();
-    ctx.ellipse(3, 6, 16, 5, 0, 0, Math.PI*2);
-    ctx.fill();
-
-    // White collar (wet, flat but prominent)
-    ctx.fillStyle = '#E8E4E0';
-    ctx.beginPath();
-    ctx.ellipse(14, -1, 8, 7, 0.2, 0, Math.PI*2);
-    ctx.fill();
-
-    // Neck
-    ctx.fillStyle = SABLE;
-    ctx.beginPath();
-    ctx.ellipse(16, -6, 8, 7, 0, 0, Math.PI*2);
-    ctx.fill();
-
-    // Head above water - elongated collie shape
-    ctx.fillStyle = SABLE;
-    ctx.beginPath();
-    ctx.ellipse(20, -10, 11, 9, 0, 0, Math.PI*2);
-    ctx.fill();
-
-    // White blaze (curved, wider)
-    ctx.fillStyle = WHITE_WARM;
-    ctx.beginPath();
-    ctx.moveTo(22, -17);
-    ctx.quadraticCurveTo(20, -13, 27, -7);
-    ctx.quadraticCurveTo(23, -4, 17, -8);
-    ctx.quadraticCurveTo(20, -13, 20, -17);
-    ctx.closePath();
-    ctx.fill();
-
-    // Long snout
-    ctx.fillStyle = SABLE_DARK;
-    ctx.beginPath();
-    ctx.ellipse(28, -8, 8, 5, 0.1, 0, Math.PI*2);
-    ctx.fill();
-    ctx.fillStyle = '#ddd';
-    ctx.beginPath();
-    ctx.ellipse(28, -6, 5, 3, 0, 0, Math.PI*2);
-    ctx.fill();
-    ctx.fillStyle = '#111';
-    ctx.beginPath();
-    ctx.arc(35, -8, 2.2, 0, Math.PI*2);
-    ctx.fill();
-
-    // Mouth slightly open, tongue
-    ctx.fillStyle = '#ff6b6b';
-    ctx.beginPath();
-    ctx.ellipse(30, -3, 3, 4, 0.1, 0, Math.PI*2);
-    ctx.fill();
-
-    // Eyes
-    ctx.fillStyle = '#fff';
-    ctx.beginPath();
-    ctx.ellipse(24, -14, 3.5, 4, 0, 0, Math.PI*2);
-    ctx.fill();
-    ctx.fillStyle = '#6B3A1F';
-    ctx.beginPath();
-    ctx.arc(24.5, -14, 2.3, 0, Math.PI*2);
-    ctx.fill();
-    ctx.fillStyle = '#111';
-    ctx.beginPath();
-    ctx.arc(25, -14, 1.2, 0, Math.PI*2);
-    ctx.fill();
-    ctx.fillStyle = '#fff';
-    ctx.beginPath();
-    ctx.arc(25.8, -15, 0.6, 0, Math.PI*2);
-    ctx.fill();
-
-    // Ears (pointed, above water, taller collie ears)
-    ctx.fillStyle = SABLE;
-    ctx.beginPath();
-    ctx.moveTo(16, -17);
-    ctx.lineTo(11, -30);
-    ctx.lineTo(9, -28); // folded tip
-    ctx.lineTo(15, -19);
-    ctx.closePath();
-    ctx.fill();
-    ctx.fillStyle = '#8B6F5E';
-    ctx.beginPath();
-    ctx.moveTo(16, -18);
-    ctx.lineTo(12, -27);
-    ctx.lineTo(11, -25);
-    ctx.lineTo(15, -19);
-    ctx.closePath();
-    ctx.fill();
-
-    ctx.fillStyle = SABLE;
-    ctx.beginPath();
-    ctx.moveTo(24, -17);
-    ctx.lineTo(29, -30);
-    ctx.lineTo(31, -28); // folded tip
-    ctx.lineTo(25, -19);
-    ctx.closePath();
-    ctx.fill();
-    ctx.fillStyle = '#8B6F5E';
-    ctx.beginPath();
-    ctx.moveTo(24, -18);
-    ctx.lineTo(28, -27);
-    ctx.lineTo(29, -25);
-    ctx.lineTo(25, -19);
-    ctx.closePath();
-    ctx.fill();
-
-    // Paddling legs
-    const legAnim = Math.sin(t*3);
-    ctx.strokeStyle = SABLE;
-    ctx.lineWidth = 4;
-    ctx.beginPath();
-    ctx.moveTo(-5, 8);
-    ctx.lineTo(-5+legAnim*4, 15);
-    ctx.stroke();
-    ctx.beginPath();
-    ctx.moveTo(5, 8);
-    ctx.lineTo(5-legAnim*4, 15);
-    ctx.stroke();
-    // White socks on paddling paws
-    ctx.strokeStyle = WHITE;
-    ctx.lineWidth = 3;
-    ctx.beginPath();
-    ctx.moveTo(-5+legAnim*4, 13);
-    ctx.lineTo(-5+legAnim*5, 17);
-    ctx.stroke();
-    ctx.beginPath();
-    ctx.moveTo(5-legAnim*4, 13);
-    ctx.lineTo(5-legAnim*5, 17);
-    ctx.stroke();
-  }
-
-  function drawCollieClimbing(){
-    // Simplified - swimming pose while climbing
-    drawCollieSwimming();
-  }
-
-  // ═══════════════════════════════════════════
-  //  DRAWING: EFFECTS
-  // ═══════════════════════════════════════════
-  function drawSplashEffects(){
-    // Droplets
+  function drawSplashes(dt){
     for(const s of splashes){
-      ctx.fillStyle = `rgba(255,255,255,${s.life*0.9})`;
-      ctx.beginPath();
-      ctx.arc(s.x, s.y, s.size * s.life, 0, Math.PI*2);
-      ctx.fill();
-      ctx.fillStyle = `rgba(100,200,220,${s.life*0.4})`;
-      ctx.beginPath();
-      ctx.arc(s.x, s.y, s.size * s.life * 0.6, 0, Math.PI*2);
-      ctx.fill();
-    }
-
-    // Bubbles
-    for(const b of bubbles){
-      ctx.strokeStyle = `rgba(255,255,255,${b.life*0.7})`;
-      ctx.lineWidth = 1;
-      ctx.beginPath();
-      ctx.arc(b.x, b.y, b.size, 0, Math.PI*2);
-      ctx.stroke();
-      ctx.fillStyle = `rgba(255,255,255,${b.life*0.4})`;
-      ctx.beginPath();
-      ctx.arc(b.x - b.size*0.3, b.y - b.size*0.3, b.size*0.3, 0, Math.PI*2);
-      ctx.fill();
-    }
-
-    // Ripples
-    for(const r of ripples){
-      if(r.delay && r.delay > 0) continue;
-      const alpha = r.life * 0.5;
-      ctx.strokeStyle = `rgba(255,255,255,${alpha})`;
-      ctx.lineWidth = 2 * r.life;
-      ctx.beginPath();
-      ctx.ellipse(r.x, r.y, r.radius, r.radius * 0.3, 0, 0, Math.PI*2);
-      ctx.stroke();
-    }
-
-    // Floating text (SPLASH! / CRASH!)
-    for(const ft of floatingText){
-      ctx.save();
-      ctx.globalAlpha = ft.life;
-      ctx.fillStyle = ft.color;
-      ctx.font = 'bold 36px Fredoka, sans-serif';
-      ctx.textAlign = 'center';
-      ctx.textBaseline = 'middle';
-      // Shadow
-      ctx.shadowColor = 'rgba(0,0,0,0.4)';
-      ctx.shadowBlur = 6;
-      ctx.shadowOffsetX = 2;
-      ctx.shadowOffsetY = 2;
-      ctx.fillText(ft.text, ft.x, ft.y);
-      ctx.restore();
+      ctx.fillStyle=s.color;
+      ctx.beginPath(); ctx.arc(s.x,s.y,3.5,0,Math.PI*2); ctx.fill();
     }
   }
 
-  // Swimming ripples around dog
-  function drawSwimRipples(){
-    if(dogState !== 'swimming') return;
-    const t = Date.now()*0.003;
-    for(let i=0; i<3; i++){
-      const r = 10 + i*12 + Math.sin(t+i)*3;
-      ctx.strokeStyle = `rgba(255,255,255,${0.3 - i*0.08})`;
-      ctx.lineWidth = 1.5;
-      ctx.beginPath();
-      ctx.ellipse(dogX, WATER_Y+3, r, r*0.3, 0, 0, Math.PI*2);
-      ctx.stroke();
-    }
-  }
-
-  // ═══════════════════════════════════════════
-  //  GAME LOGIC
-  // ═══════════════════════════════════════════
-  function dive(){
-    if(dogState !== 'idle') return;
-    dogState = 'diving';
-    diveTime = 0;
-    diveStartX = dogX;
-    diveStartY = dogY;
-    // Target: arc into open water (right of cliff)
-    targetX = CLIFF_W + 60 + Math.random() * (BASE_W - CLIFF_W - 100);
-    targetY = WATER_Y + 5;
-    stateEl.textContent = 'Diving! 🌀';
-    playBark();
-  }
-
-  function resetDog(){
-    dogState = 'idle';
-    dogAngle = 0;
-    dogX = CLIFF_W - 30;
-    dogY = CLIFF_TOP + 10;
-    stateEl.textContent = 'Ready to dive!';
-    swimTimer = 0;
-    resetTimer = 0;
-    climbProgress = 0;
-  }
-
-  function resetAll(){
-    dives = 0;
-    bestDive = 0;
-    localStorage.setItem('dods_dives', '0');
-    localStorage.setItem('dods_best', '0');
-    scoreEl.textContent = '0';
-    bestEl.textContent = '0';
-    resetDog();
-  }
-
-  function checkBoatCollision(){
-    // Check if dog landed on the boat
-    const bx = boatX;
-    const by = WATER_Y - 2 + Math.sin(boatBobPhase)*3;
-    const dogAbsX = dogX;
-    const dogAbsY = dogY;
-    // Boat bounding box
-    const boatLeft = bx - 38;
-    const boatRight = bx + 55;
-    const boatTop = by - 55; // includes mast
-    const boatBottom = by + 12;
-
-    return (dogAbsX > boatLeft && dogAbsX < boatRight &&
-            dogAbsY > by - 10 && dogAbsY < boatBottom + 5);
-  }
-
-  // ═══════════════════════════════════════════
-  //  MAIN GAME LOOP
-  // ═══════════════════════════════════════════
-  let lastTime = 0;
-
-  function loop(time){
-    const dt = Math.min((time - lastTime) / 1000, 0.05);
-    lastTime = time;
-
-    waterOffset += 1;
-    sunAngle += 0.003;
-
-    // Update clouds
-    for(const c of clouds){
-      c.x += c.speed;
-      if(c.x > BASE_W + 100) c.x = -c.w - 20;
-    }
-
-    // Update fish
-    for(const f of fishList){
-      f.x += f.speed * f.dir;
-      f.wobble += 0.02;
-      f.y += Math.sin(f.wobble) * 0.3;
-      if(f.x > BASE_W + 40) f.dir = -1;
-      if(f.x < CLIFF_W - 20) f.dir = 1;
-    }
-
-    // Update boat
-    boatBobPhase += dt * 2.5;
-    boatX += boatDir * 0.8;
-    if(boatX > BASE_W - 60) boatDir = -1;
-    if(boatX < CLIFF_W + 80) boatDir = 1;
-    if(boatWobble > 0) boatWobble -= dt * 3;
-
-    // Update dog
-    if(dogState === 'diving'){
-      diveTime += dt;
-      // Parabolic arc from cliff top to water
-      const totalDiveTime = 0.8; // seconds for dive
-      const prog = Math.min(diveTime / totalDiveTime, 1);
-
-      // Horizontal: ease out
-      dogX = diveStartX + (targetX - diveStartX) * prog;
-
-      // Vertical: parabolic (gravity)
-      const gravity = 400;
-      const initialVY = -80; // slight upward kick
-      dogY = diveStartY + initialVY * prog + 0.5 * gravity * prog * prog;
-
-      // Rotation: dog angles downward during dive
-      dogAngle = prog * Math.PI * 0.4;
-
-      if(prog >= 1){
-        dogY = WATER_Y + 3;
-        // Check if landed on boat
-        if(checkBoatCollision()){
-          // CRASH!
-          dogState = 'splashing';
-          addFloatingText(dogX, dogY - 40, 'CRASH!', '#E63946');
-          boatWobble = 5;
-          playCrash();
-          stateEl.textContent = 'CRASH! 💥 Boat hit!';
-          resetTimer = 0;
-        } else {
-          // SPLASH! (successful water dive)
-          dogState = 'splashing';
-          addSplash(dogX, WATER_Y);
-          addFloatingText(dogX, dogY - 40, 'SPLASH!', '#40E0D0');
-          dives++;
-          scoreEl.textContent = dives;
-          localStorage.setItem('dods_dives', dives.toString());
-          stateEl.textContent = 'SPLASH! 💦';
-          // Update best record
-          if(dives > bestDive){
-            bestDive = dives;
-            localStorage.setItem('dods_best', bestDive.toString());
-            bestEl.textContent = bestDive;
-            stateEl.textContent = 'NEW RECORD! 🏆';
-          }
-          resetTimer = 0;
-        }
-      }
-    } else if(dogState === 'splashing'){
-      resetTimer += dt;
-      if(resetTimer > 0.5){
-        dogState = 'swimming';
-        dogY = WATER_Y + 3;
-        dogAngle = 0;
-        stateEl.textContent = 'Swimming happily! 🐕';
-        swimTimer = 0;
-      }
-    } else if(dogState === 'swimming'){
-      swimTimer += dt;
-      dogX = targetX + Math.sin(swimTimer * 1.2) * 25;
-      dogY = WATER_Y + 3 + Math.sin(swimTimer * 1.8) * 3;
-
-      // Occasional bubbles
-      if(Math.random() < 0.04) addBubble(dogX, dogY + 5);
-
-      // After 3 seconds, climb back
-      if(swimTimer > 3){
-        dogState = 'climbing';
-        climbProgress = 0;
-        stateEl.textContent = 'Climbing back! 🧗';
-      }
-    } else if(dogState === 'climbing'){
-      climbProgress += dt;
-      const climbDuration = 0.8;
-      const prog = Math.min(climbProgress / climbDuration, 1);
-      const ease = 1 - Math.pow(1 - prog, 2);
-
-      // Move back toward cliff top
-      dogX = targetX + (CLIFF_W - 30 - targetX) * ease;
-      dogY = (WATER_Y + 3) - ease * (WATER_Y + 3 - (CLIFF_TOP + 10));
-
-      if(prog >= 1){
-        resetDog();
-      }
-    }
-
-    // Update splashes
-    for(let i=splashes.length-1; i>=0; i--){
-      const s = splashes[i];
-      s.x += s.vx;
-      s.y += s.vy;
-      s.vy += 0.18;
-      s.life -= dt * 2.5;
-      if(s.life <= 0) splashes.splice(i, 1);
-    }
-
-    // Update bubbles
-    for(let i=bubbles.length-1; i>=0; i--){
-      const b = bubbles[i];
-      b.x += b.vx;
-      b.y += b.vy;
-      b.vx += Math.sin(time*0.01 + b.x*0.05)*0.008;
-      b.life -= dt * 0.7;
-      if(b.life <= 0) bubbles.splice(i, 1);
-    }
-
-    // Update ripples
-    for(let i=ripples.length-1; i>=0; i--){
-      const r = ripples[i];
-      if(r.delay && r.delay > 0){ r.delay -= dt; continue; }
-      r.radius += 40 * dt;
-      r.life -= dt * 1.2;
-      if(r.life <= 0 || r.radius > r.maxRadius) ripples.splice(i, 1);
-    }
-
-    // Update floating text
-    for(let i=floatingText.length-1; i>=0; i--){
-      const ft = floatingText[i];
-      ft.y += ft.vy;
-      ft.life -= dt * 0.8;
-      if(ft.life <= 0) floatingText.splice(i, 1);
-    }
-
-    // ═══════════════════════════════════════════
-    //  DRAW ORDER (back to front)
-    // ═══════════════════════════════════════════
-    ctx.clearRect(0, 0, BASE_W, BASE_H);
-
+  function drawScene(dt){
     drawSky();
-    drawSun();
-    drawClouds();
-    drawWater();       // Water first
-    drawCliff();       // Cliff on top
-    drawCliffWaterPatch(); // Rock stays visible where it enters water
-    drawFish();
+    drawWater();
+    drawCliff();
     drawBoat();
-    drawSwimRipples();
-    drawCollie();      // Dog on top
-    drawSplashEffects();
+    drawDodsdog();
+    drawSplashes(dt);
+  }
 
+  function update(dt){
+    boat.x += boat.dir * boat.speed * dt;
+    if(boat.x < 285){ boat.x = 285; boat.dir = 1; }
+    if(boat.x + boat.w > W - 35){ boat.x = W - 35 - boat.w; boat.dir = -1; }
+
+    if(dog.state === 'jumping'){
+      dog.x += dog.vx * dt;
+      dog.y += dog.vy * dt;
+      dog.vy += 520 * dt;
+      dog.angle += 1.8 * dt;
+
+      if(hitBoat()){
+        dog.state = 'crash';
+        dog.vx = 0; dog.vy = 0;
+        addSplash(dog.x,dog.y,false);
+        statusEl.textContent = 'CRASH! Boat hit ❌';
+        setTimeout(resetDog, 1100);
+      } else if(dog.y >= WATER_Y + 22){
+        dog.state = 'splash';
+        addSplash(dog.x,WATER_Y+18,true);
+        dives++;
+        best = Math.max(best, dives);
+        localStorage.setItem('dodsdog-best', String(best));
+        divesEl.textContent = dives;
+        bestEl.textContent = best;
+        statusEl.textContent = 'Splash! ✅';
+        setTimeout(resetDog, 1000);
+      }
+    }
+
+    for(const s of splashes){
+      s.x += s.vx * dt;
+      s.y += s.vy * dt;
+      s.vy += 360 * dt;
+      s.life -= dt;
+    }
+    splashes = splashes.filter(s => s.life > 0);
+  }
+
+  function loop(now){
+    const dt = Math.min(.033,(now-last)/1000);
+    last = now;
+    update(dt);
+    drawScene(dt);
     requestAnimationFrame(loop);
   }
 
-  // ═══════════════════════════════════════════
-  //  CONTROLS
-  // ═══════════════════════════════════════════
-  function handleAction(){
-    if(dogState === 'idle') dive();
-  }
-
-  document.addEventListener('keydown', e => {
-    if(e.code === 'Space'){
-      e.preventDefault();
-      handleAction();
-    }
+  canvas.addEventListener('click', jump);
+  window.addEventListener('keydown', e => { if(e.code === 'Space'){ e.preventDefault(); jump(); }});
+  resetBtn.addEventListener('click', () => {
+    dives = 0;
+    divesEl.textContent = '0';
+    statusEl.textContent = 'Score reset';
+    resetDog();
   });
-  canvas.addEventListener('click', handleAction);
-  canvas.addEventListener('touchstart', e => {
-    e.preventDefault();
-    handleAction();
-  }, {passive: false});
-
-  resetBtn.addEventListener('click', e => {
-    e.stopPropagation();
-    resetAll();
-  });
-
-  // Init display
-  bestEl.textContent = bestDive > 0 ? bestDive : '0';
 
   requestAnimationFrame(loop);
 })();
