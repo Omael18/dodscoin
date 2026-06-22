@@ -237,7 +237,7 @@ footer {
   const WATER_Y = BASE_H * 0.55; // water surface at ~55% of height
   const CLIFF_W = 190;           // cliff width from left edge
   const CLIFF_TOP = 80;           // cliff starts 80px from top (NOT full height)
-  const CLIFF_BOTTOM = WATER_Y; // cliff stops EXACTLY at water line
+  const CLIFF_BOTTOM = WATER_Y + 65; // cliff continues underwater so rock stays visible
 
   function resizeCanvas() {
     const container = canvas.parentElement;
